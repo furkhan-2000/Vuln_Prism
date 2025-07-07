@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>VulnPrism</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    .field { margin: 15px; }
+    #progressContainer {
+      width: 60%;
+      margin: 30px auto;
+      display: none;
+    }
+    #progressBar {
+      height: 20px;
+      background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39);
+      border-radius: 10px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    #statusText {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    .error { color: #f44336; }
+    .success { color: #4caf50; }
+  </style>
+</head>
+<body>
+  <h1>VulnPrism</h1>
+  <p>Submit your code for a deep, language‑agnostic SAST &amp; SCA analysis.</p>
+
+  <form id="scanForm">
+    <div class="field">
+      <label><strong>Git Repo URL:</strong></label><br/>
+      <input type="url" name="repo_url" placeholder="https://github.com/you/repo.git" style="width:60%;" />
+    </div>
+
+    <div class="field">
+      <label><strong>Paste Code:</strong></label><br/>
+      <textarea name="code_text" rows="8" style="width:60%;" placeholder="Paste your code here…"></textarea>
+    </div>
+
+    <div class="field">
+      <label><strong>Upload File/Archive:</strong></label><br/>
+      <input type="file" name="file" accept=".zip,.tar.gz,.tgz,.tar,.*" />
+    </div>
+
+    <div class="field">
+      <button type="submit" style="padding:10px 20px;">Scan Now</button>
+    </div>
+  </form>
+
+  <div id="progressContainer">
+    <div id="progressBar"></div>
+    <div id="statusText">Initializing scan...</div>
+  </div>
+
+  <script>
+    const form = document.getElementById('scanForm');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const statusText = document.getElementById('statusText');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Show progress UI
+      progressContainer.style.display = 'block';
+      progressBar.style.width = '10%';
+      statusText.textContent = 'Preparing scan...';
+      statusText.className = '';
+
+      const formData = new FormData(form);
+
+      try {
+        const response = await fetch('/scan', {
+          method: 'POST',
+          body: formData
+        });
+
+        if (!response.ok) {
+          const error = await response.text();
+          throw new Error(error || 'Scan failed');
+        }
+
+        // Update progress
+        progressBar.style.width = '70%';
+        statusText.textContent = 'Generating report...';
+
+        // Get filename from headers
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const filename = contentDisposition
+          ? contentDisposition.split('filename=')[1].replace(/"/g, '')
+          : `VulnPrism_Report_${Date.now()}.pdf`;
+
+        // Create download
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+
+        // Final UI update
+        progressBar.style.width = '100%';
+        statusText.textContent = 'Scan complete! Report downloaded.';
+        statusText.className = 'success';
+
+        // Reset after delay
+        setTimeout(() => {
+          progressContainer.style.display = 'none';
+          form.reset();
+        }, 3000);
+
+      } catch (error) {
+        console.error('Scan error:', error);
+        progressBar.style.background = '#f44336';
+        statusText.textContent = `Error: ${error.message}`;
+        statusText.className = 'error';
+      }
+    });
+  </script>
+</body>
+</html>
