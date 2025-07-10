@@ -2,7 +2,7 @@
 FROM python:3.11-slim AS builder
 
 # Install system dependencies required by Playwright and other tools
-RUN apt-get update && apt-get install -y --no-install-recommends     libnss3     libxss1     libasound2     libatk-bridge2.0-0     libgtk-3-0     libgbm-dev     libu2f-udev     libvulkan1     fonts-liberation     xdg-utils     curl     --no-install-recommends &&     rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends     libnss3     libxss1     libasound2     libatk-bridge2.0-0     libgtk-3-0     libgbm-dev     libu2f-udev     libvulkan1     fonts-liberation     xdg-utils     curl     build-essential     pkg-config     libcairo2-dev     --no-install-recommends &&     rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app
