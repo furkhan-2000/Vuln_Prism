@@ -241,9 +241,8 @@ class Crawler:
         return self.attack_surface
 
 # --- Main Scanner Orchestrator ---
-@celery_app.task(name="run_scan_task")
-def run_scan_task(scan_id: int, base_url: str, old_scan_state: dict = None):
-    """Celery task to orchestrate the scanning process."""
+async def _run_scan_logic(scan_id: int, base_url: str, old_scan_state: dict = None):
+    """Contains the core asynchronous scanning logic."""
     db = SessionLocal()
     try:
         scan = db.query(Scan).filter(Scan.id == scan_id).first()
@@ -307,7 +306,7 @@ def run_scan_task(scan_id: int, base_url: str, old_scan_state: dict = None):
                             tasks.append(task)
 
                     # Wait for all scanner tasks to complete
-                    scan_results = asyncio.run(asyncio.gather(*tasks, return_exceptions=True))
+                    scan_results = await asyncio.gather(*tasks, return_exceptions=True)
 
                     # Process results
                     for result in scan_results:
@@ -349,3 +348,22 @@ def run_scan_task(scan_id: int, base_url: str, old_scan_state: dict = None):
             db.commit()
     finally:
         db.close()
+
+@celery_app.task(name="run_scan_task")
+def run_scan_task(scan_id: int, base_url: str, old_scan_state: dict = None):
+    """Celery task to orchestrate the scanning process."""
+    try:
+        asyncio.run(_run_scan_logic(scan_id, base_url, old_scan_state))
+    except Exception as e:
+        logger.error(f"[{scan_id}] Celery task failed: {e}", exc_info=True)
+        # Update scan status to failed in case of an exception during async execution
+        db = SessionLocal()
+        try:
+            scan = db.query(Scan).filter(Scan.id == scan_id).first()
+            if scan:
+                scan.status = "failed"
+                db.commit()
+        except Exception as db_e:
+            logger.error(f"[{scan_id}] Failed to update scan status to 'failed' in DB: {db_e}", exc_info=True)
+        finally:
+            db.close()
