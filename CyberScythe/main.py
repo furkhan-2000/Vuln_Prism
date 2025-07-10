@@ -21,15 +21,11 @@ formatter = jsonlogger.JsonFormatter(
 root_logger = logging.getLogger()
 root_logger.setLevel(getattr(logging, LOG_LEVEL.upper()))
 
-# Remove existing handlers to avoid duplicate logs
-if root_logger.handlers:
-    for handler in root_logger.handlers:
-        root_logger.removeHandler(handler)
-
-# Add a console handler with the custom formatter
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-root_logger.addHandler(handler)
+# Add a console handler with the custom formatter if it doesn't already exist
+if not any(isinstance(handler, logging.StreamHandler) for handler in root_logger.handlers):
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+    root_logger.addHandler(handler)
 
 logger = logging.getLogger(__name__)
 
@@ -98,6 +94,7 @@ async def start_scan_endpoint(url: str = Form(...), username: str = Depends(get_
         return {"message": "Scan initiated successfully.", "scan_id": scan_id}
     
     except Exception as e:
+        db.rollback() # Rollback in case of error
         logger.error(f"Failed to initiate scan for {url}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to initiate scan.")
     finally:
@@ -134,6 +131,7 @@ async def schedule_scan_endpoint(url: str = Form(...), schedule_time: str = Form
         return {"message": "Scan scheduled successfully.", "scan_id": scan_id, "scheduled_for": scheduled_datetime.isoformat()}
 
     except Exception as e:
+        db.rollback() # Rollback in case of error
         logger.error(f"Failed to schedule scan for {url}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to schedule scan.")
     finally:

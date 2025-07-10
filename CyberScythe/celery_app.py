@@ -108,9 +108,10 @@ def periodic_scan():
             db.refresh(new_scan)
             
             # Trigger the scan task. The scan task itself will generate the new state.
-            run_scan_task.delay(new_scan.id, site_url, old_scan_state=old_state) # Pass old state for diffing later
+            run_scan_task.delay(new_scan.id, site_url, old_scan_state=old_state)
 
     except Exception as e:
+        db.rollback() # Rollback in case of error
         logger.error(f"Error during periodic scan: {e}", exc_info=True)
     finally:
         db.close()

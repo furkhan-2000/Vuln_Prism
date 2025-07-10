@@ -299,7 +299,7 @@ async def _run_scan_logic(scan_id: int, base_url: str, old_scan_state: dict = No
                                 rate_limits[domain] = asyncio.Semaphore(limit)
                             
                             async with rate_limits[domain]:
-                                return await module.run(http_client, url, page, scan_id, attack_surface["api_endpoints"], attack_surface["cookies"], attack_surface["headers"]) # Pass page object, scan_id, api_endpoints, cookies, and headers here
+                                return await module.run(http_client, url, page, scan_id, attack_surface["api_endpoints"], attack_surface["cookies"], attack_surface["headers"])
 
                     for module in scanner_modules:
                         # Each module will scan all discovered URLs

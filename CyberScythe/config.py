@@ -15,13 +15,12 @@ CONCURRENT_REQUESTS = 10  # Number of concurrent requests for scanning
 APP_PORT = 5051
 
 # --- Database Settings ---
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/dbname")
+DATABASE_URL = os.getenv("DATABASE_URL") # Must be set as an environment variable
 
 # --- Authentication Settings (Placeholder) ---
-AUTH_CREDENTIALS = {
-    "admin": "password123",
-    "test": "testpass"
-}
+# AUTH_CREDENTIALS should be managed securely (e.g., via environment variables or a secrets management system)
+# For development, you can set them as environment variables or load from a secure config file.
+AUTH_CREDENTIALS = {}
 
 # --- Celery/Redis Settings ---
 REDIS_BROKER_URL = os.getenv("REDIS_BROKER_URL", "redis://localhost:6379/0")

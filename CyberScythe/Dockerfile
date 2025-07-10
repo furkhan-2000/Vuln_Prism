@@ -58,6 +58,7 @@ RUN groupadd --system --gid 10001 malware && useradd --system --uid 10001 --gid 
 # Set the working directory and change ownership
 WORKDIR /app
 RUN chown malware:malware /app
+ENV HOME=/app
 
 # Copy installed Python packages from builder stage
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
@@ -67,6 +68,9 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/pytho
 # and copy to /app/.cache/ms-playwright
 COPY --from=builder /root/.cache/ms-playwright /app/.cache/ms-playwright
 RUN chown -R malware:malware /app/.cache
+
+# Set HOME for Playwright to find its browsers
+ENV PLAYWRIGHT_BROWSERS_PATH=/app/.cache/ms-playwright
 
 # Copy the application code
 COPY . .
