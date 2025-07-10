@@ -2,7 +2,23 @@
 FROM python:3.11-slim AS builder
 
 # Install system dependencies required by Playwright and other tools
-RUN apt-get update && apt-get install -y --no-install-recommends     libnss3     libxss1     libasound2     libatk-bridge2.0-0     libgtk-3-0     libgbm-dev     libu2f-udev     libvulkan1     fonts-liberation     xdg-utils     curl     build-essential     pkg-config     libcairo2-dev     --no-install-recommends &&     rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    libu2f-udev \
+    libvulkan1 \
+    fonts-liberation \
+    xdg-utils \
+    curl \
+    build-essential \
+    pkg-config \
+    libcairo2-dev \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
 
 # Set the working directory
 WORKDIR /app
@@ -19,8 +35,22 @@ RUN playwright install --with-deps chromium
 # --- Stage 2: Runtime ---
 FROM python:3.11-slim
 
-# Install only the essential runtime dependencies for Playwright
-RUN apt-get update && apt-get install -y --no-install-recommends     libnss3     libxss1     libasound2     libatk-bridge2.0-0     libgtk-3-0     libgbm-dev     libu2f-udev     libvulkan1     fonts-liberation     xdg-utils     curl     --no-install-recommends &&     rm -rf /var/lib/apt/lists/*
+# Install only the essential runtime dependencies for Playwright and supervisor
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libnss3 \
+    libxss1 \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    libgbm-dev \
+    libu2f-udev \
+    libvulkan1 \
+    fonts-liberation \
+    xdg-utils \
+    curl \
+    supervisor \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user and group
 RUN groupadd --system --gid 10001 malware && useradd --system --uid 10001 --gid 10001 malware
@@ -40,6 +70,7 @@ RUN chown -R malware:malware /app/.cache
 
 # Copy the application code
 COPY . .
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Set the user to non-root
 USER malware
@@ -50,6 +81,5 @@ EXPOSE 5051
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --retries=3   CMD curl -f http://localhost:5051/health || exit 1
 
-# Command to run the application
-# Set HOME for Playwright to find its browsers
-CMD ["/usr/local/bin/python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5051", "--log-level", "debug"]
+# Command to run the application using supervisord
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

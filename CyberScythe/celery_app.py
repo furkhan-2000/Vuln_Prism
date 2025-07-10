@@ -1,6 +1,6 @@
 
 from celery import Celery
-from config import REDIS_BROKER_URL, REDIS_BACKEND_URL, MONITORED_SITES
+from config import REDIS_BROKER_URL, REDIS_BACKEND_URL, MONITORED_SITES, SCAN_STATES_DIR
 import json
 import os
 import logging

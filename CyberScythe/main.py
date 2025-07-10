@@ -84,7 +84,7 @@ async def start_scan_endpoint(url: str = Form(...), username: str = Depends(get_
     db = SessionLocal()
     try:
         # Create a new scan record in the database
-        new_scan = Scan(target_url=url, status="pending")
+        new_scan = Scan(target_url=url, status="pending", last_scanned_at=datetime.datetime.utcnow())
         db.add(new_scan)
         db.commit()
         db.refresh(new_scan)
@@ -120,7 +120,7 @@ async def schedule_scan_endpoint(url: str = Form(...), schedule_time: str = Form
 
     db = SessionLocal()
     try:
-        new_scan = Scan(target_url=url, status="scheduled", created_at=scheduled_datetime) # Use created_at for scheduled time
+        new_scan = Scan(target_url=url, status="scheduled", scheduled_for=scheduled_datetime)
         db.add(new_scan)
         db.commit()
         db.refresh(new_scan)
@@ -149,6 +149,10 @@ async def get_scan_status(scan_id: int, username: str = Depends(get_current_user
             raise HTTPException(status_code=404, detail="Scan not found.")
         
         response = {"scan_id": scan.id, "status": scan.status, "target": scan.target_url}
+        if scan.scheduled_for:
+            response["scheduled_for"] = scan.scheduled_for.isoformat()
+        if scan.last_scanned_at:
+            response["last_scanned_at"] = scan.last_scanned_at.isoformat()
         if scan.status == "completed":
             response["report_url"] = f"/reports/{scan.id}"
         return JSONResponse(content=response)

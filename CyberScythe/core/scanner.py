@@ -1,7 +1,8 @@
 import logging
 import asyncio
 import httpx
-from urllib.parse import urljoin, urlparse
+import datetime
+from urllib.parse import urljoin, urlparse, urlencode
 from collections import deque
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 import os
@@ -289,15 +290,16 @@ async def _run_scan_logic(scan_id: int, base_url: str, old_scan_state: dict = No
                     rate_limits = {}
 
                     async def run_module_with_sem(module, url):
-                        parsed_url = urlparse(url)
-                        domain = parsed_url.netloc
-                        if domain not in rate_limits:
-                            # Implement tiered rate limiting
-                            limit = 20 if "large-site.com" in domain else CONCURRENT_REQUESTS
-                            rate_limits[domain] = asyncio.Semaphore(limit)
-                        
-                        async with rate_limits[domain]:
-                            return await module.run(http_client, url, page, scan_id, attack_surface["api_endpoints"], attack_surface["cookies"], attack_surface["headers"]) # Pass page object, scan_id, api_endpoints, cookies, and headers here
+                        async with sem: # Use the global semaphore for overall concurrency
+                            parsed_url = urlparse(url)
+                            domain = parsed_url.netloc
+                            if domain not in rate_limits:
+                                # Implement tiered rate limiting
+                                limit = 20 if "large-site.com" in domain else CONCURRENT_REQUESTS
+                                rate_limits[domain] = asyncio.Semaphore(limit)
+                            
+                            async with rate_limits[domain]:
+                                return await module.run(http_client, url, page, scan_id, attack_surface["api_endpoints"], attack_surface["cookies"], attack_surface["headers"]) # Pass page object, scan_id, api_endpoints, cookies, and headers here
 
                     for module in scanner_modules:
                         # Each module will scan all discovered URLs
@@ -337,6 +339,7 @@ async def _run_scan_logic(scan_id: int, base_url: str, old_scan_state: dict = No
         
         # Update scan status and report path
         scan.status = "completed"
+        scan.last_scanned_at = datetime.datetime.utcnow()
         scan.report_path = report_path
         db.commit()
 

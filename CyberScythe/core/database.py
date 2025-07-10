@@ -14,6 +14,8 @@ class Scan(Base):
     target_url = Column(String, index=True)
     status = Column(String, default="pending")
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    scheduled_for = Column(DateTime, nullable=True) # New field for scheduled scans
+    last_scanned_at = Column(DateTime, nullable=True) # New field to track last scan time
     report_path = Column(String, nullable=True) # Added for storing report path
 
 class Vulnerability(Base):
