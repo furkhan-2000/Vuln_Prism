@@ -47,9 +47,6 @@ USER malware
 # Expose the port the app runs on
 EXPOSE 5051 
 
-# Set DATABASE_URL environment variable
-ENV DATABASE_URL="postgresql://user:password@host:port/dbname"
-
 # Healthcheck
 HEALTHCHECK --interval=30s --timeout=10s --retries=3   CMD curl -f http://localhost:5051/health || exit 1
 
