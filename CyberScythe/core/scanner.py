@@ -203,7 +203,7 @@ class Crawler:
 
                             for input_field in form_data['inputs']:
                                 if input_field['name']:
-                                    await form_page.fill(f'[name="{input_field['name']}']', "test_value")
+                                    await form_page.fill(f"[name='{input_field['name']}']", "test_value")
                             await form_page.click('button[type="submit"], input[type="submit"]') # Click submit button
                             await form_page.wait_for_load_state("networkidle")
                             # After submission, check the new URL
