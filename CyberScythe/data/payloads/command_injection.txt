@@ -1,0 +1,26 @@
+
+;ls
+;id
+;whoami
+;cat /etc/passwd
+;ping -c 4 127.0.0.1
+|ls
+|id
+|whoami
+|cat /etc/passwd
+|ping -c 4 127.0.0.1
+&ls
+&id
+&whoami
+&cat /etc/passwd
+&ping -c 4 127.0.0.1
+`ls`
+`id`
+`whoami`
+`cat /etc/passwd`
+`ping -c 4 127.0.0.1`
+$(ls)
+$(id)
+$(whoami)
+$(cat /etc/passwd)
+$(ping -c 4 127.0.0.1)

