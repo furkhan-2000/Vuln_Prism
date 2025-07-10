@@ -52,4 +52,4 @@ HEALTHCHECK --interval=30s --timeout=10s --retries=3   CMD curl -f http://localh
 
 # Command to run the application
 # Set HOME for Playwright to find its browsers
-CMD ["/usr/local/bin/python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5051", "--log-level", "info"]
+CMD ["/usr/local/bin/python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5051", "--log-level", "debug"]

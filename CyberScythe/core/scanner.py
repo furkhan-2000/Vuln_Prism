@@ -173,7 +173,7 @@ class Crawler:
                         form_page = await self.page.context.new_page()
                         await form_page.goto(current_url, wait_until="networkidle")
                         # Find the form again on the new page context
-                        form_selector = f'form[action="{form_data['action']}"]' if form_data['action'] else 'form'
+                        form_selector = f"form[action='{form_data['action']}']" if form_data['action'] else 'form'
                         if form_data['method'].lower() == 'get':
                             # For GET forms, just construct the URL with dummy params
                             get_params = {}
