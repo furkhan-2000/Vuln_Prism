@@ -3,9 +3,10 @@ import os
 from datetime import datetime
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Image
 from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER
 from reportlab.lib import colors
+from html import escape # Import escape for HTML sanitization
 
 def generate_pdf_report(target_url: str, vulnerabilities: list, output_path: str):
     doc = SimpleDocTemplate(output_path, pagesize=letter)
@@ -50,13 +51,33 @@ def generate_pdf_report(target_url: str, vulnerabilities: list, output_path: str
         story.append(Paragraph("No specific vulnerabilities were identified during this scan.", styles['Normal']))
     else:
         for i, vuln in enumerate(vulnerabilities):
-            story.append(Paragraph(f"<b>{i+1}. {vuln.get('title', 'N/A')}</b>", styles['h2']))
-            story.append(Paragraph(f"<b>Severity:</b> <font color='{_get_severity_color(vuln.get('severity'))}'>{vuln.get('severity', 'N/A')}</font>", styles['Normal']))
-            story.append(Paragraph(f"<b>URL:</b> {vuln.get('url', 'N/A')}", styles['Normal']))
-            story.append(Paragraph(f"<b>Description:</b> {vuln.get('description', 'N/A')}", styles['Justify']))
+            story.append(Paragraph(f"<b>{i+1}. {escape(vuln.get('title', 'N/A'))}</b>", styles['h2']))
+            story.append(Paragraph(f"<b>Severity:</b> <font color='{_get_severity_color(vuln.get('severity'))}'>{escape(vuln.get('severity'))}</font>", styles['Normal']))
+            story.append(Paragraph(f"<b>URL:</b> {escape(vuln.get('url', 'N/A'))}", styles['Normal']))
+            story.append(Paragraph(f"<b>Description:</b> {escape(vuln.get('description', 'N/A'))}", styles['Justify']))
             if vuln.get('payload'):
-                story.append(Paragraph(f"<b>Payload:</b> <code>{vuln.get('payload')}</code>", styles['Normal']))
-            story.append(Paragraph(f"<b>Recommendation:</b> {vuln.get('recommendation', 'N/A')}", styles['Justify']))
+                story.append(Paragraph(f"<b>Payload:</b> <code>{escape(vuln.get('payload'))}</code>", styles['Normal']))
+            if vuln.get('screenshot'):
+                try:
+                    story.append(Spacer(1, 6))
+                    story.append(Paragraph("<b>Screenshot:</b>", styles['Normal']))
+                    story.append(Image(vuln['screenshot'], width=400, height=300)) # Adjust width/height as needed
+                    story.append(Spacer(1, 6))
+                except Exception as img_e:
+                    story.append(Paragraph(f"<i>Could not load screenshot: {img_e}</i>", styles['Normal']))
+            
+            # Add recommendation
+            recommendations = {
+                "SQL Injection": "Use parameterized queries or prepared statements. Validate and sanitize all user input. Implement a Web Application Firewall (WAF).",
+                "Cross-Site Scripting (XSS)": "Sanitize all user-supplied input. Encode output based on context (HTML, URL, JavaScript). Implement a Content Security Policy (CSP).",
+                "Path Traversal": "Validate and sanitize all user-supplied input used in file paths. Use whitelisting for allowed characters and file names. Avoid directly concatenating user input into file paths.",
+                "Command Injection": "Avoid executing OS commands directly with user-supplied input. If necessary, use whitelisting for commands and arguments. Sanitize and validate all input. Use built-in API functions instead of external commands.",
+                "Directory/File Disclosure": "Ensure sensitive directories and files are not publicly accessible. Configure web server to prevent directory listing. Remove unnecessary files and backups from production servers.",
+                "Open Port": "Close unnecessary ports. Implement strict firewall rules. Ensure services running on open ports are properly secured and patched."
+            }
+            vuln_type = vuln.get('type', 'N/A')
+            recommendation_text = recommendations.get(vuln_type, "No specific recommendation available for this vulnerability type. Consult security best practices for general web application security.")
+            story.append(Paragraph(f"<b>Recommendation:</b> {recommendation_text}", styles['Justify']))
             story.append(Spacer(1, 18))
 
     doc.build(story, onFirstPage=_footer_callback, onLaterPages=_footer_callback)

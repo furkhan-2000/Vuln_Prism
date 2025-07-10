@@ -1,18 +1,61 @@
 import os
 import logging
-from fastapi import FastAPI, Request, Form, HTTPException
+from pythonjsonlogger import jsonlogger # Import jsonlogger
+from fastapi import FastAPI, Request, Form, HTTPException, Depends, status
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from core.database import init_db, SessionLocal, Scan, Vulnerability
-from config import APP_TITLE, REPORTS_DIR, LOG_LEVEL
+from config import APP_TITLE, REPORTS_DIR, LOG_LEVEL, AUTH_CREDENTIALS
 from celery_app import celery_app, run_scan_task
+from datetime import datetime
+import secrets
 
 # --- Configuration ---
-logging.basicConfig(level=getattr(logging, LOG_LEVEL.upper()), format="%(asctime)s [%(levelname)s] %(message)s")
+# Custom JSON formatter
+formatter = jsonlogger.JsonFormatter(
+    '%(asctime)s %(levelname)s %(name)s %(message)s'
+)
+
+# Get root logger and set level
+root_logger = logging.getLogger()
+root_logger.setLevel(getattr(logging, LOG_LEVEL.upper()))
+
+# Remove existing handlers to avoid duplicate logs
+if root_logger.handlers:
+    for handler in root_logger.handlers:
+        root_logger.removeHandler(handler)
+
+# Add a console handler with the custom formatter
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+root_logger.addHandler(handler)
+
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title=APP_TITLE)
 templates = Jinja2Templates(directory="templates")
+
+security = HTTPBasic()
+
+def get_current_username(credentials: HTTPBasicCredentials = Depends(security)):
+    if credentials.username in AUTH_CREDENTIALS:
+        correct_password = secrets.compare_digest(
+            credentials.password, 
+            AUTH_CREDENTIALS[credentials.username]
+        )
+        if not correct_password:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Basic"},
+            )
+        return credentials.username
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Incorrect username or password",
+        headers={"WWW-Authenticate": "Basic"},
+    )
 
 # --- Database Initialization ---
 @app.on_event("startup")
@@ -30,7 +73,7 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 @app.post("/scan", status_code=202)
-async def start_scan_endpoint(url: str = Form(...)):
+async def start_scan_endpoint(url: str = Form(...), username: str = Depends(get_current_username)):
     """
     Initiates a scan on the given URL.
     This endpoint returns immediately with a scan ID.
@@ -60,8 +103,44 @@ async def start_scan_endpoint(url: str = Form(...)):
     finally:
         db.close()
 
+@app.post("/schedule_scan", status_code=202)
+async def schedule_scan_endpoint(url: str = Form(...), schedule_time: str = Form(...), username: str = Depends(get_current_username)):
+    """
+    Schedules a scan on the given URL at a specified time.
+    """
+    if not url.startswith("http"):
+        raise HTTPException(status_code=400, detail="Invalid URL. Must start with http:// or https://")
+    
+    try:
+        # Parse the schedule_time string into a datetime object
+        # Assuming schedule_time is in ISO format, e.g., "2025-07-10T10:30:00"
+        scheduled_datetime = datetime.fromisoformat(schedule_time)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid schedule_time format. Use ISO format (e.g., YYYY-MM-DDTHH:MM:SS).")
+
+    db = SessionLocal()
+    try:
+        new_scan = Scan(target_url=url, status="scheduled", created_at=scheduled_datetime) # Use created_at for scheduled time
+        db.add(new_scan)
+        db.commit()
+        db.refresh(new_scan)
+
+        scan_id = new_scan.id
+        logger.info(f"[{scan_id}] Scan scheduled for URL: {url} at {scheduled_datetime}")
+
+        # Send the scan task to Celery with eta (estimated time of arrival)
+        run_scan_task.apply_async(args=[scan_id, url], eta=scheduled_datetime)
+
+        return {"message": "Scan scheduled successfully.", "scan_id": scan_id, "scheduled_for": scheduled_datetime.isoformat()}
+
+    except Exception as e:
+        logger.error(f"Failed to schedule scan for {url}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Failed to schedule scan.")
+    finally:
+        db.close()
+
 @app.get("/scan/{scan_id}/status")
-async def get_scan_status(scan_id: int):
+async def get_scan_status(scan_id: int, username: str = Depends(get_current_username)):
     """Checks the status of a scan."""
     db = SessionLocal()
     try:
@@ -77,7 +156,7 @@ async def get_scan_status(scan_id: int):
         db.close()
 
 @app.get("/reports/{scan_id}")
-async def get_report(scan_id: int):
+async def get_report(scan_id: int, username: str = Depends(get_current_username)):
     """Downloads the PDF report for a completed scan."""
     db = SessionLocal()
     try:

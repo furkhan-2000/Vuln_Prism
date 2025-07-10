@@ -16,7 +16,7 @@ def load_wordlist():
 COMMON_DIRS_WORDLIST = load_wordlist()
 
 # --- Directory Bruteforcer Scanner ---
-async def run(http_client: httpx.AsyncClient, base_url: str) -> list:
+async def run(http_client: httpx.AsyncClient, base_url: str, page, scan_id: int, api_endpoints: list = None, cookies: list = None, headers: list = None):
     """Runs the Directory Bruteforcing scan on a given base URL."""
     vulnerabilities = []
     logger.info(f"Starting Directory Bruteforcing scan on: {base_url}")

@@ -18,6 +18,10 @@ class Scan(Base):
 
 class Vulnerability(Base):
     __tablename__ = "vulnerabilities"
+    __table_args__ = (
+        sqlalchemy.Index('idx_scan_id', 'scan_id'),
+        sqlalchemy.Index('idx_severity', 'severity'),
+    )
     id = Column(Integer, primary_key=True, index=True)
     scan_id = Column(Integer, sqlalchemy.ForeignKey("scans.id"))
     title = Column(String)
@@ -26,7 +30,7 @@ class Vulnerability(Base):
     url = Column(String)
     payload = Column(String, nullable=True)
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False}, pool_size=20, max_overflow=0)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def init_db():

@@ -9,3 +9,9 @@ sqlalchemy==2.0.25
 psycopg2-binary
 celery
 redis
+python-json-logger # Added for structured logging
+
+# Dependency Security Note:
+# It is crucial to regularly scan and update these dependencies for known vulnerabilities.
+# Tools like Dependabot (for GitHub) or Snyk can automate this process.
+# Always review updates for breaking changes and security patches.

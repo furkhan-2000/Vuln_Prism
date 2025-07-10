@@ -15,5 +15,28 @@ APP_PORT = 5051
 # --- Database Settings ---
 DATABASE_URL = "postgresql://user:password@host:port/dbname"
 
+# --- Authentication Settings (Placeholder) ---
+AUTH_CREDENTIALS = {
+    "admin": "password123",
+    "test": "testpass"
+}
+
+# --- Celery/Redis Settings ---
+REDIS_BROKER_URL = "redis://localhost:6379/0"
+REDIS_BACKEND_URL = "redis://localhost:6379/1"
+
+# --- Continuous Monitoring Settings ---
+MONITORED_SITES = [
+    # "http://example.com",
+    # "https://another-site.org"
+]
+
+# --- Scan State Management ---
+SCAN_STATES_DIR = "scan_states"
+
+# --- Scanner Safety Settings ---
+SAFE_MODE = True  # Blocks state-changing operations
+DANGEROUS_FORM_ACTIONS = ["delete", "update", "create", "remove", "add", "edit", "submit"] # Keywords in form action URLs
+
 # --- Reporting Settings ---
 REPORTS_DIR = "reports"
