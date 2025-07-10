@@ -1,3 +1,5 @@
+import os
+
 # --- General Settings ---
 APP_TITLE = "CyberScythe"
 APP_VERSION = "1.0.0"
@@ -13,7 +15,7 @@ CONCURRENT_REQUESTS = 10  # Number of concurrent requests for scanning
 APP_PORT = 5051
 
 # --- Database Settings ---
-DATABASE_URL = "postgresql://user:password@host:port/dbname"
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost:5432/dbname")
 
 # --- Authentication Settings (Placeholder) ---
 AUTH_CREDENTIALS = {
