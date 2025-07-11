@@ -1,0 +1,6 @@
+body { background: #121212; color: #eee; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+.container { max-width: 600px; margin: auto; padding: 50px; text-align: center; }
+input { padding: 10px; width: 70%; border-radius: 5px; border: none; }
+button { padding: 10px 20px; margin-left: 10px; border-radius: 5px; border: none; background: #48dbc2; color: #121212; font-weight: bold; cursor: pointer; }
+button:hover { background: #35b7a3; }
+
