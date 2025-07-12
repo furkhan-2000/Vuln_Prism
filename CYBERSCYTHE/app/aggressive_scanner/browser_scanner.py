@@ -5,7 +5,8 @@ import math
 import numpy as np
 from playwright.async_api import async_playwright
 from fake_useragent import UserAgent
-from loguru import logger  # Added missing logger import
+from loguru import logger
+import httpx
 
 from .payloads import (
     polymorphic_xss_payload,
@@ -18,7 +19,17 @@ from .detectors import (
     detect_sqli,
     detect_cmd_injection,
     detect_path_traversal,
-    detect_info_disclosure
+    detect_info_disclosure,
+    check_security_headers,
+    check_exposed_api_keys,
+    check_outdated_software,
+    check_directory_listing,
+    check_common_misconfigurations,
+    check_basic_xss,
+    check_insecure_forms,
+    check_sensitive_file_exposure,
+    check_insecure_cookies,
+    check_cors_misconfiguration
 )
 from .scanner import ScanResult
 
@@ -187,8 +198,7 @@ async def create_stealth_context(browser, proxy=None):
         proxy=proxy,
         # Nuclear fingerprint spoofing
         color_scheme='dark' if random.random() > 0.7 else 'light',
-        reduced_motion='reduce' if random.random() > 0.8 else 'no-preference',
-        http_credentials={'username': 'proxyuser', 'password': 'proxypass'} if proxy else None
+        reduced_motion='reduce' if random.random() > 0.8 else 'no-preference'
     )
 
     # Advanced evasion techniques
@@ -268,6 +278,26 @@ async def aggressive_run(url: str, scan_result: ScanResult, aggression_level=3):
 
             scan_result.scanned_urls += 1
             logger.info(f"Browser scanning URL: {url}")
+
+            # --- Static and Dynamic Vulnerability Checks ---
+            # Get initial response headers for header-based checks
+            initial_response = await page.request.get(url)
+            headers = initial_response.headers
+
+            # Get HTML content for content-based checks
+            html_content = await page.content()
+            tree = HTMLParser(html_content)
+
+            check_security_headers(headers, scan_result.vulnerabilities)
+            check_exposed_api_keys(html_content, scan_result.vulnerabilities)
+            check_outdated_software(headers, html_content, scan_result.vulnerabilities)
+            check_directory_listing(url, scan_result.vulnerabilities)
+            check_common_misconfigurations(url, scan_result.vulnerabilities)
+            check_basic_xss(url, html_content, scan_result.vulnerabilities)
+            check_insecure_forms(tree, url, scan_result.vulnerabilities)
+            check_sensitive_file_exposure(url, scan_result.vulnerabilities)
+            check_insecure_cookies(await page.context.cookies(), url, scan_result.vulnerabilities)
+            check_cors_misconfiguration(headers, scan_result.vulnerabilities)
 
             # --- Dynamic Interaction and Vulnerability Testing ---
 

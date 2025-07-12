@@ -1,7 +1,7 @@
 import random
 import urllib.parse
 import hashlib
-from config import settings
+from .config import settings
 from loguru import logger
 
 def _obfuscate(payload: str) -> str:

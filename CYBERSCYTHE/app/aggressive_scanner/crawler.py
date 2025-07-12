@@ -1,8 +1,8 @@
 import asyncio
 from urllib.parse import urlparse, urldefrag
 from selectolax.parser import HTMLParser
-from config import settings
-from utils import normalize_url, is_same_domain, is_blacklisted, reliable_request
+from .config import settings
+from .utils import normalize_url, is_same_domain, is_blacklisted, reliable_request
 from loguru import logger
 import httpx
 from typing import Optional
@@ -136,3 +136,4 @@ class AsyncCrawler:
         logger.info(stats)
         
         return list(self.visited)
+        await self.client.aclose()
