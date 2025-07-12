@@ -184,7 +184,7 @@ async def aggressive_run(url: str, scan_result: ScanResult):
             scan_result.error_count += 1
         finally:
             await context.close()
-            await browser.close()), lambda route: route.abort())
+            await browser.close()
     await context.route(re.compile(r".*(google|facebook|twitter|analytics|track|pixel|ads|beacon)\.\w{2,}"), lambda route: route.abort())
 
     return context
