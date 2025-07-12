@@ -1,15 +1,24 @@
 async function startScan() {
     const url = document.getElementById("url").value;
-    document.getElementById("output").innerHTML = "Scanning...";
+    const output = document.getElementById("output");
+    output.innerHTML = "<div class='scanning'>Scanning... <div class='spinner'></div></div>";
+    
     try {
         const res = await fetch(`/scan?url=${encodeURIComponent(url)}`);
         const data = await res.json();
         if (data.report) {
-            document.getElementById("output").innerHTML = `<p>Scan complete. <a href="${data.report}" target="_blank">Download Report</a></p>`;
+            output.innerHTML = `
+                <div class="success">
+                    <p>Scan complete!</p>
+                    <a href="${data.report}" target="_blank" class="report-link">
+                        Download Report
+                    </a>
+                </div>
+            `;
         } else {
-            document.getElementById("output").innerHTML = `<p>Error: ${data.error}</p>`;
+            output.innerHTML = `<div class="error">Error: ${data.error || 'Unknown error'}</div>`;
         }
     } catch (err) {
-        document.getElementById("output").innerHTML = `<p>Scan failed: ${err.message}</p>`;
+        output.innerHTML = `<div class="error">Scan failed: ${err.message}</div>`;
     }
 }
