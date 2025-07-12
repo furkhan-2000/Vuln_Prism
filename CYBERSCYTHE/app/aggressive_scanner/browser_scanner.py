@@ -242,7 +242,10 @@ async def aggressive_run(url: str, scan_result: ScanResult, aggression_level=3):
     async with async_playwright() as p:
         # Configure browser for maximum penetration
         browser = await p.chromium.launch(
-            headless=False,
+                headless=True,
+                args=['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+            )
+            headless=True,
             args=[
                 '--disable-blink-features=AutomationControlled',
                 '--no-sandbox',

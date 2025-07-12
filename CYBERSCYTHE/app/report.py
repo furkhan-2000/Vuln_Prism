@@ -1,8 +1,11 @@
 from fpdf import FPDF
 import os
 
+from pathlib import Path
+
 def create_pdf_report(scan_id, url, findings, output_path):
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    safe_path = Path(output_path).resolve()
+    safe_path.parent.mkdir(parents=True, exist_ok=True)
     pdf = FPDF()
     pdf.add_page()
 
