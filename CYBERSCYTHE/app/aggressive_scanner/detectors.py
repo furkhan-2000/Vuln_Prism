@@ -147,7 +147,9 @@ def check_security_headers(headers, vulnerabilities, url):
             "url": url,
             "type": "Missing Security Headers",
             "severity": "Medium",
-            "description": f"The following security headers are missing or misconfigured: {', '.join(missing_headers)}. This can lead to various attacks like XSS, clickjacking, and protocol downgrade attacks."
+            "description": f"The following security headers are missing or misconfigured: {', '.join(missing_headers)}. This can lead to various attacks like XSS, clickjacking, and protocol downgrade attacks.",
+            "param": "N/A",
+            "payload": "N/A"
         })
 
 def check_exposed_api_keys(html_content, vulnerabilities, url):
@@ -181,7 +183,9 @@ def check_exposed_api_keys(html_content, vulnerabilities, url):
             "url": url,
             "type": "Exposed API Key/Token",
             "severity": "High",
-            "description": f"Potentially exposed API keys or tokens found in the HTML content. Examples: {', '.join(found_keys[:3])}. This could lead to unauthorized access to services."
+            "description": f"Potentially exposed API keys or tokens found in the HTML content. Examples: {', '.join(found_keys[:3])}. This could lead to unauthorized access to services.",
+            "param": "Page Content",
+            "payload": ", '.join(found_keys[:3])"
         })
 
 def check_outdated_software(headers, html_content, vulnerabilities, url):
@@ -191,14 +195,18 @@ def check_outdated_software(headers, html_content, vulnerabilities, url):
             "url": url,
             "type": "Outdated Server Software",
             "severity": "Medium",
-            "description": f"Potentially outdated Apache server detected: {server_header}. Update to the latest stable version to mitigate known vulnerabilities."
+            "description": f"Potentially outdated Apache server detected: {server_header}. Update to the latest stable version to mitigate known vulnerabilities.",
+            "param": "Server Header",
+            "payload": server_header
         })
     if "nginx" in server_header and not re.search(r'nginx/(1\.[18-9]\.\d+|[2-9]\.\d+\.\d+)', server_header):
         vulnerabilities.append({
             "url": url,
             "type": "Outdated Server Software",
             "severity": "Medium",
-            "description": f"Potentially outdated Nginx server detected: {server_header}. Update to the latest stable version to mitigate known vulnerabilities."
+            "description": f"Potentially outdated Nginx server detected: {server_header}. Update to the latest stable version to mitigate known vulnerabilities.",
+            "param": "Server Header",
+            "payload": server_header
         })
 
     if "wordpress" in html_content.lower():
@@ -210,7 +218,9 @@ def check_outdated_software(headers, html_content, vulnerabilities, url):
                     "url": url,
                     "type": "Outdated CMS (WordPress)",
                     "severity": "High",
-                    "description": f"Outdated WordPress version detected: {version}. Many vulnerabilities exist in older versions. Update to the latest version."
+                    "description": f"Outdated WordPress version detected: {version}. Many vulnerabilities exist in older versions. Update to the latest version.",
+                    "param": "HTML Content",
+                    "payload": version
                 })
 
     php_header = headers.get('X-Powered-By', '').lower()
@@ -223,7 +233,9 @@ def check_outdated_software(headers, html_content, vulnerabilities, url):
                     "url": url,
                     "type": "Outdated PHP Version",
                     "severity": "High",
-                    "description": f"Outdated PHP version detected: {version}. This version is End-of-Life and no longer receives security updates. Upgrade to a supported PHP version (e.g., 8.x)."
+                    "description": f"Outdated PHP version detected: {version}. This version is End-of-Life and no longer receives security updates. Upgrade to a supported PHP version (e.g., 8.x).",
+                    "param": "X-Powered-By Header",
+                    "payload": version
                 })
 
 def check_directory_listing(base_url, vulnerabilities, url):
@@ -237,7 +249,9 @@ def check_directory_listing(base_url, vulnerabilities, url):
                     "url": url,
                     "type": "Directory Listing Enabled",
                     "severity": "High",
-                    "description": f"Directory listing is enabled for {test_url}. This can expose sensitive files and directory structures."
+                    "description": f"Directory listing is enabled for {test_url}. This can expose sensitive files and directory structures.",
+                    "param": "N/A",
+                    "payload": test_url
                 })
         except httpx.RequestError:
             pass
@@ -257,7 +271,9 @@ def check_common_misconfigurations(base_url, vulnerabilities, url):
                     "url": url,
                     "type": "Common Misconfiguration/Exposed File",
                     "severity": "High",
-                    "description": f"Potentially exposed sensitive file or misconfiguration at {test_url}. This could reveal sensitive information or provide unauthorized access."
+                    "description": f"Potentially exposed sensitive file or misconfiguration at {test_url}. This could reveal sensitive information or provide unauthorized access.",
+                    "param": "N/A",
+                    "payload": test_url
                 })
         except httpx.RequestError:
             pass
@@ -269,7 +285,9 @@ def check_basic_xss(base_url, html_content, vulnerabilities, url):
             "url": url,
             "type": "Reflected XSS (Basic)",
             "severity": "Medium",
-            "description": f"A basic XSS payload was reflected in the page content. This indicates a potential Cross-Site Scripting vulnerability. Further testing is recommended."
+            "description": f"A basic XSS payload was reflected in the page content. This indicates a potential Cross-Site Scripting vulnerability. Further testing is recommended.",
+            "param": "HTML Content",
+            "payload": test_payload
         })
 
     try:
@@ -280,7 +298,9 @@ def check_basic_xss(base_url, html_content, vulnerabilities, url):
                 "url": url,
                 "type": "Reflected XSS (URL Parameter)",
                 "severity": "Medium",
-                "description": f"A basic XSS payload injected via URL parameter was reflected. This indicates a potential Cross-Site Scripting vulnerability. Further testing is recommended."
+                "description": f"A basic XSS payload injected via URL parameter was reflected. This indicates a potential Cross-Site Scripting vulnerability. Further testing is recommended.",
+                "param": "URL Parameter",
+                "payload": test_payload
                 })
     except httpx.RequestError:
         pass
@@ -296,7 +316,9 @@ def check_insecure_forms(tree, base_url, vulnerabilities, url):
                 "url": url,
                 "type": "Insecure Form Submission (HTTP on HTTPS)",
                 "severity": "High",
-                "description": f"Form submits data over HTTP ({action}) while the page is HTTPS. This can expose sensitive user data."
+                "description": f"Form submits data over HTTP ({action}) while the page is HTTPS. This can expose sensitive user data.",
+                "param": "Form Action",
+                "payload": action
             })
 
         csrf_token_found = False
@@ -311,7 +333,9 @@ def check_insecure_forms(tree, base_url, vulnerabilities, url):
                 "url": url,
                 "type": "Missing CSRF Token (Heuristic)",
                 "severity": "Medium",
-                "description": f"POST form at '{action}' might be missing a CSRF token. This could make it vulnerable to Cross-Site Request Forgery (CSRF) attacks."
+                "description": f"POST form at '{action}' might be missing a CSRF token. This could make it vulnerable to Cross-Site Request Forgery (CSRF) attacks.",
+                "param": "Form Action",
+                "payload": action
             })
 
 def check_sensitive_file_exposure(base_url, vulnerabilities, url):
@@ -331,7 +355,9 @@ def check_sensitive_file_exposure(base_url, vulnerabilities, url):
                         "url": url,
                         "type": "Sensitive File Exposure",
                         "severity": "Medium",
-                        "description": f"Potentially sensitive file exposed at {test_url}. Review its content for confidential information."
+                        "description": f"Potentially sensitive file exposed at {test_url}. Review its content for confidential information.",
+                        "param": "N/A",
+                        "payload": test_url
                     })
         except httpx.RequestError:
             pass
@@ -348,7 +374,9 @@ def check_insecure_cookies(cookies, base_url, vulnerabilities, url):
                 "url": url,
                 "type": "Insecure Cookie (Missing Secure Flag)",
                 "severity": "Medium",
-                "description": f"Cookie '{cookie_name}' is served over HTTPS but is missing the 'Secure' flag. This cookie could be intercepted over HTTP if the user accesses the site insecurely."
+                "description": f"Cookie '{cookie_name}' is served over HTTPS but is missing the 'Secure' flag. This cookie could be intercepted over HTTP if the user accesses the site insecurely.",
+                "param": cookie_name,
+                "payload": "Missing Secure Flag"
             })
 
         if not cookie_httponly:
@@ -356,7 +384,9 @@ def check_insecure_cookies(cookies, base_url, vulnerabilities, url):
                 "url": url,
                 "type": "Insecure Cookie (Missing HttpOnly Flag)",
                 "severity": "Medium",
-                "description": f"Cookie '{cookie_name}' is missing the 'HttpOnly' flag. This makes it vulnerable to XSS attacks, as JavaScript can access the cookie."
+                "description": f"Cookie '{cookie_name}' is missing the 'HttpOnly' flag. This makes it vulnerable to XSS attacks, as JavaScript can access the cookie.",
+                "param": cookie_name,
+                "payload": "Missing HttpOnly Flag"
             })
 
         if cookie_samesite not in ['Lax', 'Strict', 'lax', 'strict']:
@@ -364,7 +394,9 @@ def check_insecure_cookies(cookies, base_url, vulnerabilities, url):
                 "url": url,
                 "type": "Insecure Cookie (Missing/Weak SameSite Flag)",
                 "severity": "Low",
-                "description": f"Cookie '{cookie_name}' is missing or has a weak 'SameSite' attribute ('{cookie_samesite}'). This can make it vulnerable to CSRF attacks."
+                "description": f"Cookie '{cookie_name}' is missing or has a weak 'SameSite' attribute ('{cookie_samesite}'). This can make it vulnerable to CSRF attacks.",
+                "param": cookie_name,
+                "payload": f"Weak SameSite: {cookie_samesite}"
             })
 
 def check_cors_misconfiguration(headers, vulnerabilities, url):
@@ -374,12 +406,16 @@ def check_cors_misconfiguration(headers, vulnerabilities, url):
             "url": url,
             "type": "CORS Misconfiguration (Wildcard Origin)",
             "severity": "High",
-            "description": "The 'Access-Control-Allow-Origin' header is set to '*', allowing any domain to access resources. This can lead to Cross-Origin Resource Sharing (CORS) vulnerabilities if sensitive data is exposed."
+            "description": "The 'Access-Control-Allow-Origin' header is set to '*', allowing any domain to access resources. This can lead to Cross-Origin Resource Sharing (CORS) vulnerabilities if sensitive data is exposed.",
+            "param": "Access-Control-Allow-Origin Header",
+            "payload": acao
         })
     elif acao and ',' in acao:
         vulnerabilities.append({
             "url": url,
             "type": "CORS Misconfiguration (Multiple Origins)",
             "severity": "Medium",
-            "description": f"The 'Access-Control-Allow-Origin' header allows multiple origins: '{acao}'. Ensure this is intentional and properly secured to prevent unauthorized access."
+            "description": f"The 'Access-Control-Allow-Origin' header allows multiple origins: '{acao}'. Ensure this is intentional and properly secured to prevent unauthorized access.",
+            "param": "Access-Control-Allow-Origin Header",
+            "payload": acao
         })
