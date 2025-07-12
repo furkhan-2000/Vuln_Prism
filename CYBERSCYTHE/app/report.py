@@ -1,6 +1,5 @@
 from fpdf import FPDF
 import os
-
 from pathlib import Path
 
 def create_pdf_report(scan_id, url, findings, output_path):
@@ -48,4 +47,4 @@ def create_pdf_report(scan_id, url, findings, output_path):
     pdf.cell(0, 10, write("Designed and developed by Khan Mohammed"), 0, 1, 'C')
     pdf.cell(0, 10, write("(c) All rights reserved 2025 | www.linkedin.com/in/khan-mohammed-790b18214"), 0, 1, 'C')
 
-    pdf.output(output_path)
+    pdf.output(safe_path)  # Use safe_path for output

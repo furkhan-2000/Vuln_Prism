@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
 from fastapi.concurrency import run_in_threadpool
 import uuid
 import os
-from app.scanner import perform_scan
+from app.aggressive_scanner.scanner import perform_scan
 from app.report import create_pdf_report
 from loguru import logger
 import sys
@@ -31,7 +31,7 @@ app = FastAPI(
 )
 
 # Mount static directory
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="/app/static"), name="static")
 
 @app.get("/", include_in_schema=False)
 def root():
@@ -68,4 +68,3 @@ def download_report(scan_id: str):
     if not os.path.exists(filepath):
         return JSONResponse(status_code=404, content={"error": "Report not found"})
     return FileResponse(filepath, media_type='application/pdf', filename=f"CyberScythe_Report_{scan_id}.pdf")
-

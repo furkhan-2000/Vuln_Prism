@@ -3,13 +3,13 @@ import httpx
 import asyncio
 from urllib.parse import urlparse, urljoin, urldefrag
 from tenacity import (
-    retry, 
-    retry_if_exception_type, 
-    wait_exponential_jitter, 
+    retry,
+    retry_if_exception_type,
+    wait_exponential_jitter,
     stop_after_attempt,
     before_sleep_log
 )
-from config import settings
+from .config import settings
 from loguru import logger
 from functools import lru_cache
 import uuid
@@ -48,7 +48,7 @@ def get_random_headers():
 @retry(
     retry=retry_if_exception_type((httpx.ConnectError, httpx.TimeoutException)),
     wait=wait_exponential_jitter(
-        initial=settings.backoff_factor, 
+        initial=settings.backoff_factor,
         max=settings.request_timeout,
         jitter=lambda: random.uniform(0.3, 0.7)
     ),
@@ -57,9 +57,9 @@ def get_random_headers():
     reraise=True
 )
 async def reliable_request(
-    client: httpx.AsyncClient, 
-    method: str, 
-    url: str, 
+    client: httpx.AsyncClient,
+    method: str,
+    url: str,
     **kwargs
 ) -> Optional[httpx.Response]:
     if is_blacklisted(url):
@@ -69,7 +69,7 @@ async def reliable_request(
     headers = kwargs.get('headers', get_random_headers())
     params = kwargs.get('params')
     data = kwargs.get('data')
-    
+
     try:
         response = await client.request(
             method=method.upper(),
@@ -83,12 +83,12 @@ async def reliable_request(
         )
     except (httpx.RequestError, httpx.HTTPStatusError) as e:
         raise e
-    
+
     content_length = response.headers.get('content-length')
     if content_length and int(content_length) > settings.max_response_size:
         logger.warning(f"Response too large: {url} ({content_length} bytes)")
         return None
-        
+
     await asyncio.sleep(settings.rate_limit_delay)
     return response
 
