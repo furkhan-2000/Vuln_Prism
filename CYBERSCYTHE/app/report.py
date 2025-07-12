@@ -38,6 +38,7 @@ def create_pdf_report(scan_id, url, findings, output_path):
             pdf.set_font("Arial", 'B', 10)
             pdf.cell(0, 8, write(f"[{vuln.get('type', 'N/A').upper()}] Severity: {vuln.get('severity', 'N/A')}"), 0, 1)
             pdf.set_font("Arial", '', 10)
+            # Use multi_cell for descriptions that might wrap
             pdf.multi_cell(0, 6, write(f"Description: {vuln.get('description', 'No description provided.')}"))
             pdf.ln(5)
 

@@ -9,9 +9,8 @@ RUN apt-get update \
     gcc python3-dev \
     && pip install --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt \
-    && playwright install --with-deps \
-    && playwright install-deps \
-    && apt-get autoremove -y \
+    && playwright install chromium --with-deps \
+    && apt-get purge -y --auto-remove gcc python3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 

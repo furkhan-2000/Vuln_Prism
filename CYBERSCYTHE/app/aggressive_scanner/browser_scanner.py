@@ -134,12 +134,12 @@ async def human_like_type(element, text, user_profile="expert"):
             await asyncio.sleep(max(0.1, pause))
 
             # 40% chance of micro-corrections
-            if random.random() < 0.4:
+            if random.random() < 0.4 and recursion_depth < 3: # Added recursion limit
                 corrections = random.randint(1, min(3, len(word)))
                 for _ in range(corrections):
                     await element.press('Backspace')
                     await asyncio.sleep(0.05)
-                await human_like_type(element, word[-corrections:], user_profile)
+                await human_like_type(element, word[-corrections:], user_profile, recursion_depth + 1)
 
 # --- Advanced human behavior with strategic patterns ---
 async def simulate_human_behavior(page, aggression_level=3):
@@ -270,9 +270,14 @@ async def aggressive_run(url: str, scan_result: ScanResult, aggression_level=3):
         page = await context.new_page()
 
         try:
-            await page.goto(url, timeout=60000,
-                            wait_until=random.choice(['domcontentloaded', 'load', 'networkidle']))
+            await page.goto(url, timeout=60000, wait_until=random.choice(['domcontentloaded', 'load', 'networkidle']))
+        except Exception as e:
+            logger.error(f"Failed to navigate to {url}: {e}")
+            scan_result.error_count += 1
+            await browser.close()
+            return
 
+            logger.info(f"Starting scan for {url}")
             await simulate_human_behavior(page, aggression_level)
             await break_captcha(page) # Attempt to break CAPTCHA
 
@@ -308,6 +313,7 @@ async def aggressive_run(url: str, scan_result: ScanResult, aggression_level=3):
                 try:
                     name = await element.get_attribute('name') or await element.get_attribute('id')
                     if not name:
+                        logger.warning(f"Found an input element without a name or id. Skipping.")
                         continue
 
                     logger.info(f"Testing input field: {name}")
@@ -346,6 +352,8 @@ async def aggressive_run(url: str, scan_result: ScanResult, aggression_level=3):
             response_text = await page.content()
             if detect_info_disclosure(response_text):
                 scan_result.add_vulnerability(url, "Info Disclosure", "Page Content", "N/A")
+
+            logger.info(f"Browser scan complete for {url}")
 
         except Exception as e:
             logger.exception(f"Browser scan failed for {url}: {e}")

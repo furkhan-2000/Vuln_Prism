@@ -34,6 +34,16 @@ class ScanResult:
         self.vuln_count += 1
         logger.critical(f"VULNERABILITY: {vuln_type} at {url} in param '{param}'")
 
+    def to_dict(self):
+        return {
+            'url': getattr(self, 'url', 'N/A'),
+            'title': getattr(self, 'title', 'N/A'),
+            'vulnerabilities': self.vulnerabilities,
+            'scanned_urls': self.scanned_urls,
+            'vuln_count': self.vuln_count,
+            'error_count': self.error_count
+        }
+
     def report(self):
         logger.info("\n=== SCAN REPORT ===")
         logger.info(f"Scanned URLs: {self.scanned_urls}")
