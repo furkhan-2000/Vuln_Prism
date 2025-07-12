@@ -36,13 +36,16 @@ class ScanResult:
         }
 
     def report(self):
-        logger.info("
-=== SCAN REPORT ===")
+        logger.info("\n=== SCAN REPORT ===")
         logger.info(f"Scanned URLs: {self.scanned_urls}")
         logger.info(f"Vulnerabilities found: {self.vuln_count}")
         logger.info(f"Errors encountered: {self.error_count}")
         for vuln in self.vulnerabilities:
             logger.info(
+                f"[{vuln['type']}] {vuln['url']} "
+                f"Parameter: {vuln['param']} "
+                f"Payload: {vuln['payload']}"
+            )
                 f"[{vuln['type']}] {vuln['url']} "
                 f"Parameter: {vuln['param']} "
                 f"Payload: {vuln['payload']}"
