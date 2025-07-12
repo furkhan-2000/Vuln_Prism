@@ -46,8 +46,6 @@ class ScanResult:
                 f"Parameter: {vuln['param']} "
                 f"Payload: {vuln['payload']}"
             )
-                f"[{vuln['type']}] {vuln['url']} "
-                f"Parameter: {vuln['param']} "
                 f"Payload: {vuln['payload']}"
             )
 
