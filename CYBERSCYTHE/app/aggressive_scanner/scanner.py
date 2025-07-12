@@ -46,8 +46,6 @@ class ScanResult:
                 f"Parameter: {vuln['param']} "
                 f"Payload: {vuln['payload']}"
             )
-                f"Payload: {vuln['payload']}"
-            )
 
 async def perform_scan(url: str) -> ScanResult:
     """Initiates and runs the full scan against the target URL."""
@@ -61,4 +59,3 @@ async def perform_scan(url: str) -> ScanResult:
     
     scan_result.report() # Log the final report to the console
     return scan_result
-
