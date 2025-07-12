@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VulnPrism - Cyber Security Dashboard</title>
+  
+  <!-- Override console.warn -->
+  <script>
+    (function(){
+      const origWarn = console.warn;
+      console.warn = function(msg, ...args){
+        if (typeof msg === 'string' && (
+             msg.includes('cdn.tailwindcss.com should not be used in production') ||
+             msg.includes('in-browser Babel transformer')
+           )) {
+          return;
+        }
+        origWarn.call(console, msg, ...args);
+      };
+    })();
+  </script>
+
+  <!-- External Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&display=swap');
+    
+    :root {
+      --cyber-teal: #38bdf8;
+      --holographic-purple: #c084fc;
+      --cyber-blue: #0ff;
+      --matrix-green: #0f0;
+      --deep-space: #0a0a15;
+    }
+    
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: linear-gradient(135deg, var(--deep-space) 0%, #000 100%);
+      color: #e0e0ff;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    .shimmer-text {
+      background: linear-gradient(90deg, 
+        var(--cyber-teal) 20%, 
+        var(--holographic-purple) 40%, 
+        var(--cyber-teal) 60%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 3s linear infinite;
+    }
+    
+    @keyframes fogMove {
+      0%   { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+    
+    .fog {
+      pointer-events: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/foggy.png');
+      opacity: 0.12;
+      animation: fogMove 60s linear infinite;
+      z-index: 5;
+    }
+    
+    .cyber-border {
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2),
+                 0 0 30px rgba(192, 132, 252, 0.1),
+                 inset 0 0 15px rgba(56, 189, 248, 0.1);
+    }
+    
+    .cyber-glow {
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.5),
+                 0 0 20px rgba(192, 132, 252, 0.3);
+    }
+    
+    .cyber-card {
+      background: rgba(10, 15, 25, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .cyber-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.3),
+                 0 0 30px rgba(192, 132, 252, 0.2);
+    }
+    
+    .section-title {
+      position: relative;
+      display: inline-block;
+      margin-bottom: 2.5rem;
+    }
+    
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 10%;
+      width: 80%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyber-teal), var(--holographic-purple), transparent);
+      border-radius: 2px;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, rgba(10, 10, 25, 0.9) 0%, rgba(20, 30, 48, 0.7) 100%);
+    }
+    
+    .terminal-text {
+      font-family: 'Courier New', monospace;
+      color: var(--matrix-green);
+      text-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+    }
+    
+    .scroll-down {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+      40% { transform: translateY(-20px) translateX(-50%); }
+      60% { transform: translateY(-10px) translateX(-50%); }
+    }
+    
+    .parallax-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    
+    .grid-pattern {
+      background-image: 
+        radial-gradient(circle at 1px 1px, rgba(56, 189, 248, 0.1) 1px, transparent 0);
+      background-size: 30px 30px;
+    }
+    
+    .cyber-button {
+      background: linear-gradient(135deg, var(--cyber-teal), var(--holographic-purple));
+      border: none;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+    }
+    
+    .cyber-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.6);
+    }
+    
+    .cyber-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 20px;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(25deg);
+      transition: all 0.5s;
+    }
+    
+    .cyber-button:hover::after {
+      left: 120%;
+    }
+    
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyber-teal), transparent);
+      animation: scan 3s linear infinite;
+    }
+    
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+    
+    .holographic-line {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyber-teal), var(--holographic-purple), transparent);
+      margin: 20px 0;
+    }
+
+    /* New styles for parallel scrolling and bot icon */
+    .pin-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .pin-content {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bot-icon-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--cyber-teal), var(--holographic-purple));
+      box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .bot-icon-container:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.6);
+    }
+
+    .bot-icon-container svg {
+      width: 40px;
+      height: 40px;
+      color: white;
+    }
+
+    .bot-hover-text {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      pointer-events: none;
+      margin-bottom: 10px;
+    }
+
+    .bot-icon-container:hover .bot-hover-text {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .linkedin-link:hover {
+      color: #0077B5; /* LinkedIn blue */
+      text-shadow: 0 0 8px #0077B5;
+    }
+
+    /* Transparent cyber-card with glowing border */
+    .transparent-cyber-card {
+      background: rgba(10, 15, 25, 0.0); /* Fully transparent background */
+      backdrop-filter: blur(0px); /* Remove blur */
+      border: none; /* Remove default border */
+      position: relative;
+      overflow: hidden; /* For the glowing border effect */
+      border-radius: 12px;
+      padding: 8px;
+      text-decoration: none; /* Remove underline from <a> tag */
+      display: block; /* Make the whole card clickable */
+    }
+
+    .transparent-cyber-card::before {
+      content: '';
+      position: absolute;
+      top: -100%;
+      left: -100%;
+      width: 300%;
+      height: 300%;
+      background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        var(--cyber-teal) 10%,
+        var(--holographic-purple) 20%,
+        transparent 30%
+      );
+      animation: rotateBorder 4s linear infinite;
+      z-index: -1;
+    }
+
+    .transparent-cyber-card::after {
+      content: '';
+      position: absolute;
+      inset: 2px; /* Adjust to control border thickness */
+      background: linear-gradient(135deg, var(--deep-space) 0%, #000 100%); /* Match body background */
+      border-radius: 10px; /* Slightly smaller than parent for border effect */
+      z-index: -1;
+    }
+
+    @keyframes rotateBorder {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .hero-description {
+        font-size: 1rem;
+      }
+      .cyber-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+      .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
+        grid-template-columns: 1fr;
+      }
+      .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4 {
+        grid-template-columns: 1fr;
+      }
+      .grid-cols-1.lg\:grid-cols-2 {
+        grid-template-columns: 1fr;
+      }
+      .about-content .flex-shrink-0 {
+        width: 100%;
+      }
+      .bot-icon-container {
+        width: 60px;
+        height: 60px;
+        bottom: 15px;
+        right: 15px;
+      }
+      .bot-hover-text {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+      }
+    }
+  </style>
+</head>
+<body class="overflow-x-hidden">
+  <div id="root"></div>
+  <div class="fog"></div>
+  <div class="scan-line"></div>
+
+  <script type="text/babel">
+    const CYBER_PALETTE = {
+      black: '#000000',
+      cyberTeal: '#38bdf8',
+      holographicPurple: '#c084fc',
+      matrixGreen: '#0f0',
+      deepSpace: '#0a0a15'
+    };
+
+    const user = { id: 'user123', fingerprint: 'unique-biometric-token' };
+
+    // Enhanced DNA Background with Three.js
+    function DNABackground({ user }) {
+      const dnaHash = CryptoJS.SHA256(user.fingerprint + user.id).toString();
+      const seed = parseInt(dnaHash.slice(0, 8), 16);
+
+      React.useEffect(() => {
+        const canvas = document.getElementById('dna-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+          canvas, 
+          alpha: true,
+          antialias: true
+        });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor(0x000000, 0);
+
+        // Add floating particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        const posArray = new Float32Array(particlesCount * 3);
+        
+        for(let i = 0; i < particlesCount * 3; i++) {
+          posArray[i] = (Math.random() - 0.5) * 100;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+          size: 0.1,
+          color: CYBER_PALETTE.cyberTeal,
+          transparent: true,
+          opacity: 0.6
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        // DNA Strands
+        const vertexShader = `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `;
+        
+        const fragmentShader = `
+          uniform float time;
+          uniform vec3 color1;
+          uniform vec3 color2;
+          varying vec2 vUv;
+          void main() {
+            float t = (sin(time + vUv.x*10.0 + vUv.y*10.0) +
+                       sin(time*1.5 + vUv.x*5.0 - vUv.y*5.0)) * 0.25 + 0.5;
+            vec3 color = mix(color1, color2, t);
+            float pulse = sin(time*2.0)*0.1 + 0.6;
+            gl_FragColor = vec4(color, pulse * 0.4);
+          }
+        `;
+
+        const material = new THREE.ShaderMaterial({
+          uniforms: {
+            time:   { value: 0 },
+            color1: { value: new THREE.Color(CYBER_PALETTE.cyberTeal) },
+            color2: { value: new THREE.Color(CYBER_PALETTE.holographicPurple) }
+          },
+          vertexShader,
+          fragmentShader,
+          wireframe: true,
+          transparent: true
+        });
+
+        function makeTorus(x, ry=0) {
+          const geo = new THREE.TorusGeometry(12, 2, 64, 200);
+          const mesh = new THREE.Mesh(geo, material);
+          mesh.position.x = x;
+          mesh.rotation.y = ry;
+          scene.add(mesh);
+          return mesh;
+        }
+
+        const torus1 = makeTorus(-5, 0);
+        const torus2 = makeTorus(5, Math.PI/2);
+
+        camera.position.z = 30;
+        let idx = 0;
+        const interval = setInterval(() => {
+          idx = (idx + 1) % 3;
+          const tgt = [-5, 0, 5];
+          gsap.to(torus1.position, { z: tgt[idx], duration: 1, ease: "power2.inOut" });
+          gsap.to(torus2.position, { z: tgt[(idx+2)%3], duration: 1, ease: "power2.inOut" });
+        }, 5000);
+
+        function animate() {
+          requestAnimationFrame(animate);
+          torus1.rotation.x += 0.004; 
+          torus1.rotation.y += 0.004;
+          torus2.rotation.x += 0.004; 
+          torus2.rotation.y += 0.004;
+          particlesMesh.rotation.y += 0.001;
+          material.uniforms.time.value += 0.04;
+          renderer.render(scene, camera);
+        }
+        animate();
+
+        // Handle resize
+        const handleResize = () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+        
+        window.addEventListener('resize', handleResize);
+        
+        return () => { 
+          clearInterval(interval); 
+          renderer.dispose();
+          window.removeEventListener('resize', handleResize);
+        };
+      }, [seed]);
+
+      return <canvas id="dna-canvas" className="fixed inset-0 z-0 opacity-25" />;
+    }
+
+    // Main Dashboard Component with Sections
+    function Dashboard() {
+      React.useEffect(() => {
+        // Initialize GSAP animations
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Hero animations
+        gsap.from('#dropV', {
+          y: -300,
+          opacity: 0,
+          duration: 1.5,
+          ease: 'bounce.out',
+          delay: 0.2
+        });
+        
+        gsap.from('#dropP', {
+          y: -300,
+          opacity: 0,
+          duration: 1.5,
+          ease: 'bounce.out',
+          delay: 0.4
+        });
+        
+        gsap.from('.hero-subtitle', {
+          opacity: 0,
+          y: 20,
+          duration: 1,
+          delay: 1.2
+        });
+        
+        gsap.from('.hero-description', {
+          opacity: 0,
+          y: 20,
+          duration: 1,
+          delay: 1.4
+        });
+        
+        gsap.from('.cta-button', {
+          opacity: 0,
+          y: 20,
+          duration: 1,
+          delay: 1.6
+        });
+        
+        // Section animations
+        gsap.utils.toArray('.section').forEach(section => {
+          gsap.from(section, {
+            opacity: 0,
+            y: 50,
+            duration: 1,
+            scrollTrigger: {
+              trigger: section,
+              start: 'top 80%',
+              toggleActions: 'play none none none'
+            }
+          });
+        });
+        
+        // Card animations
+        gsap.utils.toArray('.cyber-card').forEach((card, i) => {
+          gsap.from(card, {
+            opacity: 0,
+            y: 30,
+            duration: 0.8,
+            delay: i * 0.1,
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 90%',
+              toggleActions: 'play none none none'
+            }
+          });
+        });
+
+        // Parallel scrolling for "About VulnPrism" section
+        gsap.to(".about-content", {
+          xPercent: -100,
+          ease: "none",
+          scrollTrigger: {
+            trigger: ".about-section",
+            pin: true,
+            scrub: 1,
+            end: () => "+=" + document.querySelector(".about-content").offsetWidth
+          }
+        });
+
+      }, []);
+
+      return (
+        <div className="relative z-10">
+          {/* Hero Section */}
+          <section className="min-h-screen flex flex-col items-center justify-center text-center relative overflow-hidden pt-20">
+            <DNABackground user={user} />
+            <div className="max-w-4xl px-4 z-10">
+              <h1 className="text-6xl md:text-8xl font-bold mb-6">
+                <span id="dropV" className="inline-block shimmer-text">V</span>uln
+                <span id="dropP" className="inline-block shimmer-text">P</span>rism
+              </h1>
+              <h2 className="3xl md:text-4xl font-bold mb-4 hero-subtitle">
+                Advanced <span className="shimmer-text">Security Intelligence</span> Platform
+              </h2>
+              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto hero-description">
+                Comprehensive vulnerability detection and remediation across your entire software development lifecycle, from code to cloud. Leverage AI-powered analysis for both static code and live applications.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/static/index.html" className="cyber-button cta-button">Launch Live Scan</a>
+                <a href="/sast/temp_index.html" className="cyber-button bg-transparent border border-cyan-500 cta-button">Audit Source Code</a>
+              </div>
+            </div>
+            <div className="scroll-down">
+              <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+              </svg>
+            </div>
+          </section>
+          
+          {/* About VulnPrism Section (Parallel Scrolling) */}
+          <section className="pin-section about-section bg-gradient-to-r from-deep-space to-black py-20">
+            <div className="pin-content">
+              <div className="about-content flex flex-nowrap overflow-hidden w-full">
+                <div className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-8 text-center">
+                  <h2 className="text-4xl font-bold mb-6 section-title shimmer-text">About VulnPrism</h2>
+                  <p className="text-lg text-gray-300 leading-relaxed">
+                    VulnPrism is a cutting-edge cybersecurity platform designed to empower developers and security teams with unparalleled visibility and control over their application security posture. We provide a holistic approach to vulnerability management, integrating advanced AI and machine learning to detect, analyze, and help remediate security flaws across the entire software development lifecycle.
+                  </p>
+                </div>
+                <div className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-8 text-center">
+                  <h3 className="text-3xl font-bold mb-4 shimmer-text">Our Mission</h3>
+                  <p className="text-lg text-gray-300 leading-relaxed">
+                    Our mission is to simplify application security, making it accessible and effective for organizations of all sizes. By automating complex scanning processes and providing actionable insights, VulnPrism helps you build secure software faster, reduce your attack surface, and protect your valuable assets from evolving cyber threats.
+                  </p>
+                </div>
+                <div className="flex-shrink-0 w-full md:w-1/2 lg:w-1/3 p-8 text-center">
+                  <h3 className="text-3xl font-bold mb-4 shimmer-text">Why Choose VulnPrism?</h3>
+                  <ul className="text-lg text-gray-300 list-disc list-inside text-left mx-auto max-w-md">
+                    <li>Comprehensive coverage: SAST, DAST, and SCA in one platform.</li>
+                    <li>AI-powered accuracy: Minimize false positives and focus on real threats.</li>
+                    <li>Automated remediation: Get actionable steps and code suggestions.</li>
+                    <li>Seamless integration: Fits into your existing CI/CD pipelines.</li>
+                    <li>User-friendly interface: Intuitive design for developers and security experts.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          {/* Core Capabilities Section */}
+          <section className="py-20 section gradient-bg">
+            <div className="max-w-7xl mx-auto px-4">
+              <h2 className="text-4xl font-bold text-center mb-16 section-title shimmer-text">Core Capabilities</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {/* Feature Card 1: AI-Powered Threat Detection */}
+                <div className="cyber-card cyber-border p-8">
+                  <div className="text-cyan-400 mb-4">
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">AI-Powered Threat Detection</h3>
+                  <p className="text-gray-300">
+                    Our advanced AI and machine learning models analyze both static code and dynamic application behavior to detect a wide spectrum of vulnerabilities, including zero-days, with high accuracy.
+                  </p>
+                </div>
+                
+                {/* Feature Card 2: Deep Code & Dependency Analysis (SAST/SCA) */}
+                <div className="cyber-card cyber-border p-8">
+                  <div className="text-cyan-400 mb-4">
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">Deep Code & Dependency Analysis (SAST/SCA)</h3>
+                  <p className="text-gray-300">
+                    Perform in-depth static analysis of your source code and identify vulnerable open-source components, ensuring security from the earliest stages of development.
+                  </p>
+                </div>
+
+                {/* Feature Card 3: Automated Remediation */}
+                <div className="cyber-card cyber-border p-8">
+                  <div className="text-purple-400 mb-4">
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
+                    </svg>
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3">Automated Remediation</h3>
+                  <p className="text-gray-300">
+                    Receive AI-generated remediation advice, code patches, and actionable security recommendations to quickly fix identified vulnerabilities at both the code and application layers.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          {/* Stats Section */}
+          <section className="py-20 section relative overflow-hidden">
+            <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center cyber-card cyber-border p-6">
+                <div className="text-5xl font-bold text-cyan-400 mb-2">95.0%</div>
+                <div className="text-gray-300">Detection Accuracy</div>
+              </div>
+              
+              <div className="text-center cyber-card cyber-border p-6">
+                <div className="text-5xl font-bold text-cyan-400 mb-2">10x</div>
+                <div className="text-gray-300">Faster Remediation</div>
+              </div>
+              
+              <div className="text-center cyber-card cyber-border p-6">
+                <div className="text-5xl font-bold text-purple-400 mb-2">0</div>
+                <div className="text-gray-300">False Positives</div>
+              </div>
+            </div>
+          </section>
+          
+          {/* How It Works Section */}
+          <section className="py-20 section gradient-bg">
+            <div className="max-w-7xl mx-auto px-4">
+              <h2 className="text-4xl font-bold text-center mb-16 section-title shimmer-text">How VulnPrism Works</h2>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                {/* SAST/SCA Workflow */}
+                <div className="transparent-cyber-card cyber-border p-8">
+                  <h3 className="text-3xl font-bold mb-6 shimmer-text">Static Code Analysis (SAST/SCA)</h3>
+                  <div className="space-y-8">
+                    <div>
+                      <div className="text-cyan-400 text-3xl font-bold mb-4">01</div>
+                      <h4 className="text-2xl font-bold mb-3">Unleash Code Power</h4>
+                      <p className="text-gray-300 mb-4">
+                        Our SAST engine meticulously dissects your codebase, identifying critical vulnerabilities and security misconfigurations before deployment. It's like an X-ray for your code, revealing hidden flaws.
+                      </p>
+                    </div>
+                    <div>
+                      <div className="text-purple-400 text-3xl font-bold mb-4">02</div>
+                      <h4 className="text-2xl font-bold mb-3">Dependency Deep Dive</h4>
+                      <p className="text-gray-300 mb-4">
+                        Beyond your custom code, our SCA module scans all third-party libraries and dependencies for known vulnerabilities, ensuring your entire software supply chain is secure. Stay ahead of open-source risks.
+                      </p>
+                    </div>
+                    <div>
+                      <div className="text-cyan-400 text-3xl font-bold mb-4">03</div>
+                      <h4 className="text-2xl font-bold mb-3">Precision Remediation</h4>
+                      <p className="text-gray-300 mb-4">
+                        Get actionable insights with AI-generated fixes and detailed reports. Our recommendations are precise, helping your team patch vulnerabilities quickly and efficiently, securing your software from its foundation.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* DAST Workflow */}
+                <div className="transparent-cyber-card cyber-border p-8">
+                  <h3 className="text-3xl font-bold mb-6 shimmer-text">CyberScythe: Dynamic Application Security</h3>
+                  <div className="space-y-8">
+                    <div>
+                      <div className="text-cyan-400 text-3xl font-bold mb-4">01</div>
+                      <h4 className="text-2xl font-bold mb-3">Live Target Engagement</h4>
+                      <p className="text-gray-300 mb-4">
+                        Initiate dynamic security testing by simply providing the URL of your live web application or API endpoint. CyberScythe, our advanced DAST engine, then begins its intelligent scanning process, simulating real-world attack scenarios against your deployed environment.
+                      </p>
+                    </div>
+                    <div>
+                      <div className="text-purple-400 text-3xl font-bold mb-4">02</div>
+                      <h4 className="text-2xl font-bold mb-3">Runtime Vulnerability Discovery</h4>
+                      <p className="text-gray-300 mb-4">
+                        CyberScythe intelligently crawls and interacts with your running application, uncovering critical runtime flaws like broken authentication, misconfigurations, and data exposure that static analysis often misses. It's real-world testing, in real-time.
+                      </p>
+                    </div>
+                    <div>
+                      <div className="text-cyan-400 text-3xl font-bold mb-4">03</div>
+                      <h4 className="text-2xl font-bold mb-3">Instant Threat Intelligence</h4>
+                      <p className="text-gray-300 mb-4">
+                        Gain immediate visibility into active threats with real-time alerts. Comprehensive PDF reports are generated on completion, detailing discovered vulnerabilities, their impact, and practical remediation steps, enabling rapid response to critical security findings in your live applications.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+          
+          {/* CTA Section */}
+          <section className="py-32 section relative overflow-hidden">
+            <div className="max-w-4xl mx-auto px-4 text-center">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Ready to <span className="shimmer-text">Secure Your Entire Software Ecosystem</span>?
+              </h2>
+              <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
+                Join thousands of developers who trust VulnPrism for enterprise-grade security.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="/static/index.html" className="cyber-button px-10 py-4 text-xl">
+                  Launch Live Scan
+                </a>
+                <a href="/sast/temp_index.html" className="cyber-button bg-transparent border border-cyan-500 text-xl">
+                  Audit Source Code
+                </a>
+              </div>
+            </div>
+          </section>
+          
+          {/* AI Bot Icon */}
+          <div className="bot-icon-container">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            </svg>
+            <div className="bot-hover-text">Zoya - AI Bot</div>
+          </div>
+
+          {/* Footer */}
+          <footer className="py-12 border-t border-cyan-900">
+            <div className="max-w-7xl mx-auto px-4 text-center">
+              <div className="text-2xl font-bold mb-4 shimmer-text">VulnPrism</div>
+              <p className="text-gray-400 mb-6">Advanced Security Intelligence Platform</p>
+              <div className="flex justify-center space-x-6 mb-6">
+                {/* Social media icons can be added here if desired */}
+              </div>
+              <p className="text-gray-500 text-sm">
+                Designed & developed by Khan Mohammed © 2025 All rights reserved | 
+                <a href="https://www.linkedin.com/in/khan-mohammed-790b18214" target="_blank" rel="noopener noreferrer" className="linkedin-link text-gray-400 transition">
+                  www.linkedin.com/in/khan-mohammed-790b18214
+                </a>
+              </p>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Dashboard />);
+  </script>
+</body>
+</html>

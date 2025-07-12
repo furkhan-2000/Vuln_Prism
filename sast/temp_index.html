@@ -2,14 +2,168 @@
 <html>
 <head>
   <meta charset="utf-8"/>
-  <title>VulnPrism</title>
+  <title>VulnPrism SAST & SCA</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    .field { margin: 15px; }
+    @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&display=swap');
+    
+    :root {
+      --cyber-teal: #38bdf8;
+      --holographic-purple: #c084fc;
+      --cyber-blue: #0ff;
+      --matrix-green: #0f0;
+      --deep-space: #0a0a15;
+    }
+    
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: linear-gradient(135deg, var(--deep-space) 0%, #000 100%);
+      color: #e0e0ff;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+      margin: 0; /* Remove default body margin */
+      padding: 0; /* Remove default body padding */
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    
+    .shimmer-text {
+      background: linear-gradient(90deg, 
+        var(--cyber-teal) 20%, 
+        var(--holographic-purple) 40%, 
+        var(--cyber-teal) 60%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: shimmer 3s linear infinite;
+    }
+    
+    @keyframes fogMove {
+      0%   { background-position: 0% 0%; }
+      100% { background-position: 100% 100%; }
+    }
+    
+    .fog {
+      pointer-events: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/foggy.png');
+      opacity: 0.12;
+      animation: fogMove 60s linear infinite;
+      z-index: -1; /* Ensure fog is behind content */
+    }
+    
+    .scan-line {
+      position: fixed; /* Changed to fixed */
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyber-teal), transparent);
+      animation: scan 3s linear infinite;
+      z-index: -1; /* Ensure scan-line is behind content */
+    }
+    
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+
+    .cyber-button {
+      background: linear-gradient(135deg, var(--cyber-teal), var(--holographic-purple));
+      border: none;
+      color: white;
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+      cursor: pointer; /* Add cursor pointer */
+    }
+    
+    .cyber-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.6);
+    }
+    
+    .cyber-button::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -60%;
+      width: 20px;
+      height: 200%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: rotate(25deg);
+      transition: all 0.5s;
+    }
+    
+    .cyber-button:hover::after {
+      left: 120%;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 30px;
+      background: rgba(10, 15, 25, 0.7); /* Semi-transparent background for content container */
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      position: relative; /* For z-index */
+      z-index: 1; /* Ensure content is above background effects */
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .field { 
+      margin: 20px 0; 
+    }
+
+    input[type="url"],
+    textarea {
+      padding: 12px 15px;
+      width: calc(100% - 30px); /* Adjust width for padding */
+      border-radius: 5px;
+      border: 1px solid rgba(56, 189, 248, 0.3); /* Cyber border */
+      background: rgba(255, 255, 255, 0.05); /* Slightly visible background */
+      color: #eee;
+      font-size: 1rem;
+      box-shadow: inset 0 0 8px rgba(56, 189, 248, 0.1);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input[type="url"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--cyber-teal);
+      box-shadow: inset 0 0 8px rgba(56, 189, 248, 0.3), 0 0 10px rgba(56, 189, 248, 0.5);
+    }
+
     #progressContainer {
-      width: 60%;
+      width: 80%;
       margin: 30px auto;
       display: none;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.2);
     }
     #progressBar {
       height: 20px;
@@ -21,40 +175,97 @@
     #statusText {
       margin-top: 10px;
       font-weight: bold;
+      color: #eee;
     }
-    .error { color: #f44336; }
-    .success { color: #4caf50; }
+    .error { 
+      color: #f44336; 
+      background: rgba(244, 67, 54, 0.1);
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .success { 
+      color: #4caf50; 
+      background: rgba(76, 175, 80, 0.1);
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .linkedin-link:hover {
+      color: #0077B5; /* LinkedIn blue */
+      text-shadow: 0 0 8px #0077B5;
+    }
+
+    /* Mobile responsiveness */
+    @media (max-width: 768px) {
+      .container {
+        margin: 20px auto;
+        padding: 15px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      p {
+        font-size: 1rem;
+      }
+      input[type="url"],
+      textarea {
+        width: calc(100% - 20px); /* Adjust width for smaller padding */
+        padding: 10px;
+      }
+      .cyber-button {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+      #progressContainer {
+        width: 95%;
+        padding: 8px;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>VulnPrism</h1>
-  <p>Submit your code for a deep, language‑agnostic SAST &amp; SCA analysis.</p>
+  <div class="fog"></div>
+  <div class="scan-line"></div>
 
-  <form id="scanForm">
-    <div class="field">
-      <label><strong>Git Repo URL:</strong></label><br/>
-      <input type="url" name="repo_url" placeholder="https://github.com/you/repo.git" style="width:60%;" />
+  <div class="container">
+    <h1 class="shimmer-text">VulnPrism SAST & SCA</h1>
+    <p>Submit your code for a deep, language‑agnostic SAST &amp; SCA analysis. Our powerful engines meticulously dissect your codebase and dependencies to uncover critical vulnerabilities and ensure your software supply chain is secure.</p>
+
+    <form id="scanForm">
+      <div class="field">
+        <label><strong>Git Repo URL:</strong></label><br/>
+        <input type="url" name="repo_url" placeholder="https://github.com/you/repo.git" />
+      </div>
+
+      <div class="field">
+        <label><strong>Paste Code:</strong></label><br/>
+        <textarea name="code_text" rows="8" placeholder="Paste your code here…"></textarea>
+      </div>
+
+      <div class="field">
+        <label><strong>Upload File/Archive:</strong></label><br/>
+        <input type="file" name="file" accept=".zip,.tar.gz,.tgz,.tar,.*" />
+      </div>
+
+      <div class="field">
+        <button type="submit" class="cyber-button">Scan Now</button>
+      </div>
+    </form>
+
+    <div id="progressContainer">
+      <div id="progressBar"></div>
+      <div id="statusText">Initializing scan...</div>
     </div>
-
-    <div class="field">
-      <label><strong>Paste Code:</strong></label><br/>
-      <textarea name="code_text" rows="8" style="width:60%;" placeholder="Paste your code here…"></textarea>
-    </div>
-
-    <div class="field">
-      <label><strong>Upload File/Archive:</strong></label><br/>
-      <input type="file" name="file" accept=".zip,.tar.gz,.tgz,.tar,.*" />
-    </div>
-
-    <div class="field">
-      <button type="submit" style="padding:10px 20px;">Scan Now</button>
-    </div>
-  </form>
-
-  <div id="progressContainer">
-    <div id="progressBar"></div>
-    <div id="statusText">Initializing scan...</div>
   </div>
+
+  <footer style="text-align: center; padding: 20px; margin-top: 50px; color: #aaa;">
+    <p style="font-size: 0.9rem;">
+      Designed & developed by Khan Mohammed © 2025 All rights reserved | 
+      <a href="https://www.linkedin.com/in/khan-mohammed-790b18214" target="_blank" rel="noopener noreferrer" class="linkedin-link" style="color: #eee; text-decoration: none;">
+        www.linkedin.com/in/khan-mohammed-790b18214
+      </a>
+    </p>
+  </footer>
 
   <script>
     const form = document.getElementById('scanForm');
