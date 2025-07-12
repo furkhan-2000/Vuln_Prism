@@ -120,15 +120,15 @@ async def aggressive_run(url: str, scan_result: ScanResult):
 
             # --- Perform Static Analysis First ---
             logger.info(f"Performing static analysis on {url}")
-            check_security_headers(headers, scan_result.vulnerabilities)
-            check_exposed_api_keys(html_content, scan_result.vulnerabilities)
-            check_outdated_software(headers, html_content, scan_result.vulnerabilities)
-            check_directory_listing(url, scan_result.vulnerabilities)
-            check_common_misconfigurations(url, scan_result.vulnerabilities)
-            check_insecure_forms(tree, url, scan_result.vulnerabilities)
-            check_sensitive_file_exposure(url, scan_result.vulnerabilities)
-            check_insecure_cookies(await context.cookies(), url, scan_result.vulnerabilities)
-            check_cors_misconfiguration(headers, scan_result.vulnerabilities)
+            check_security_headers(headers, scan_result.vulnerabilities, url)
+            check_exposed_api_keys(html_content, scan_result.vulnerabilities, url)
+            check_outdated_software(headers, html_content, scan_result.vulnerabilities, url)
+            check_directory_listing(url, scan_result.vulnerabilities, url)
+            check_common_misconfigurations(url, scan_result.vulnerabilities, url)
+            check_insecure_forms(tree, url, scan_result.vulnerabilities, url)
+            check_sensitive_file_exposure(url, scan_result.vulnerabilities, url)
+            check_insecure_cookies(await context.cookies(), url, scan_result.vulnerabilities, url)
+            check_cors_misconfiguration(headers, scan_result.vulnerabilities, url)
 
             # --- Dynamic Injection Testing on Forms ---
             logger.info(f"Starting dynamic form injection for {url}")

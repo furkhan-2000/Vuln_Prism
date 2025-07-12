@@ -129,7 +129,7 @@ def detect_info_disclosure(response_text: str) -> bool:
         logger.error(f"Info disclosure detection error: {e}")
         return False
 
-def check_security_headers(headers, vulnerabilities):
+def check_security_headers(headers, vulnerabilities, url):
     missing_headers = []
     if 'Strict-Transport-Security' not in headers:
         missing_headers.append("Strict-Transport-Security (HSTS)")
@@ -144,12 +144,13 @@ def check_security_headers(headers, vulnerabilities):
 
     if missing_headers:
         vulnerabilities.append({
+            "url": url,
             "type": "Missing Security Headers",
             "severity": "Medium",
             "description": f"The following security headers are missing or misconfigured: {', '.join(missing_headers)}. This can lead to various attacks like XSS, clickjacking, and protocol downgrade attacks."
         })
 
-def check_exposed_api_keys(html_content, vulnerabilities):
+def check_exposed_api_keys(html_content, vulnerabilities, url):
     patterns = [
         r'sk-[a-zA-Z0-9]{32,}',
         r'AIza[0-9A-Za-z\-_]{35}',
@@ -177,21 +178,24 @@ def check_exposed_api_keys(html_content, vulnerabilities):
 
     if found_keys:
         vulnerabilities.append({
+            "url": url,
             "type": "Exposed API Key/Token",
             "severity": "High",
             "description": f"Potentially exposed API keys or tokens found in the HTML content. Examples: {', '.join(found_keys[:3])}. This could lead to unauthorized access to services."
         })
 
-def check_outdated_software(headers, html_content, vulnerabilities):
+def check_outdated_software(headers, html_content, vulnerabilities, url):
     server_header = headers.get('Server', '').lower()
     if "apache" in server_header and not re.search(r'apache/(2\.[4-9]\.\d+|[3-9]\.\d+\.\d+)', server_header):
         vulnerabilities.append({
+            "url": url,
             "type": "Outdated Server Software",
             "severity": "Medium",
             "description": f"Potentially outdated Apache server detected: {server_header}. Update to the latest stable version to mitigate known vulnerabilities."
         })
     if "nginx" in server_header and not re.search(r'nginx/(1\.[18-9]\.\d+|[2-9]\.\d+\.\d+)', server_header):
         vulnerabilities.append({
+            "url": url,
             "type": "Outdated Server Software",
             "severity": "Medium",
             "description": f"Potentially outdated Nginx server detected: {server_header}. Update to the latest stable version to mitigate known vulnerabilities."
@@ -203,6 +207,7 @@ def check_outdated_software(headers, html_content, vulnerabilities):
             version = wp_version_match.group(1)
             if version < "6.0":
                 vulnerabilities.append({
+                    "url": url,
                     "type": "Outdated CMS (WordPress)",
                     "severity": "High",
                     "description": f"Outdated WordPress version detected: {version}. Many vulnerabilities exist in older versions. Update to the latest version."
@@ -215,12 +220,13 @@ def check_outdated_software(headers, html_content, vulnerabilities):
             version = php_version_match.group(1)
             if version.startswith(('5.', '7.0', '7.1', '7.2', '7.3', '7.4')):
                 vulnerabilities.append({
+                    "url": url,
                     "type": "Outdated PHP Version",
                     "severity": "High",
                     "description": f"Outdated PHP version detected: {version}. This version is End-of-Life and no longer receives security updates. Upgrade to a supported PHP version (e.g., 8.x)."
                 })
 
-def check_directory_listing(base_url, vulnerabilities):
+def check_directory_listing(base_url, vulnerabilities, url):
     common_paths = ["/.git/HEAD", "/.svn/entries", "/wp-content/", "/uploads/"]
     for path in common_paths:
         test_url = f"{base_url.rstrip('/')}{path}"
@@ -228,6 +234,7 @@ def check_directory_listing(base_url, vulnerabilities):
             response = httpx.get(test_url, follow_redirects=True, timeout=5)
             if response.status_code == 200 and ("Index of /" in response.text or "Parent Directory" in response.text or "wp-content" in response.text):
                 vulnerabilities.append({
+                    "url": url,
                     "type": "Directory Listing Enabled",
                     "severity": "High",
                     "description": f"Directory listing is enabled for {test_url}. This can expose sensitive files and directory structures."
@@ -235,7 +242,7 @@ def check_directory_listing(base_url, vulnerabilities):
         except httpx.RequestError:
             pass
 
-def check_common_misconfigurations(base_url, vulnerabilities):
+def check_common_misconfigurations(base_url, vulnerabilities, url):
     misconfig_paths = [
         "/.git/config", "/admin/", "/phpmyadmin/", "/backup/", "/test/",
         "/config.php.bak", "/.env", "/crossdomain.xml", "/sitemap.xml.bak",
@@ -247,6 +254,7 @@ def check_common_misconfigurations(base_url, vulnerabilities):
             response = httpx.get(test_url, follow_redirects=True, timeout=5)
             if response.status_code == 200 and len(response.text) > 50:
                 vulnerabilities.append({
+                    "url": url,
                     "type": "Common Misconfiguration/Exposed File",
                     "severity": "High",
                     "description": f"Potentially exposed sensitive file or misconfiguration at {test_url}. This could reveal sensitive information or provide unauthorized access."
@@ -254,10 +262,11 @@ def check_common_misconfigurations(base_url, vulnerabilities):
         except httpx.RequestError:
             pass
 
-def check_basic_xss(base_url, html_content, vulnerabilities):
+def check_basic_xss(base_url, html_content, vulnerabilities, url):
     test_payload = "<script>alert('XSS')</script>"
     if test_payload in html_content:
         vulnerabilities.append({
+            "url": url,
             "type": "Reflected XSS (Basic)",
             "severity": "Medium",
             "description": f"A basic XSS payload was reflected in the page content. This indicates a potential Cross-Site Scripting vulnerability. Further testing is recommended."
@@ -268,6 +277,7 @@ def check_basic_xss(base_url, html_content, vulnerabilities):
         response = httpx.get(test_url, follow_redirects=True, timeout=5)
         if test_payload in response.text:
             vulnerabilities.append({
+                "url": url,
                 "type": "Reflected XSS (URL Parameter)",
                 "severity": "Medium",
                 "description": f"A basic XSS payload injected via URL parameter was reflected. This indicates a potential Cross-Site Scripting vulnerability. Further testing is recommended."
@@ -275,7 +285,7 @@ def check_basic_xss(base_url, html_content, vulnerabilities):
     except httpx.RequestError:
         pass
 
-def check_insecure_forms(tree, base_url, vulnerabilities):
+def check_insecure_forms(tree, base_url, vulnerabilities, url):
     forms = tree.css('form')
     for form in forms:
         action = form.get('action', '')
@@ -283,6 +293,7 @@ def check_insecure_forms(tree, base_url, vulnerabilities):
 
         if base_url.startswith("https://") and action.startswith("http://"):
             vulnerabilities.append({
+                "url": url,
                 "type": "Insecure Form Submission (HTTP on HTTPS)",
                 "severity": "High",
                 "description": f"Form submits data over HTTP ({action}) while the page is HTTPS. This can expose sensitive user data."
@@ -297,12 +308,13 @@ def check_insecure_forms(tree, base_url, vulnerabilities):
 
         if not csrf_token_found and method == 'POST':
             vulnerabilities.append({
+                "url": url,
                 "type": "Missing CSRF Token (Heuristic)",
                 "severity": "Medium",
                 "description": f"POST form at '{action}' might be missing a CSRF token. This could make it vulnerable to Cross-Site Request Forgery (CSRF) attacks."
             })
 
-def check_sensitive_file_exposure(base_url, vulnerabilities):
+def check_sensitive_file_exposure(base_url, vulnerabilities, url):
     sensitive_files = [
         "/robots.txt", "/sitemap.xml", "/admin/config.php", "/config.inc.php",
         "/wp-config.php", "/.htaccess", "/.htpasswd", "/README.md", "/LICENSE",
@@ -316,6 +328,7 @@ def check_sensitive_file_exposure(base_url, vulnerabilities):
             if response.status_code == 200 and len(response.text) > 0:
                 if any(token in response.text for token in ["User-agent", "Disallow", "sitemap", "<?php", "root", "password", "license", "dependencies", "phpinfo()"]):
                     vulnerabilities.append({
+                        "url": url,
                         "type": "Sensitive File Exposure",
                         "severity": "Medium",
                         "description": f"Potentially sensitive file exposed at {test_url}. Review its content for confidential information."
@@ -323,7 +336,7 @@ def check_sensitive_file_exposure(base_url, vulnerabilities):
         except httpx.RequestError:
             pass
 
-def check_insecure_cookies(cookies, base_url, vulnerabilities):
+def check_insecure_cookies(cookies, base_url, vulnerabilities, url):
     for cookie in cookies:
         cookie_name = cookie.get('name')
         cookie_secure = cookie.get('secure')
@@ -332,6 +345,7 @@ def check_insecure_cookies(cookies, base_url, vulnerabilities):
 
         if base_url.startswith("https://") and not cookie_secure:
             vulnerabilities.append({
+                "url": url,
                 "type": "Insecure Cookie (Missing Secure Flag)",
                 "severity": "Medium",
                 "description": f"Cookie '{cookie_name}' is served over HTTPS but is missing the 'Secure' flag. This cookie could be intercepted over HTTP if the user accesses the site insecurely."
@@ -339,6 +353,7 @@ def check_insecure_cookies(cookies, base_url, vulnerabilities):
 
         if not cookie_httponly:
             vulnerabilities.append({
+                "url": url,
                 "type": "Insecure Cookie (Missing HttpOnly Flag)",
                 "severity": "Medium",
                 "description": f"Cookie '{cookie_name}' is missing the 'HttpOnly' flag. This makes it vulnerable to XSS attacks, as JavaScript can access the cookie."
@@ -346,21 +361,24 @@ def check_insecure_cookies(cookies, base_url, vulnerabilities):
 
         if cookie_samesite not in ['Lax', 'Strict', 'lax', 'strict']:
             vulnerabilities.append({
+                "url": url,
                 "type": "Insecure Cookie (Missing/Weak SameSite Flag)",
                 "severity": "Low",
                 "description": f"Cookie '{cookie_name}' is missing or has a weak 'SameSite' attribute ('{cookie_samesite}'). This can make it vulnerable to CSRF attacks."
             })
 
-def check_cors_misconfiguration(headers, vulnerabilities):
+def check_cors_misconfiguration(headers, vulnerabilities, url):
     acao = headers.get('Access-Control-Allow-Origin')
     if acao == '*':
         vulnerabilities.append({
+            "url": url,
             "type": "CORS Misconfiguration (Wildcard Origin)",
             "severity": "High",
             "description": "The 'Access-Control-Allow-Origin' header is set to '*', allowing any domain to access resources. This can lead to Cross-Origin Resource Sharing (CORS) vulnerabilities if sensitive data is exposed."
         })
     elif acao and ',' in acao:
         vulnerabilities.append({
+            "url": url,
             "type": "CORS Misconfiguration (Multiple Origins)",
             "severity": "Medium",
             "description": f"The 'Access-Control-Allow-Origin' header allows multiple origins: '{acao}'. Ensure this is intentional and properly secured to prevent unauthorized access."
