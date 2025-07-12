@@ -49,10 +49,14 @@ async def scan(url: str = Query(..., description="Target URL to scan")):
     try:
         os.makedirs(os.path.dirname(report_path), exist_ok=True)
 
-        # Offload the blocking perform_scan into a thread
-        findings = await run_in_threadpool(perform_scan, url)
+        # Run the async scanner directly (not via run_in_threadpool)
+        findings = await perform_scan(url)
 
-        # Offload the blocking create_pdf_report into a thread
+        # Persist URL (and optionally title) on the ScanResult for reporting
+        setattr(findings, "url", url)
+        # You could also set findings.title here if your scanner populates it
+
+        # Offload the blocking PDF creation into a thread
         await run_in_threadpool(create_pdf_report, scan_id, url, findings.to_dict(), report_path)
 
         logger.info(f"Scan complete for {url} with scan_id {scan_id}")
@@ -68,3 +72,4 @@ def download_report(scan_id: str):
     if not os.path.exists(filepath):
         return JSONResponse(status_code=404, content={"error": "Report not found"})
     return FileResponse(filepath, media_type='application/pdf', filename=f"CyberScythe_Report_{scan_id}.pdf")
+
