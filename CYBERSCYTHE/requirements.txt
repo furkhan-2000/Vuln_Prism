@@ -9,6 +9,4 @@ tenacity==8.2.3
 pydantic==2.6.1
 pydantic-settings==2.1.0
 playwright==1.44.0
-numpy==1.26.4
-fake-useragent==1.5.1
 
