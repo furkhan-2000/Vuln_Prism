@@ -16,7 +16,11 @@ def _obfuscate(payload: str) -> str:
         lambda x: hashlib.md5(x.encode()).hexdigest()[:len(x)],
         lambda x: ''.join([f'%{hex(ord(c))[2:]}' for c in x]),
         lambda x: ''.join([f'&#x{hex(ord(c))[2:]};' for c in x]),
-        lambda x: ''.join([f'\\x{hex(ord(c))[2:]}' for c in x]),
+        lambda x: ''.join([f'\x{hex(ord(c))[2:]}' for c in x]),
+        lambda x: x.replace(' ', '/**/'),
+        lambda x: '/*{}*/'.format(x),
+        lambda x: ''.join(chr(ord(c) + 1) for c in x),
+        lambda x: x[::-1],
     ]
     return random.choice(techniques)(payload)
 

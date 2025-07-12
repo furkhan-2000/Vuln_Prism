@@ -20,7 +20,7 @@ class Settings(BaseSettings):
     request_timeout: PositiveInt = 20
     max_concurrent_requests: PositiveInt = 25
     rate_limit_delay: PositiveFloat = 0.15
-    max_crawl_depth: conint(ge=1) = 6
+    max_crawl_depth: conint(ge=1) = 10
     max_retries: conint(ge=0) = 3
     backoff_factor: PositiveFloat = 0.3
     

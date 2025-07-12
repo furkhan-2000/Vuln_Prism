@@ -53,7 +53,7 @@ async def scan(url: str = Query(..., description="Target URL to scan")):
         findings = await run_in_threadpool(perform_scan, url)
 
         # Offload the blocking create_pdf_report into a thread
-        await run_in_threadpool(create_pdf_report, scan_id, url, findings, report_path)
+        await run_in_threadpool(create_pdf_report, scan_id, url, findings_for_report, report_path)
 
         logger.info(f"Scan complete for {url} with scan_id {scan_id}")
         return {"msg": "Scan complete", "report": f"/{report_path}"}

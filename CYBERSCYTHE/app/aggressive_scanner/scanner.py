@@ -171,9 +171,7 @@ async def scan_url(client: httpx.AsyncClient, result: ScanResult, url: str):
         logger.error(f"URL scan error: {e}")
         result.error_count += 1
 
-async def aggressive_scan_whole_site(urls: List[str], client: httpx.AsyncClient) -> ScanResult:
-    result = ScanResult()
-    
+async def aggressive_scan_whole_site(urls: List[str], client: httpx.AsyncClient, result: ScanResult):
     semaphore = asyncio.Semaphore(settings.max_concurrent_requests)
     
     async def limited_scan(url: str):
@@ -182,9 +180,6 @@ async def aggressive_scan_whole_site(urls: List[str], client: httpx.AsyncClient)
     
     tasks = [limited_scan(url) for url in urls]
     await asyncio.gather(*tasks)
-    
-    result.report()
-    return result
 
 async def full_scan(base_url: str) -> ScanResult:
     from .crawler import AsyncCrawler

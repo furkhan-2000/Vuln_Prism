@@ -9,8 +9,7 @@ RUN apt-get update && apt-get install -y \
 
 # Install Python dependencies with pip cache
 COPY requirements.txt .
-RUN pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip     && pip install --no-cache-dir -r requirements.txt     && playwright install --with-deps
 
 # Copy application code
 COPY app/ app/
