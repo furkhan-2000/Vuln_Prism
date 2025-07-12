@@ -2,7 +2,6 @@ import asyncio
 import random
 import re
 import math
-import numpy as np
 from playwright.async_api import async_playwright, Error as PlaywrightError
 from loguru import logger
 from selectolax.parser import HTMLParser
@@ -86,6 +85,11 @@ async def create_stealth_context(browser):
         Object.defineProperty(window, 'chrome', {get: () => ({ runtime: {} })});
         Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3]});
     """)
+
+    # Resource warfare: block trackers and heavy assets
+    await context.route(re.compile(r".*\.(png|jpg|jpeg|webp|gif|svg|mp4|woff2?)$"), lambda route: route.abort())
+    await context.route(re.compile(r".*(google|facebook|twitter|analytics|track|pixel|ads|beacon)\.\w{2,}"), lambda route: route.abort())
+
     return context
 
 # --- Main Scanning Logic ---
@@ -185,170 +189,4 @@ async def aggressive_run(url: str, scan_result: ScanResult):
         finally:
             await context.close()
             await browser.close()
-    await context.route(re.compile(r".*(google|facebook|twitter|analytics|track|pixel|ads|beacon)\.\w{2,}"), lambda route: route.abort())
 
-    return context
-
-# --- CAPTCHA stormbreaker module ---
-async def break_captcha(page):
-    if await page.query_selector('iframe[src*="recaptcha"]'):
-        logger.info("Detected reCAPTCHA - deploying countermeasures")
-        # 1. Audio challenge bypass
-        await page.evaluate('''async () => {
-            const iframes = document.querySelectorAll('iframe');
-            for (const iframe of iframes) {
-                if (iframe.src.includes('recaptcha')) {
-                    const newIframe = document.createElement('iframe');
-                    newIframe.srcdoc = '<html><head></head><body>Bypassed</body></html>';
-                    iframe.parentNode.replaceChild(newIframe, iframe);
-                }
-            }
-        }''')
-        await asyncio.sleep(1)
-
-        # 2. Behavioral override
-        await page.keyboard.press('Tab', delay=100)
-        await page.keyboard.press('Space', delay=100)
-        await asyncio.sleep(2)
-
-        # 3. Nuclear option (if still visible)
-        if await page.query_selector('div.recaptcha-challenge'):
-            await page.evaluate('document.querySelector("div.recaptcha-challenge").style.display = "none"')
-
-    return True
-
-# --- Main assault engine ---
-async def aggressive_run(url: str, scan_result: ScanResult, aggression_level=3):
-    async with async_playwright() as p:
-        # Configure browser for maximum penetration
-        browser = await p.chromium.launch(
-            headless=True,
-            args=[
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-blink-features=AutomationControlled',
-                '--disable-web-security',
-                '--disable-features=IsolateOrigins,site-per-process',
-                '--disable-site-isolation-trials',
-                '--disable-infobars',
-                f'--window-size={random.randint(1200,1920)},{random.randint(800,1080)}'
-            ]
-        )
-
-        context = await create_stealth_context(browser)
-        page = await context.new_page()
-
-        try:
-            await page.goto(url, timeout=60000, wait_until=random.choice(['domcontentloaded', 'load', 'networkidle']))
-        except Exception as e:
-            logger.error(f"Failed to navigate to {url}: {e}")
-            scan_result.error_count += 1
-            await browser.close()
-            return
-
-            logger.info(f"Starting scan for {url}")
-            await simulate_human_behavior(page, aggression_level)
-            await break_captcha(page) # Attempt to break CAPTCHA
-
-            scan_result.scanned_urls += 1
-            logger.info(f"Browser scanning URL: {url}")
-
-            # --- Static and Dynamic Vulnerability Checks ---
-            # Get initial response headers for header-based checks
-            initial_response = await page.request.get(url)
-            headers = initial_response.headers
-
-            # Get HTML content for content-based checks
-            html_content = await page.content()
-            tree = HTMLParser(html_content)
-
-            check_security_headers(headers, scan_result.vulnerabilities)
-            check_exposed_api_keys(html_content, scan_result.vulnerabilities)
-            check_outdated_software(headers, html_content, scan_result.vulnerabilities)
-            check_directory_listing(url, scan_result.vulnerabilities)
-            check_common_misconfigurations(url, scan_result.vulnerabilities)
-            check_basic_xss(url, html_content, scan_result.vulnerabilities)
-            check_insecure_forms(tree, url, scan_result.vulnerabilities)
-            check_sensitive_file_exposure(url, scan_result.vulnerabilities)
-            check_insecure_cookies(await page.context.cookies(), url, scan_result.vulnerabilities)
-            check_cors_misconfiguration(headers, scan_result.vulnerabilities)
-
-            # --- Dynamic Interaction and Vulnerability Testing ---
-
-            # Find all input fields and textareas
-            input_elements = await page.query_selector_all('input:not([type="submit"]):not([type="button"]):not([type="hidden"]), textarea')
-
-            for element in input_elements:
-                try:
-                    name = await element.get_attribute('name') or await element.get_attribute('id')
-                    if not name:
-                        logger.warning(f"Found an input element without a name or id. Skipping.")
-                        continue
-
-                    logger.info(f"Testing input field: {name}")
-                    test_cases = [
-                        (polymorphic_xss_payload, detect_xss, "XSS"),
-                        (polymorphic_sqli_payload, detect_sqli, "SQLi"),
-                        (polymorphic_cmd_injection_payload, detect_cmd_injection, "CMD Injection"),
-                        (polymorphic_path_traversal_payload, detect_path_traversal, "Path Traversal")
-                    ]
-
-                    for payload_func, detect_func, vuln_type in test_cases:
-                        payload = payload_func()
-
-                        # Type payload into the field
-                        await element.fill(payload)
-                        await asyncio.sleep(random.uniform(0.1, 0.5)) # Human-like typing delay
-
-                        # Get current page content after typing
-                        response_text = await page.content()
-
-                        if detect_func(response_text, payload if vuln_type == "XSS" else None):
-                            scan_result.add_vulnerability(url, vuln_type, name, payload)
-
-                        if detect_info_disclosure(response_text):
-                            scan_result.add_vulnerability(url, "Info Disclosure", name, payload)
-
-                        # Clear the field for the next payload
-                        await element.fill("")
-                        await asyncio.sleep(random.uniform(0.1, 0.3))
-
-                except Exception as e:
-                    logger.exception(f"Error typing into input: {e}")
-                    scan_result.error_count += 1
-
-            # Check for info disclosure on the page itself
-            response_text = await page.content()
-            if detect_info_disclosure(response_text):
-                scan_result.add_vulnerability(url, "Info Disclosure", "Page Content", "N/A")
-
-            logger.info(f"Browser scan complete for {url}")
-
-        except Exception as e:
-            logger.exception(f"Browser scan failed for {url}: {e}")
-            scan_result.error_count += 1
-        finally:
-            await context.clear_cookies()
-            await browser.close()
-
-# --- Battlefield commander (for testing, not used in main scanner flow) ---
-if __name__ == "__main__":
-    async def test_run():
-        # Create a dummy ScanResult for testing
-        class DummyScanResult:
-            def __init__(self):
-                self.vulnerabilities = []
-                self.scanned_urls = 0
-                self.vuln_count = 0
-                self.error_count = 0
-            def add_vulnerability(self, url, vuln_type, param, payload):
-                logger.critical(f"[VULN] {vuln_type} at {url} in {param} with {payload}")
-                self.vulnerabilities.append({'url': url, 'type': vuln_type, 'param': param, 'payload': payload})
-                self.vuln_count += 1
-
-        dummy_result = DummyScanResult()
-        await aggressive_run("https://www.google.com", dummy_result, aggression_level=3)
-        logger.info(f"Total vulnerabilities found: {dummy_result.vuln_count}")
-
-    asyncio.run(test_run())
