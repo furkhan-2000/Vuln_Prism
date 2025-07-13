@@ -1,0 +1,28 @@
+services:
+  dashboard:
+    image: nginx:alpine
+    ports:
+      - "3000:80"
+    depends_on:
+      - cyberscythe
+      - sast
+  sast:
+    build:
+      context: ./sast
+      dockerfile: Dockerfile
+    ports:
+      - "5050:5050"
+    environment:
+      - PYTHONUNBUFFERED=1
+    
+  # DAST Service (CyberScythe)
+  cyberscythe:
+    build:
+      context: ./CYBERSCYTHE
+      dockerfile: Dockerfile
+    ports:
+      - "5051:5051"
+    environment:
+      - PYTHONUNBUFFERED=1
+
+

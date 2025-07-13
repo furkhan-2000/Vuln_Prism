@@ -30,6 +30,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script type="module" src="https://unpkg.com/@splinetool/viewer/build/spline-viewer.js"></script>
 
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&display=swap');
@@ -44,7 +45,7 @@
     
     body {
       font-family: 'Exo 2', sans-serif;
-      background: linear-gradient(135deg, var(--deep-space) 0%, #000 100%);
+      background: linear-gradient(135deg, var(--deep-space) 0%, #000814 50%, #001d3d 100%);
       color: #e0e0ff;
       overflow-x: hidden;
       scroll-behavior: smooth;
@@ -168,21 +169,24 @@
       background: linear-gradient(135deg, var(--cyber-teal), var(--holographic-purple));
       border: none;
       color: white;
-      padding: 12px 28px;
-      border-radius: 30px;
+      padding: 14px 32px;
+      border-radius: 50px;
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
       position: relative;
       overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      text-decoration: none;
+      display: inline-block;
       cursor: pointer;
     }
     
     .cyber-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.6);
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(56, 189, 248, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.2);
     }
     
     .cyber-button::after {
@@ -199,6 +203,96 @@
     
     .cyber-button:hover::after {
       left: 120%;
+    }
+    
+    .scan-line {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--cyber-teal), transparent);
+      animation: scan 3s linear infinite;
+    }
+    
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+    
+    .holographic-line {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--cyber-teal), var(--holographic-purple), transparent);
+      margin: 20px 0;
+    }
+
+    /* New styles for parallel scrolling and bot icon */
+    .pin-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .pin-content {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bot-icon-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--cyber-teal), var(--holographic-purple));
+      box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+    }
+
+    .bot-icon-container:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.6);
+    }
+
+    .bot-icon-container svg {
+      width: 40px;
+      height: 40px;
+      color: white;
+    }
+
+    .bot-hover-text {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+      pointer-events: none;
+      margin-bottom: 10px;
+    }
+
+    .bot-icon-container:hover .bot-hover-text {
+      opacity: 1;
+      visibility: visible;
     }
 
     .linkedin-link:hover {
@@ -524,15 +618,35 @@
                 <span id="dropV" className="inline-block shimmer-text">V</span>uln
                 <span id="dropP" className="inline-block shimmer-text">P</span>rism
               </h1>
-              <h2 className="3xl md:text-4xl font-bold mb-4 hero-subtitle">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 hero-subtitle">
                 Advanced <span className="shimmer-text">Security Intelligence</span> Platform
               </h2>
-              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto hero-description">
-                Comprehensive vulnerability detection and remediation across your entire software development lifecycle, from code to cloud. Leverage AI-powered analysis for both static code and live applications.
+              <p className="text-xl text-gray-300 mb-10 max-w-3xl mx-auto hero-description leading-relaxed">
+                Comprehensive vulnerability detection and remediation across your entire software development lifecycle, from code to cloud. Leverage AI-powered analysis for both static code and live applications with enterprise-grade precision.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/static/index.html" className="cyber-button cta-button">Launch Live Scan</a>
-                <a href="/sast/temp_index.html" className="cyber-button bg-transparent border border-cyan-500 cta-button">Audit Source Code</a>
+              <div className="flex flex-wrap justify-center gap-4 mb-8 text-sm text-cyan-300">
+                <span className="px-4 py-2 bg-cyan-500/10 rounded-full border border-cyan-500/20">🛡️ SAST & SCA</span>
+                <span className="px-4 py-2 bg-purple-500/10 rounded-full border border-purple-500/20">⚡ DAST & IAST</span>
+                <span className="px-4 py-2 bg-teal-500/10 rounded-full border border-teal-500/20">🤖 AI-Powered</span>
+                <span className="px-4 py-2 bg-blue-500/10 rounded-full border border-blue-500/20">☁️ Cloud-Native</span>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                <a href="http://localhost:5051/" className="cyber-button cta-button group">
+                  <span className="flex items-center gap-2">
+                    🔍 Launch Live Scan
+                    <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                  </span>
+                </a>
+                <a href="http://localhost:5050/" className="cyber-button bg-transparent border-2 border-cyan-500 hover:bg-cyan-500/10 cta-button group">
+                  <span className="flex items-center gap-2">
+                    📋 Audit Source Code
+                    <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                  </span>
+                </a>
               </div>
             </div>
             <div className="scroll-down">
@@ -579,29 +693,43 @@
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {/* Feature Card 1: AI-Powered Threat Detection */}
-                <div className="cyber-card cyber-border p-8">
-                  <div className="text-cyan-400 mb-4">
-                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <div className="cyber-card cyber-border p-8 group hover:scale-105 transition-all duration-300">
+                  <div className="text-cyan-400 mb-6 relative">
+                    <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                    <svg className="w-16 h-16 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold mb-3">AI-Powered Threat Detection</h3>
-                  <p className="text-gray-300">
+                  <h3 className="text-2xl font-bold mb-4 shimmer-text">🤖 AI-Powered Threat Detection</h3>
+                  <p className="text-gray-300 leading-relaxed mb-4">
                     Our advanced AI and machine learning models analyze both static code and dynamic application behavior to detect a wide spectrum of vulnerabilities, including zero-days, with high accuracy.
                   </p>
+                  <div className="flex items-center text-cyan-400 text-sm font-semibold">
+                    <span>Learn More</span>
+                    <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                  </div>
                 </div>
                 
                 {/* Feature Card 2: Deep Code & Dependency Analysis (SAST/SCA) */}
-                <div className="cyber-card cyber-border p-8">
-                  <div className="text-cyan-400 mb-4">
-                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <div className="cyber-card cyber-border p-8 group hover:scale-105 transition-all duration-300">
+                  <div className="text-purple-400 mb-6 relative">
+                    <div className="absolute inset-0 bg-purple-400/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                    <svg className="w-16 h-16 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
                     </svg>
                   </div>
-                  <h3 className="text-2xl font-bold mb-3">Deep Code & Dependency Analysis (SAST/SCA)</h3>
-                  <p className="text-gray-300">
+                  <h3 className="text-2xl font-bold mb-4 shimmer-text">📋 Deep Code & Dependency Analysis</h3>
+                  <p className="text-gray-300 leading-relaxed mb-4">
                     Perform in-depth static analysis of your source code and identify vulnerable open-source components, ensuring security from the earliest stages of development.
                   </p>
+                  <div className="flex items-center text-purple-400 text-sm font-semibold">
+                    <span>Explore SAST/SCA</span>
+                    <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                  </div>
                 </div>
 
                 {/* Feature Card 3: Automated Remediation */}
@@ -715,10 +843,10 @@
                 Join thousands of developers who trust VulnPrism for enterprise-grade security.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="/static/index.html" className="cyber-button px-10 py-4 text-xl">
+                <a href="http://localhost:5051/" className="cyber-button px-10 py-4 text-xl">
                   Launch Live Scan
                 </a>
-                <a href="/sast/temp_index.html" className="cyber-button bg-transparent border border-cyan-500 text-xl">
+                <a href="http://localhost:5050/" className="cyber-button bg-transparent border border-cyan-500 text-xl">
                   Audit Source Code
                 </a>
               </div>

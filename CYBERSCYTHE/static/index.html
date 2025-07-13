@@ -28,7 +28,7 @@
     
     body {
       font-family: 'Exo 2', sans-serif;
-      background: linear-gradient(135deg, var(--deep-space) 0%, #000 100%);
+      background: linear-gradient(135deg, var(--deep-space) 0%, #000814 50%, #001d3d 100%);
       color: #e0e0ff;
       overflow-x: hidden;
       scroll-behavior: smooth;
@@ -89,21 +89,24 @@
       background: linear-gradient(135deg, var(--cyber-teal), var(--holographic-purple));
       border: none;
       color: white;
-      padding: 12px 28px;
-      border-radius: 30px;
+      padding: 14px 32px;
+      border-radius: 50px;
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 1.2px;
       text-transform: uppercase;
       position: relative;
       overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1);
       cursor: pointer;
+      backdrop-filter: blur(10px);
+      text-decoration: none;
+      display: inline-block;
     }
     
     .cyber-button:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.6);
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(56, 189, 248, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.2);
     }
     
     .cyber-button::after {
@@ -123,59 +126,143 @@
     }
 
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 50px auto;
-      padding: 30px;
-      background: rgba(10, 15, 25, 0.7);
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+      padding: 40px;
+      background: rgba(10, 15, 25, 0.8);
+      border-radius: 20px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.7), 0 0 0 1px rgba(56, 189, 248, 0.2);
       position: relative;
       z-index: 1;
       text-align: center;
+      backdrop-filter: blur(20px);
     }
 
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 20px;
+      font-size: 2.8rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
     }
 
-    p {
+    .tool-interface {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 40px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .input-label {
+      display: block;
       font-size: 1.1rem;
-      line-height: 1.6;
-      margin-bottom: 20px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--cyber-teal);
+      text-align: left;
     }
 
     .input-group {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
     input[type="url"] {
-      padding: 12px 15px;
-      width: calc(100% - 30px);
-      border-radius: 5px;
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 16px 20px;
+      width: calc(100% - 40px);
+      border-radius: 12px;
+      border: 2px solid rgba(56, 189, 248, 0.3);
       background: rgba(255, 255, 255, 0.05);
       color: #eee;
-      font-size: 1rem;
-      box-shadow: inset 0 0 8px rgba(56, 189, 248, 0.1);
-      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      font-size: 1.1rem;
+      box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.1);
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
     }
 
     input[type="url"]:focus {
       outline: none;
       border-color: var(--cyber-teal);
-      box-shadow: inset 0 0 8px rgba(56, 189, 248, 0.3), 0 0 10px rgba(56, 189, 248, 0.5);
+      box-shadow: inset 0 0 15px rgba(56, 189, 248, 0.3), 0 0 20px rgba(56, 189, 248, 0.5);
+      transform: translateY(-2px);
     }
 
     #output {
       margin-top: 30px;
-      padding: 20px;
-      border-radius: 5px;
-      min-height: 100px;
+      padding: 25px;
+      border-radius: 12px;
+      min-height: 120px;
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid rgba(56, 189, 248, 0.2);
       color: #eee;
       text-align: left;
+    }
+
+    .description-section {
+      margin-top: 50px;
+    }
+
+    .description-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 20px;
+      padding: 40px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      backdrop-filter: blur(10px);
+      text-align: left;
+    }
+
+    .description-title {
+      font-size: 2.2rem;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .description-content p {
+      font-size: 1.1rem;
+      line-height: 1.7;
+      margin-bottom: 25px;
+      color: #d1d5db;
+    }
+
+    .feature-highlights {
+      display: grid;
+      gap: 25px;
+      margin: 30px 0;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      padding: 20px;
+      background: rgba(56, 189, 248, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      flex-shrink: 0;
+    }
+
+    .feature-item h4 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--cyber-teal);
+    }
+
+    .feature-item p {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin: 0;
+      color: #d1d5db;
+    }
+
+    .description-footer {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--holographic-purple);
+      text-align: center;
+      margin-top: 30px;
     }
 
     .scanning {
@@ -236,7 +323,7 @@
     }
 
     .linkedin-link:hover {
-      color: #0077B5; /* LinkedIn blue */
+      color: #0077B5;
       text-shadow: 0 0 8px #0077B5;
     }
 
@@ -244,24 +331,31 @@
     @media (max-width: 768px) {
       .container {
         margin: 20px auto;
-        padding: 15px;
+        padding: 20px;
       }
       h1 {
-        font-size: 2rem;
+        font-size: 2.2rem;
       }
-      p {
-        font-size: 1rem;
+      .tool-interface {
+        padding: 20px;
       }
       input[type="url"] {
         width: calc(100% - 20px);
-        padding: 10px;
+        padding: 12px 15px;
       }
       .cyber-button {
-        padding: 10px 20px;
+        padding: 12px 24px;
         font-size: 0.9rem;
       }
       #output {
-        padding: 15px;
+        padding: 20px;
+      }
+      .description-card {
+        padding: 25px;
+      }
+      .feature-item {
+        flex-direction: column;
+        text-align: center;
       }
     }
   </style>
@@ -272,20 +366,65 @@
   <div class="scan-line"></div>
 
   <div class="container">
-    <h1 class="shimmer-text">CyberScythe: See What Attackers See</h1>
-    <p>Where StaticGuard secures your code, CyberScythe protects your live environment. It works by simulating the tactics of real-world hackers, actively probing your running applications, APIs, and cloud systems to uncover vulnerabilities that only show up during runtime.</p>
-    <p>Think of it as a continuous, automated pen test that validates your defenses under real conditions. CyberScythe exposes hidden misconfigurations, authentication gaps, and business logic flaws that static tools simply can’t find. With clear, actionable insights, your team can fix issues before they ever become incidents — protecting your customers, your uptime, and your brand reputation.</p>
-
-    <div class="input-group">
-      <input type="url" id="url" placeholder="Enter site URL (e.g., https://example.com)" />
-      <button onclick="startScan()" class="cyber-button">Start Aggressive Scan</button>
+    <h1 class="shimmer-text">CyberScythe: Dynamic Application Security Testing</h1>
+    
+    <!-- Main Tool Interface -->
+    <div class="tool-interface">
+      <div class="input-group">
+        <label for="url" class="input-label">🎯 Target URL</label>
+        <input type="url" id="url" placeholder="Enter site URL (e.g., https://example.com)" />
+        <button onclick="startScan()" class="cyber-button">
+          <span style="display: flex; align-items: center; gap: 8px; justify-content: center;">
+            🔍 Start Aggressive Scan
+            <svg style="width: 16px; height: 16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+      <div id="output"></div>
     </div>
-    <div id="output"></div>
+
+    <!-- Description Section (moved below tool) -->
+    <div class="description-section">
+      <div class="description-card">
+        <h2 class="description-title shimmer-text">🛡️ See What Attackers See</h2>
+        <div class="description-content">
+          <p>Where static analysis secures your code, <strong>CyberScythe</strong> protects your live environment. Our dynamic application security testing (DAST) platform simulates real-world attack scenarios, actively probing your running applications, APIs, and cloud systems to uncover vulnerabilities that only manifest during runtime.</p>
+          
+          <div class="feature-highlights">
+            <div class="feature-item">
+              <span class="feature-icon">⚡</span>
+              <div>
+                <h4>Real-Time Vulnerability Discovery</h4>
+                <p>Continuous automated penetration testing that validates your defenses under actual operating conditions, identifying security gaps that traditional tools miss.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🔍</span>
+              <div>
+                <h4>Runtime-Only Vulnerabilities</h4>
+                <p>Exposes hidden misconfigurations, authentication bypasses, and business logic flaws that only surface when applications are running in production environments.</p>
+              </div>
+            </div>
+            <div class="feature-item">
+              <span class="feature-icon">🎯</span>
+              <div>
+                <h4>Actionable Security Intelligence</h4>
+                <p>Clear, prioritized insights with detailed remediation guidance help your team fix critical issues before they become security incidents or data breaches.</p>
+              </div>
+            </div>
+          </div>
+          
+          <p class="description-footer">Protect your customers, maintain uptime, and safeguard your brand reputation with enterprise-grade dynamic security testing that thinks like an attacker.</p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <footer style="text-align: center; padding: 20px; margin-top: 50px; color: #aaa;">
     <p style="font-size: 0.9rem;">
-      Designed & developed by Khan Mohammed © 2025 All rights reserved | 
+      Designed & developed by Khan Mohammed © 2025 All rights reserved |
       <a href="https://www.linkedin.com/in/khan-mohammed-790b18214" target="_blank" rel="noopener noreferrer" class="linkedin-link" style="color: #eee; text-decoration: none;">
         www.linkedin.com/in/khan-mohammed-790b18214
       </a>
@@ -311,12 +450,12 @@
         const canvas = document.getElementById('dna-canvas');
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ 
-          canvas, 
+        const renderer = new THREE.WebGLRenderer({
+          canvas,
           alpha: true,
           antialias: true
         });
-        
+
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setClearColor(0x000000, 0);
@@ -324,11 +463,11 @@
         const particlesGeometry = new THREE.BufferGeometry();
         const particlesCount = 2000;
         const posArray = new Float32Array(particlesCount * 3);
-        
+
         for(let i = 0; i < particlesCount * 3; i++) {
           posArray[i] = (Math.random() - 0.5) * 100;
         }
-        
+
         particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
         const particlesMaterial = new THREE.PointsMaterial({
           size: 0.1,
@@ -336,7 +475,7 @@
           transparent: true,
           opacity: 0.6
         });
-        
+
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         scene.add(particlesMesh);
 
@@ -347,7 +486,7 @@
             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
           }
         `;
-        
+
         const fragmentShader = `
           uniform float time;
           uniform vec3 color1;
@@ -397,9 +536,9 @@
 
         function animate() {
           requestAnimationFrame(animate);
-          torus1.rotation.x += 0.004; 
+          torus1.rotation.x += 0.004;
           torus1.rotation.y += 0.004;
-          torus2.rotation.x += 0.004; 
+          torus2.rotation.x += 0.004;
           torus2.rotation.y += 0.004;
           particlesMesh.rotation.y += 0.001;
           material.uniforms.time.value += 0.04;
@@ -412,11 +551,11 @@
           camera.updateProjectionMatrix();
           renderer.setSize(window.innerWidth, window.innerHeight);
         };
-        
+
         window.addEventListener('resize', handleResize);
-        
-        return () => { 
-          clearInterval(interval); 
+
+        return () => {
+          clearInterval(interval);
           renderer.dispose();
           window.removeEventListener('resize', handleResize);
         };
@@ -427,11 +566,9 @@
 
     ReactDOM.createRoot(document.getElementById('root')).render(<DNABackground user={user} />);
 
-    const form = document.getElementById('scanForm');
-    const output = document.getElementById('output');
-
     async function startScan() {
         const url = document.getElementById("url").value;
+        const output = document.getElementById("output");
 
         if (!url) {
             output.innerHTML = `<div class="error">Please enter a URL to scan.</div>`;
@@ -457,6 +594,7 @@
     }
 
     async function pollStatus(scan_id) {
+        const output = document.getElementById("output");
         const interval = setInterval(async () => {
             try {
                 const res = await fetch(`/status/${scan_id}`);
@@ -489,8 +627,6 @@
                 clearInterval(interval);
                 output.innerHTML = `<div class="error">Error polling for status: ${err.message}</div>`;
             }
-        }, 3000); // Poll every 3 seconds
+        }, 3000);
     }
   </script>
-</body>
-</html>
