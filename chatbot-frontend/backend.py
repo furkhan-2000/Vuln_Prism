@@ -52,52 +52,57 @@ async def chat_with_zoya(request: ChatRequest):
     """DeepSeek API integration"""
     api_key = os.getenv("DEEPSEEK_API_KEY")
     if not api_key or not api_key.strip():
-        print("[ERROR] DeepSeek API key is missing or empty in .env file.")
+        print("[ERROR] OpenRouter API key is missing or empty in .env file.")
         raise HTTPException(status_code=500, detail="API key not configured. Please check your .env file.")
+
+    # Optional: Set your site URL and title for OpenRouter rankings
+    site_url = "https://your-site-url.com"  # Change to your actual site URL if desired
+    site_title = "VulnPrism"  # Change to your actual site title if desired
 
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
-                "https://api.deepseek.com/v1/chat/completions",
+                "https://openrouter.ai/api/v1/chat/completions",
                 headers={
+                    "Authorization": f"Bearer {api_key}",
                     "Content-Type": "application/json",
-                    "Authorization": f"Bearer {api_key}"
+                    "HTTP-Referer": site_url,
+                    "X-Title": site_title
                 },
                 json={
-                    "model": "deepseek-chat",
+                    "model": "openai/gpt-4o",
                     "messages": [{"role": msg.role, "content": msg.content} for msg in request.messages],
                     "max_tokens": request.max_tokens,
-                    "temperature": request.temperature,
-                    "stream": False
+                    "temperature": request.temperature
                 },
                 timeout=30.0
             )
             if response.status_code == 401:
-                print("[ERROR] DeepSeek API key is invalid or unauthorized.")
-                raise HTTPException(status_code=401, detail="DeepSeek API key is invalid or unauthorized.")
+                print("[ERROR] OpenRouter API key is invalid or unauthorized.")
+                raise HTTPException(status_code=401, detail="OpenRouter API key is invalid or unauthorized.")
             if response.status_code == 429:
-                print("[ERROR] DeepSeek API rate limit exceeded.")
-                raise HTTPException(status_code=429, detail="DeepSeek API rate limit exceeded. Please try again later.")
+                print("[ERROR] OpenRouter API rate limit exceeded.")
+                raise HTTPException(status_code=429, detail="OpenRouter API rate limit exceeded. Please try again later.")
             if response.status_code >= 500:
-                print(f"[ERROR] DeepSeek server error: {response.status_code} {response.text}")
-                raise HTTPException(status_code=502, detail="DeepSeek service is temporarily unavailable. Please try again later.")
+                print(f"[ERROR] OpenRouter server error: {response.status_code} {response.text}")
+                raise HTTPException(status_code=502, detail="OpenRouter service is temporarily unavailable. Please try again later.")
             if response.status_code != 200:
-                print("[ERROR] DeepSeek API error:", response.status_code, response.text)
+                print("[ERROR] OpenRouter API error:", response.status_code, response.text)
                 raise HTTPException(status_code=response.status_code, detail=response.text)
             try:
                 data = response.json()
             except Exception as parse_err:
-                print("[ERROR] Failed to parse DeepSeek response:", parse_err, response.text)
-                raise HTTPException(status_code=500, detail="Failed to parse DeepSeek response.")
+                print("[ERROR] Failed to parse OpenRouter response:", parse_err, response.text)
+                raise HTTPException(status_code=500, detail="Failed to parse OpenRouter response.")
             if not data or "choices" not in data or not data["choices"]:
-                print("[ERROR] DeepSeek API returned no choices.", data)
-                raise HTTPException(status_code=500, detail="DeepSeek API returned no choices.")
+                print("[ERROR] OpenRouter API returned no choices.", data)
+                raise HTTPException(status_code=500, detail="OpenRouter API returned no choices.")
             return data
     except httpx.RequestError as e:
-        print("[ERROR] Network error calling DeepSeek:", e)
-        raise HTTPException(status_code=502, detail="Network error calling DeepSeek API.")
+        print("[ERROR] Network error calling OpenRouter:", e)
+        raise HTTPException(status_code=502, detail="Network error calling OpenRouter API.")
     except Exception as e:
-        print("[ERROR] DeepSeek exception:", e)
+        print("[ERROR] OpenRouter exception:", e)
         raise HTTPException(status_code=500, detail="Internal server error.")
 
 if __name__ == "__main__":
