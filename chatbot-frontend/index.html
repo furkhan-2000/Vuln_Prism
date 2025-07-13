@@ -249,8 +249,8 @@
       position: fixed;
       bottom: 20px;
       right: 20px;
-      width: 80px;
-      height: 80px;
+      width: 60px;
+      height: 60px;
       border-radius: 50%;
       cursor: pointer;
       transition: transform 0.3s ease;
@@ -260,6 +260,7 @@
       justify-content: center;
       background: linear-gradient(135deg, var(--cyber-teal), var(--holographic-purple));
       box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
+      opacity: 0.7;
     }
 
     .bot-icon-container:hover {
@@ -272,6 +273,7 @@
       height: 28px;
       color: white;
       transition: width 0.2s, height 0.2s;
+      animation: pulse 2s infinite ease-in-out;
     }
 
     .bot-hover-text {
@@ -404,6 +406,20 @@
     .typing-indicator span:nth-of-type(1) { animation-delay: -0.32s; }
     .typing-indicator span:nth-of-type(2) { animation-delay: -0.16s; }
     @keyframes bounce_dot { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 <body class="overflow-x-hidden">
@@ -421,8 +437,8 @@
     </div>
     <div id="chat-messages" class="flex-1 p-4 overflow-y-auto"></div>
     <div class="p-4 border-t border-cyan-900/50">
-      <div class="relative">
-        <input type="text" id="chat-input" placeholder="Ask Zoya anything..." class="w-full bg-black/30 border border-cyan-700/50 rounded-full py-3 px-5 pr-12 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyber-teal transition-all"/>
+      <div class="relative transparent-cyber-card p-2">
+        <input type="text" id="chat-input" placeholder="Ask Zoya anything..." class="w-full bg-black/30 border-none rounded-full py-3 px-5 pr-12 text-white placeholder-gray-500 focus:outline-none focus:ring-0 transition-all"/>
         <button id="chat-send" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-cyber-teal hover:bg-holographic-purple transition-colors">
           <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
         </button>
@@ -434,7 +450,7 @@
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
     </svg>
-    <div class="bot-hover-text">Zoya - AI Bot</div>
+    <div class="bot-hover-text">Zoya - Cyber Security AI</div>
   </div>
 
   <script type="text/babel">
@@ -826,13 +842,13 @@
             </div>
           </section>
           
-          <footer className="py-12 border-t border-cyan-900">
+          <footer className="py-12 border-t border-cyan-900 relative z-10">
             <div className="max-w-7xl mx-auto px-4 text-center">
               <div className="text-2xl font-bold mb-4 shimmer-text">VulnPrism</div>
               <p className="text-gray-400 mb-6">Advanced Security Intelligence Platform</p>
               <p className="text-gray-500 text-sm">
                 Designed & developed by Khan Mohammed © 2025 All rights reserved | 
-                <a href="https://www.linkedin.com/in/khan-mohammed-790b18214" target="_blank" rel="noopener noreferrer" className="linkedin-link text-gray-400 transition">
+                <a href="https://www.linkedin.com/in/khan-mohammed-790b18214">
                   www.linkedin.com/in/khan-mohammed-790b18214
                 </a>
               </p>
@@ -857,7 +873,10 @@
     const SAST_SERVICE_URL = 'http://localhost:5050';
     const CYBERSCYTHE_SERVICE_URL = 'http://localhost:5051';
 
-    let conversationHistory = [{ role: 'system', content: 'You are Zoya, a helpful AI assistant for the VulnPrism cybersecurity platform. Be friendly, helpful, and concise.' }];
+    let conversationHistory = [{
+      role: 'system',
+      content: "You are Zoya, the advanced Cyber Security AI for VulnPrism, an intelligent platform created by Khan Mohammed. Your primary function is to assist users with cybersecurity insights, analyze security reports, and provide professional guidance. Always introduce yourself as Zoya, maintain a professional yet approachable demeanor, and mention the creator if asked."
+    }];
 
     botIcon.addEventListener('click', () => toggleChatWindow());
     closeChat.addEventListener('click', () => toggleChatWindow());
