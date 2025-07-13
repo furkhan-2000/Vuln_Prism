@@ -327,7 +327,14 @@
       text-shadow: 0 0 8px #0077B5;
     }
 
-    /* Mobile responsiveness */
+    /* Enhanced Mobile Responsiveness */
+    @media (max-width: 1024px) {
+      .container {
+        margin: 30px auto;
+        padding: 30px;
+      }
+    }
+
     @media (max-width: 768px) {
       .container {
         margin: 20px auto;
@@ -340,12 +347,14 @@
         padding: 20px;
       }
       input[type="url"] {
-        width: calc(100% - 20px);
-        padding: 12px 15px;
+        width: calc(100% - 40px); /* Adjusted for padding */
+        padding: 14px 18px;
+        margin-bottom: 15px; /* Add space between input and button on mobile */
       }
       .cyber-button {
-        padding: 12px 24px;
-        font-size: 0.9rem;
+        width: 100%;
+        padding: 14px 0;
+        font-size: 1rem;
       }
       #output {
         padding: 20px;
@@ -356,6 +365,39 @@
       .feature-item {
         flex-direction: column;
         text-align: center;
+        gap: 15px;
+      }
+      .description-title {
+        font-size: 1.8rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        margin: 10px auto;
+        padding: 15px;
+        border-radius: 15px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      .tool-interface {
+        padding: 15px;
+      }
+      input[type="url"] {
+        font-size: 1rem;
+      }
+      .cyber-button {
+        font-size: 0.9rem;
+      }
+      .description-title {
+        font-size: 1.6rem;
+      }
+      .feature-item {
+        padding: 15px;
+      }
+      .feature-item h4 {
+        font-size: 1.1rem;
       }
     }
   </style>

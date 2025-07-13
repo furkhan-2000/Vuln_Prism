@@ -6,6 +6,7 @@ import subprocess
 from zipfile import ZipFile
 from tarfile import open as TarOpen
 from pathlib import Path
+from dotenv import load_dotenv
 
 from fastapi import FastAPI, UploadFile, Form, HTTPException, Request
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
@@ -14,6 +15,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 import scan_engine
+
+# Load environment variables
+load_dotenv(".env")
+load_dotenv()  # Also check local .env if exists
 
 # Logging
 logging.basicConfig(

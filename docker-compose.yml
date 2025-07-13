@@ -1,30 +1,21 @@
 services:
-  dashboard:
-    image: nginx:alpine
+  chatbot-frontend:
+    build: ./chatbot-frontend
     ports:
-      - "3000:80"
-    volumes:
-      - ./:/usr/share/nginx/html
-    depends_on:
-      - cyberscythe
-      - sast
+      - "3000:3000"
+
   sast:
-    build:
-      context: ./sast
-      dockerfile: Dockerfile
+    build: ./sast
     ports:
       - "5050:5050"
-    environment:
-      - PYTHONUNBUFFERED=1
-    
-  # DAST Service (CyberScythe)
+    volumes:
+      - ./chatbot-frontend/.env:/app/.env:ro
+
   cyberscythe:
-    build:
-      context: ./CYBERSCYTHE
-      dockerfile: Dockerfile
+    build: ./CYBERSCYTHE
     ports:
       - "5051:5051"
-    environment:
-      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./chatbot-frontend/.env:/app/.env:ro
 
 

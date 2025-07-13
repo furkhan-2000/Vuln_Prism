@@ -1,13 +1,21 @@
-from fastapi import FastAPI, Query, BackgroundTasks
+from fastapi import FastAPI, Query, BackgroundTasks, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, BaseSettings
+from dotenv import load_dotenv
 import uuid
 import os
 import json
+import httpx
 from app.aggressive_scanner.scanner import perform_scan, ScanResult
 from app.report import create_pdf_report
 from loguru import logger
 import sys
+
+# Load environment variables
+load_dotenv(".env")
+load_dotenv()  # Also check local .env if exists
 
 # Configure logging
 logger.remove()
@@ -30,6 +38,15 @@ app = FastAPI(
     title="CyberScythe",
     description="Aggressive Smart Vulnerability Scanner",
     version="5.0.0",
+)
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 REPORTS_DIR = "static/reports"
@@ -81,6 +98,8 @@ def root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+
 
 @app.post("/scan")
 async def scan(background_tasks: BackgroundTasks, url: str = Query(..., description="Target URL to scan")):

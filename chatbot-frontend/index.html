@@ -226,7 +226,6 @@
       margin: 20px 0;
     }
 
-    /* New styles for parallel scrolling and bot icon */
     .pin-section {
       min-height: 100vh;
       display: flex;
@@ -254,7 +253,7 @@
       border-radius: 50%;
       cursor: pointer;
       transition: transform 0.3s ease;
-      z-index: 1000;
+      z-index: 1001;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -296,21 +295,20 @@
     }
 
     .linkedin-link:hover {
-      color: #0077B5; /* LinkedIn blue */
+      color: #0077B5;
       text-shadow: 0 0 8px #0077B5;
     }
 
-    /* Transparent cyber-card with glowing border */
     .transparent-cyber-card {
-      background: rgba(10, 15, 25, 0.0); /* Fully transparent background */
-      backdrop-filter: blur(0px); /* Remove blur */
-      border: none; /* Remove default border */
+      background: rgba(10, 15, 25, 0.0);
+      backdrop-filter: blur(0px);
+      border: none;
       position: relative;
-      overflow: hidden; /* For the glowing border effect */
+      overflow: hidden;
       border-radius: 12px;
       padding: 8px;
-      text-decoration: none; /* Remove underline from <a> tag */
-      display: block; /* Make the whole card clickable */
+      text-decoration: none;
+      display: block;
     }
 
     .transparent-cyber-card::before {
@@ -334,9 +332,9 @@
     .transparent-cyber-card::after {
       content: '';
       position: absolute;
-      inset: 2px; /* Adjust to control border thickness */
-      background: linear-gradient(135deg, var(--deep-space) 0%, #000 100%); /* Match body background */
-      border-radius: 10px; /* Slightly smaller than parent for border effect */
+      inset: 2px;
+      background: linear-gradient(135deg, var(--deep-space) 0%, #000 100%);
+      border-radius: 10px;
       z-index: -1;
     }
 
@@ -345,44 +343,97 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Mobile responsiveness */
-    @media (max-width: 768px) {
-      .hero-description {
-        font-size: 1rem;
-      }
-      .cyber-button {
-        padding: 10px 20px;
-        font-size: 0.9rem;
-      }
-      .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-3 {
-        grid-template-columns: 1fr;
-      }
-      .grid-cols-1.md\:grid-cols-2.lg\:grid-cols-4 {
-        grid-template-columns: 1fr;
-      }
-      .grid-cols-1.lg\:grid-cols-2 {
-        grid-template-columns: 1fr;
-      }
-      .about-content .flex-shrink-0 {
-        width: 100%;
-      }
-      .bot-icon-container {
-        width: 60px;
-        height: 60px;
-        bottom: 15px;
-        right: 15px;
-      }
-      .bot-hover-text {
-        font-size: 0.8rem;
-        padding: 6px 10px;
-      }
+    @media (max-width: 1024px) {
+      .section-title { font-size: 2.5rem; }
+      .about-content { flex-direction: column; }
+      .about-content .flex-shrink-0 { width: 100%; padding: 1.5rem; }
     }
+
+    @media (max-width: 768px) {
+      .hero-description { font-size: 1rem; padding: 0 1rem; }
+      .cyber-button { padding: 12px 24px; font-size: 0.9rem; }
+      .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-3 { grid-template-columns: 1fr; }
+      .grid-cols-1.md\\:grid-cols-2.lg\\:grid-cols-4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+      .grid-cols-1.lg\\:grid-cols-2 { grid-template-columns: 1fr; }
+      .bot-icon-container { width: 60px; height: 60px; bottom: 15px; right: 15px; }
+      .bot-hover-text { font-size: 0.8rem; padding: 6px 10px; }
+      .text-6xl.md\\:text-8xl { font-size: 3.5rem; }
+      .text-3xl.md\\:text-4xl { font-size: 1.75rem; }
+      .py-20 { padding-top: 4rem; padding-bottom: 4rem; }
+      .py-32 { padding-top: 6rem; padding-bottom: 6rem; }
+      .px-4 { padding-left: 1rem; padding-right: 1rem; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-description { font-size: 0.9rem; }
+      .cyber-button { padding: 10px 18px; font-size: 0.8rem; }
+      .text-6xl.md\\:text-8xl { font-size: 2.5rem; }
+      .text-3xl.md\\:text-4xl { font-size: 1.5rem; }
+      .section-title { font-size: 2rem; }
+      .text-5xl { font-size: 2.5rem; }
+    }
+
+    /* Chatbot Styles */
+    .chat-message { margin-bottom: 1rem; display: flex; max-width: 85%; }
+    .chat-message.user { margin-left: auto; flex-direction: row-reverse; }
+    .chat-message .avatar {
+      width: 32px; height: 32px; border-radius: 50%; margin: 0 8px;
+      flex-shrink: 0; background: linear-gradient(135deg, var(--cyber-teal), var(--holographic-purple));
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; color: var(--deep-space);
+    }
+    .chat-message.user .avatar::after { content: 'U'; }
+    .chat-message.bot .avatar::after { content: 'Z'; }
+    .chat-message .message-content {
+      padding: 0.75rem 1rem; border-radius: 12px;
+      font-size: 0.9rem; line-height: 1.4; word-break: break-word;
+    }
+    .chat-message.user .message-content {
+      background-color: rgba(56, 189, 248, 0.2); color: #e0e0ff; border-top-right-radius: 0;
+    }
+    .chat-message.bot .message-content {
+      background-color: rgba(20, 30, 48, 0.7); color: #e0e0ff; border-top-left-radius: 0;
+    }
+    .typing-indicator { display: flex; align-items: center; padding: 0.75rem 1rem; }
+    .typing-indicator span {
+      height: 8px; width: 8px; margin: 0 2px; background-color: var(--cyber-teal);
+      border-radius: 50%; display: inline-block; animation: bounce_dot 1.4s infinite ease-in-out both;
+    }
+    .typing-indicator span:nth-of-type(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-of-type(2) { animation-delay: -0.16s; }
+    @keyframes bounce_dot { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
   </style>
 </head>
 <body class="overflow-x-hidden">
   <div id="root"></div>
   <div class="fog"></div>
   <div class="scan-line"></div>
+  
+  <!-- AI Bot Icon & Chat Window -->
+  <div id="chat-container" class="hidden fixed bottom-24 right-5 w-full max-w-md h-[70vh] bg-deep-space/80 backdrop-blur-xl rounded-lg shadow-2xl cyber-border z-[1100] flex flex-col overflow-hidden transition-all duration-300 ease-in-out transform-gpu scale-95 opacity-0">
+    <div class="flex items-center justify-between p-4 border-b border-cyan-900/50">
+      <h3 class="text-lg font-bold shimmer-text">Zoya - AI Assistant</h3>
+      <button id="close-chat" class="text-gray-400 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div id="chat-messages" class="flex-1 p-4 overflow-y-auto"></div>
+    <div class="p-4 border-t border-cyan-900/50">
+      <div class="relative">
+        <input type="text" id="chat-input" placeholder="Ask Zoya anything..." class="w-full bg-black/30 border border-cyan-700/50 rounded-full py-3 px-5 pr-12 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyber-teal transition-all"/>
+        <button id="chat-send" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 rounded-full bg-cyber-teal hover:bg-holographic-purple transition-colors">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bot-icon" class="bot-icon-container">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+    </svg>
+    <div class="bot-hover-text">Zoya - AI Bot</div>
+  </div>
 
   <script type="text/babel">
     const CYBER_PALETTE = {
@@ -395,7 +446,6 @@
 
     const user = { id: 'user123', fingerprint: 'unique-biometric-token' };
 
-    // Enhanced DNA Background with Three.js
     function DNABackground({ user }) {
       const dnaHash = CryptoJS.SHA256(user.fingerprint + user.id).toString();
       const seed = parseInt(dnaHash.slice(0, 8), 16);
@@ -414,7 +464,6 @@
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setClearColor(0x000000, 0);
 
-        // Add floating particles
         const particlesGeometry = new THREE.BufferGeometry();
         const particlesCount = 2000;
         const posArray = new Float32Array(particlesCount * 3);
@@ -434,7 +483,6 @@
         const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
         scene.add(particlesMesh);
 
-        // DNA Strands
         const vertexShader = `
           varying vec2 vUv;
           void main() {
@@ -502,7 +550,6 @@
         }
         animate();
 
-        // Handle resize
         const handleResize = () => {
           camera.aspect = window.innerWidth / window.innerHeight;
           camera.updateProjectionMatrix();
@@ -521,87 +568,34 @@
       return <canvas id="dna-canvas" className="fixed inset-0 z-0 opacity-25" />;
     }
 
-    // Main Dashboard Component with Sections
     function Dashboard() {
       React.useEffect(() => {
-        // Initialize GSAP animations
         gsap.registerPlugin(ScrollTrigger);
         
-        // Hero animations
-        gsap.from('#dropV', {
-          y: -300,
-          opacity: 0,
-          duration: 1.5,
-          ease: 'bounce.out',
-          delay: 0.2
-        });
+        gsap.from('#dropV', { y: -300, opacity: 0, duration: 1.5, ease: 'bounce.out', delay: 0.2 });
+        gsap.from('#dropP', { y: -300, opacity: 0, duration: 1.5, ease: 'bounce.out', delay: 0.4 });
+        gsap.from('.hero-subtitle', { opacity: 0, y: 20, duration: 1, delay: 1.2 });
+        gsap.from('.hero-description', { opacity: 0, y: 20, duration: 1, delay: 1.4 });
+        gsap.from('.cta-button', { opacity: 0, y: 20, duration: 1, delay: 1.6 });
         
-        gsap.from('#dropP', {
-          y: -300,
-          opacity: 0,
-          duration: 1.5,
-          ease: 'bounce.out',
-          delay: 0.4
-        });
-        
-        gsap.from('.hero-subtitle', {
-          opacity: 0,
-          y: 20,
-          duration: 1,
-          delay: 1.2
-        });
-        
-        gsap.from('.hero-description', {
-          opacity: 0,
-          y: 20,
-          duration: 1,
-          delay: 1.4
-        });
-        
-        gsap.from('.cta-button', {
-          opacity: 0,
-          y: 20,
-          duration: 1,
-          delay: 1.6
-        });
-        
-        // Section animations
         gsap.utils.toArray('.section').forEach(section => {
           gsap.from(section, {
-            opacity: 0,
-            y: 50,
-            duration: 1,
-            scrollTrigger: {
-              trigger: section,
-              start: 'top 80%',
-              toggleActions: 'play none none none'
-            }
+            opacity: 0, y: 50, duration: 1,
+            scrollTrigger: { trigger: section, start: 'top 80%', toggleActions: 'play none none none' }
           });
         });
         
-        // Card animations
         gsap.utils.toArray('.cyber-card').forEach((card, i) => {
           gsap.from(card, {
-            opacity: 0,
-            y: 30,
-            duration: 0.8,
-            delay: i * 0.1,
-            scrollTrigger: {
-              trigger: card,
-              start: 'top 90%',
-              toggleActions: 'play none none none'
-            }
+            opacity: 0, y: 30, duration: 0.8, delay: i * 0.1,
+            scrollTrigger: { trigger: card, start: 'top 90%', toggleActions: 'play none none none' }
           });
         });
 
-        // Parallel scrolling for "About VulnPrism" section
         gsap.to(".about-content", {
-          xPercent: -100,
-          ease: "none",
+          xPercent: -100, ease: "none",
           scrollTrigger: {
-            trigger: ".about-section",
-            pin: true,
-            scrub: 1,
+            trigger: ".about-section", pin: true, scrub: 1,
             end: () => "+=" + document.querySelector(".about-content").offsetWidth
           }
         });
@@ -647,6 +641,12 @@
                     </svg>
                   </span>
                 </a>
+                <a href="#" className="cyber-button bg-transparent border-2 border-purple-500 cta-button group relative">
+                  <span className="flex items-center gap-2">
+                    💰 BIT BOUNTY
+                  </span>
+                  <span className="absolute bottom-1 right-2 text-xs text-purple-300">~ Launching Soon</span>
+                </a>
               </div>
             </div>
             <div className="scroll-down">
@@ -656,7 +656,6 @@
             </div>
           </section>
           
-          {/* About VulnPrism Section (Parallel Scrolling) */}
           <section className="pin-section about-section bg-gradient-to-r from-deep-space to-black py-20">
             <div className="pin-content">
               <div className="about-content flex flex-nowrap overflow-hidden w-full">
@@ -686,58 +685,33 @@
             </div>
           </section>
           
-          {/* Core Capabilities Section */}
           <section className="py-20 section gradient-bg">
             <div className="max-w-7xl mx-auto px-4">
               <h2 className="text-4xl font-bold text-center mb-16 section-title shimmer-text">Core Capabilities</h2>
-              
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {/* Feature Card 1: AI-Powered Threat Detection */}
                 <div className="cyber-card cyber-border p-8 group hover:scale-105 transition-all duration-300">
                   <div className="text-cyan-400 mb-6 relative">
                     <div className="absolute inset-0 bg-cyan-400/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                    <svg className="w-16 h-16 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                    </svg>
+                    <svg className="w-16 h-16 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                   </div>
                   <h3 className="text-2xl font-bold mb-4 shimmer-text">🤖 AI-Powered Threat Detection</h3>
                   <p className="text-gray-300 leading-relaxed mb-4">
                     Our advanced AI and machine learning models analyze both static code and dynamic application behavior to detect a wide spectrum of vulnerabilities, including zero-days, with high accuracy.
                   </p>
-                  <div className="flex items-center text-cyan-400 text-sm font-semibold">
-                    <span>Learn More</span>
-                    <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                    </svg>
-                  </div>
                 </div>
-                
-                {/* Feature Card 2: Deep Code & Dependency Analysis (SAST/SCA) */}
                 <div className="cyber-card cyber-border p-8 group hover:scale-105 transition-all duration-300">
                   <div className="text-purple-400 mb-6 relative">
                     <div className="absolute inset-0 bg-purple-400/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-                    <svg className="w-16 h-16 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
-                    </svg>
+                    <svg className="w-16 h-16 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
                   </div>
                   <h3 className="text-2xl font-bold mb-4 shimmer-text">📋 Deep Code & Dependency Analysis</h3>
                   <p className="text-gray-300 leading-relaxed mb-4">
                     Perform in-depth static analysis of your source code and identify vulnerable open-source components, ensuring security from the earliest stages of development.
                   </p>
-                  <div className="flex items-center text-purple-400 text-sm font-semibold">
-                    <span>Explore SAST/SCA</span>
-                    <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
-                    </svg>
-                  </div>
                 </div>
-
-                {/* Feature Card 3: Automated Remediation */}
                 <div className="cyber-card cyber-border p-8">
                   <div className="text-purple-400 mb-4">
-                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path>
-                    </svg>
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
                   </div>
                   <h3 className="text-2xl font-bold mb-3">Automated Remediation</h3>
                   <p className="text-gray-300">
@@ -748,19 +722,16 @@
             </div>
           </section>
           
-          {/* Stats Section */}
           <section className="py-20 section relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center cyber-card cyber-border p-6">
                 <div className="text-5xl font-bold text-cyan-400 mb-2">95.0%</div>
                 <div className="text-gray-300">Detection Accuracy</div>
               </div>
-              
               <div className="text-center cyber-card cyber-border p-6">
                 <div className="text-5xl font-bold text-cyan-400 mb-2">10x</div>
                 <div className="text-gray-300">Faster Remediation</div>
               </div>
-              
               <div className="text-center cyber-card cyber-border p-6">
                 <div className="text-5xl font-bold text-purple-400 mb-2">0</div>
                 <div className="text-gray-300">False Positives</div>
@@ -768,13 +739,10 @@
             </div>
           </section>
           
-          {/* How It Works Section */}
           <section className="py-20 section gradient-bg">
             <div className="max-w-7xl mx-auto px-4">
               <h2 className="text-4xl font-bold text-center mb-16 section-title shimmer-text">How VulnPrism Works</h2>
-              
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                {/* SAST/SCA Workflow */}
                 <div className="transparent-cyber-card cyber-border p-8">
                   <h3 className="text-3xl font-bold mb-6 shimmer-text">Static Code Analysis (SAST/SCA)</h3>
                   <div className="space-y-8">
@@ -801,8 +769,6 @@
                     </div>
                   </div>
                 </div>
-
-                {/* DAST Workflow */}
                 <div className="transparent-cyber-card cyber-border p-8">
                   <h3 className="text-3xl font-bold mb-6 shimmer-text">CyberScythe: Dynamic Application Security</h3>
                   <div className="space-y-8">
@@ -833,7 +799,6 @@
             </div>
           </section>
           
-          {/* CTA Section */}
           <section className="py-32 section relative overflow-hidden">
             <div className="max-w-4xl mx-auto px-4 text-center">
               <h2 className="text-4xl md:text-5xl font-bold mb-6">
@@ -849,26 +814,20 @@
                 <a href="http://localhost:5050/" className="cyber-button bg-transparent border border-cyan-500 text-xl">
                   Audit Source Code
                 </a>
+                <a href="#" className="cyber-button bg-transparent border border-purple-500 text-xl relative">
+                  <span className="flex items-center gap-2">
+                    💰 BIT BOUNTY
+                  </span>
+                  <span className="absolute bottom-1 right-2 text-xs text-purple-300">~ Launching Soon</span>
+                </a>
               </div>
             </div>
           </section>
           
-          {/* AI Bot Icon */}
-          <div className="bot-icon-container">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-            </svg>
-            <div className="bot-hover-text">Zoya - AI Bot</div>
-          </div>
-
-          {/* Footer */}
           <footer className="py-12 border-t border-cyan-900">
             <div className="max-w-7xl mx-auto px-4 text-center">
               <div className="text-2xl font-bold mb-4 shimmer-text">VulnPrism</div>
               <p className="text-gray-400 mb-6">Advanced Security Intelligence Platform</p>
-              <div className="flex justify-center space-x-6 mb-6">
-                {/* Social media icons can be added here if desired */}
-              </div>
               <p className="text-gray-500 text-sm">
                 Designed & developed by Khan Mohammed © 2025 All rights reserved | 
                 <a href="https://www.linkedin.com/in/khan-mohammed-790b18214" target="_blank" rel="noopener noreferrer" className="linkedin-link text-gray-400 transition">
@@ -882,6 +841,136 @@
     }
 
     ReactDOM.createRoot(document.getElementById('root')).render(<Dashboard />);
+  </script>
+  
+  <script>
+    const botIcon = document.getElementById('bot-icon');
+    const chatContainer = document.getElementById('chat-container');
+    const closeChat = document.getElementById('close-chat');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatInput = document.getElementById('chat-input');
+    const chatSend = document.getElementById('chat-send');
+
+    const CHAT_API_URL = '/chat';
+    const SAST_SERVICE_URL = 'http://localhost:5050';
+    const CYBERSCYTHE_SERVICE_URL = 'http://localhost:5051';
+
+    let conversationHistory = [{ role: 'system', content: 'You are Zoya, a helpful AI assistant for the VulnPrism cybersecurity platform. Be friendly, helpful, and concise.' }];
+
+    botIcon.addEventListener('click', () => toggleChatWindow());
+    closeChat.addEventListener('click', () => toggleChatWindow());
+    chatSend.addEventListener('click', () => sendMessage());
+    chatInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    function toggleChatWindow() {
+        if (chatContainer.classList.contains('hidden')) {
+            chatContainer.classList.remove('hidden');
+            setTimeout(() => chatContainer.classList.remove('scale-95', 'opacity-0'), 10);
+        } else {
+            chatContainer.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => chatContainer.classList.add('hidden'), 300);
+        }
+    }
+
+    function addMessage(sender, message) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('chat-message', sender);
+
+        const avatar = document.createElement('div');
+        avatar.classList.add('avatar');
+
+        const messageContent = document.createElement('div');
+        messageContent.classList.add('message-content');
+        messageContent.style.wordWrap = 'break-word';
+        messageContent.style.whiteSpace = 'pre-wrap';
+        messageContent.innerText = message;
+
+        messageElement.appendChild(avatar);
+        messageElement.appendChild(messageContent);
+        chatMessages.appendChild(messageElement);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        const typingIndicator = document.createElement('div');
+        typingIndicator.id = 'typing-indicator';
+        typingIndicator.classList.add('chat-message', 'bot');
+        typingIndicator.innerHTML = `
+            <div class="avatar"></div>
+            <div class="message-content">
+                <div class="typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        `;
+        chatMessages.appendChild(typingIndicator);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function removeTypingIndicator() {
+        const typingIndicator = document.getElementById('typing-indicator');
+        if (typingIndicator) typingIndicator.remove();
+    }
+
+    async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        addMessage('user', message);
+        chatInput.value = '';
+        showTypingIndicator();
+
+        conversationHistory.push({ role: 'user', content: message });
+
+        try {
+            const response = await fetch(CHAT_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    messages: conversationHistory,
+                    max_tokens: 1024,
+                    temperature: 0.7
+                })
+            });
+
+            console.log('Response status:', response.status);
+
+            if (!response.ok) {
+                let errorMessage = `HTTP error! status: ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    console.error('Error response:', errorData);
+                    errorMessage += `, message: ${errorData.error?.message || errorData.message || 'Unknown error'}`;
+                } catch (e) {
+                    const errorText = await response.text();
+                    console.error('Error response text:', errorText);
+                    errorMessage += `, response: ${errorText}`;
+                }
+                throw new Error(errorMessage);
+            }
+
+            const data = await response.json();
+            console.log('API Response:', data);
+
+            if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                throw new Error('Invalid response format from API');
+            }
+
+            const botReply = data.choices[0].message.content;
+            conversationHistory.push({ role: 'assistant', content: botReply });
+            removeTypingIndicator();
+            addMessage('bot', botReply);
+
+        } catch (error) {
+            console.error('Error calling chat API:', error);
+            removeTypingIndicator();
+            addMessage('bot', `Sorry, I'm having trouble connecting to the chat service: ${error.message}. Please make sure the CyberScythe service is running on port 5051.`);
+        }
+    }
   </script>
 </body>
 </html>

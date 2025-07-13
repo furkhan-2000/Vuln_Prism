@@ -316,7 +316,14 @@
       text-shadow: 0 0 8px #0077B5;
     }
 
-    /* Mobile responsiveness */
+    /* Enhanced Mobile Responsiveness */
+    @media (max-width: 1024px) {
+      .container {
+        margin: 30px auto;
+        padding: 30px;
+      }
+    }
+
     @media (max-width: 768px) {
       .container {
         margin: 20px auto;
@@ -331,7 +338,7 @@
       input[type="url"],
       textarea,
       input[type="file"] {
-        width: calc(100% - 20px);
+        width: calc(100% - 30px);
         padding: 12px 15px;
       }
       .cyber-button {
@@ -344,9 +351,40 @@
       .feature-item {
         flex-direction: column;
         text-align: center;
+        gap: 15px;
       }
       #progressContainer {
         padding: 15px;
+      }
+      .description-title {
+        font-size: 1.8rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        margin: 10px auto;
+        padding: 15px;
+        border-radius: 15px;
+      }
+      h1 {
+        font-size: 1.8rem;
+      }
+      .tool-interface {
+        padding: 15px;
+      }
+      .cyber-button {
+        width: 100%;
+        padding: 14px 0;
+      }
+      .description-title {
+        font-size: 1.6rem;
+      }
+      .feature-item {
+        padding: 15px;
+      }
+      .feature-item h4 {
+        font-size: 1.1rem;
       }
     }
   </style>
