@@ -8,14 +8,8 @@ services:
     build: ./sast
     ports:
       - "5050:5050"
-    volumes:
-      - ./chatbot-frontend/.env:/app/.env:ro
-
   cyberscythe:
     build: ./CYBERSCYTHE
     ports:
       - "5051:5051"
-    volumes:
-      - ./chatbot-frontend/.env:/app/.env:ro
-
 
