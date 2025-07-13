@@ -51,9 +51,10 @@ async def health():
 async def chat_with_zoya(request: ChatRequest):
     """DeepSeek API integration"""
     api_key = os.getenv("DEEPSEEK_API_KEY")
-    if not api_key:
-        raise HTTPException(status_code=500, detail="API key not configured")
-    
+    if not api_key or not api_key.strip():
+        print("[ERROR] DeepSeek API key is missing or empty in .env file.")
+        raise HTTPException(status_code=500, detail="API key not configured. Please check your .env file.")
+
     try:
         async with httpx.AsyncClient() as client:
             response = await client.post(
@@ -71,14 +72,33 @@ async def chat_with_zoya(request: ChatRequest):
                 },
                 timeout=30.0
             )
-            
+            if response.status_code == 401:
+                print("[ERROR] DeepSeek API key is invalid or unauthorized.")
+                raise HTTPException(status_code=401, detail="DeepSeek API key is invalid or unauthorized.")
+            if response.status_code == 429:
+                print("[ERROR] DeepSeek API rate limit exceeded.")
+                raise HTTPException(status_code=429, detail="DeepSeek API rate limit exceeded. Please try again later.")
+            if response.status_code >= 500:
+                print(f"[ERROR] DeepSeek server error: {response.status_code} {response.text}")
+                raise HTTPException(status_code=502, detail="DeepSeek service is temporarily unavailable. Please try again later.")
             if response.status_code != 200:
+                print("[ERROR] DeepSeek API error:", response.status_code, response.text)
                 raise HTTPException(status_code=response.status_code, detail=response.text)
-            
-            return response.json()
-            
+            try:
+                data = response.json()
+            except Exception as parse_err:
+                print("[ERROR] Failed to parse DeepSeek response:", parse_err, response.text)
+                raise HTTPException(status_code=500, detail="Failed to parse DeepSeek response.")
+            if not data or "choices" not in data or not data["choices"]:
+                print("[ERROR] DeepSeek API returned no choices.", data)
+                raise HTTPException(status_code=500, detail="DeepSeek API returned no choices.")
+            return data
+    except httpx.RequestError as e:
+        print("[ERROR] Network error calling DeepSeek:", e)
+        raise HTTPException(status_code=502, detail="Network error calling DeepSeek API.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print("[ERROR] DeepSeek exception:", e)
+        raise HTTPException(status_code=500, detail="Internal server error.")
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=3000)
