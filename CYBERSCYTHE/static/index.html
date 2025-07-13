@@ -4,6 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CyberScythe: Dynamic Application Security</title>
+  
+  <!-- External Libraries -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600;700;800&display=swap');
     
@@ -21,8 +32,8 @@
       color: #e0e0ff;
       overflow-x: hidden;
       scroll-behavior: smooth;
-      margin: 0; /* Remove default body margin */
-      padding: 0; /* Remove default body padding */
+      margin: 0;
+      padding: 0;
     }
     
     @keyframes shimmer {
@@ -55,18 +66,18 @@
       background: url('https://www.transparenttextures.com/patterns/foggy.png');
       opacity: 0.12;
       animation: fogMove 60s linear infinite;
-      z-index: -1; /* Ensure fog is behind content */
+      z-index: -1;
     }
     
     .scan-line {
-      position: fixed; /* Changed to fixed */
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 3px;
       background: linear-gradient(90deg, transparent, var(--cyber-teal), transparent);
       animation: scan 3s linear infinite;
-      z-index: -1; /* Ensure scan-line is behind content */
+      z-index: -1;
     }
     
     @keyframes scan {
@@ -87,7 +98,7 @@
       overflow: hidden;
       transition: all 0.3s ease;
       box-shadow: 0 5px 15px rgba(56, 189, 248, 0.4);
-      cursor: pointer; /* Add cursor pointer */
+      cursor: pointer;
     }
     
     .cyber-button:hover {
@@ -115,12 +126,12 @@
       max-width: 800px;
       margin: 50px auto;
       padding: 30px;
-      background: rgba(10, 15, 25, 0.7); /* Semi-transparent background for content container */
+      background: rgba(10, 15, 25, 0.7);
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      position: relative; /* For z-index */
-      z-index: 1; /* Ensure content is above background effects */
-      text-align: center; /* Center content within container */
+      position: relative;
+      z-index: 1;
+      text-align: center;
     }
 
     h1 {
@@ -140,10 +151,10 @@
 
     input[type="url"] {
       padding: 12px 15px;
-      width: calc(100% - 30px); /* Adjust width for padding */
+      width: calc(100% - 30px);
       border-radius: 5px;
-      border: 1px solid rgba(56, 189, 248, 0.3); /* Cyber border */
-      background: rgba(255, 255, 255, 0.05); /* Slightly visible background */
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: rgba(255, 255, 255, 0.05);
       color: #eee;
       font-size: 1rem;
       box-shadow: inset 0 0 8px rgba(56, 189, 248, 0.1);
@@ -242,7 +253,7 @@
         font-size: 1rem;
       }
       input[type="url"] {
-        width: calc(100% - 20px); /* Adjust width for smaller padding */
+        width: calc(100% - 20px);
         padding: 10px;
       }
       .cyber-button {
@@ -256,6 +267,7 @@
   </style>
 </head>
 <body>
+  <div id="root"></div>
   <div class="fog"></div>
   <div class="scan-line"></div>
 
@@ -279,6 +291,205 @@
     </p>
   </footer>
 
-  <script src="/static/app.js"></script>
+  <script type="text/babel">
+    const CYBER_PALETTE = {
+      black: '#000000',
+      cyberTeal: '#38bdf8',
+      holographicPurple: '#c084fc',
+      matrixGreen: '#0f0',
+      deepSpace: '#0a0a15'
+    };
+
+    const user = { id: 'user123', fingerprint: 'unique-biometric-token' };
+
+    function DNABackground({ user }) {
+      const dnaHash = CryptoJS.SHA256(user.fingerprint + user.id).toString();
+      const seed = parseInt(dnaHash.slice(0, 8), 16);
+
+      React.useEffect(() => {
+        const canvas = document.getElementById('dna-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ 
+          canvas, 
+          alpha: true,
+          antialias: true
+        });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setClearColor(0x000000, 0);
+
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 2000;
+        const posArray = new Float32Array(particlesCount * 3);
+        
+        for(let i = 0; i < particlesCount * 3; i++) {
+          posArray[i] = (Math.random() - 0.5) * 100;
+        }
+        
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        const particlesMaterial = new THREE.PointsMaterial({
+          size: 0.1,
+          color: CYBER_PALETTE.cyberTeal,
+          transparent: true,
+          opacity: 0.6
+        });
+        
+        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+        scene.add(particlesMesh);
+
+        const vertexShader = `
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `;
+        
+        const fragmentShader = `
+          uniform float time;
+          uniform vec3 color1;
+          uniform vec3 color2;
+          varying vec2 vUv;
+          void main() {
+            float t = (sin(time + vUv.x*10.0 + vUv.y*10.0) +
+                       sin(time*1.5 + vUv.x*5.0 - vUv.y*5.0)) * 0.25 + 0.5;
+            vec3 color = mix(color1, color2, t);
+            float pulse = sin(time*2.0)*0.1 + 0.6;
+            gl_FragColor = vec4(color, pulse * 0.4);
+          }
+        `;
+
+        const material = new THREE.ShaderMaterial({
+          uniforms: {
+            time:   { value: 0 },
+            color1: { value: new THREE.Color(CYBER_PALETTE.cyberTeal) },
+            color2: { value: new THREE.Color(CYBER_PALETTE.holographicPurple) }
+          },
+          vertexShader,
+          fragmentShader,
+          wireframe: true,
+          transparent: true
+        });
+
+        function makeTorus(x, ry=0) {
+          const geo = new THREE.TorusGeometry(12, 2, 64, 200);
+          const mesh = new THREE.Mesh(geo, material);
+          mesh.position.x = x;
+          mesh.rotation.y = ry;
+          scene.add(mesh);
+          return mesh;
+        }
+
+        const torus1 = makeTorus(-5, 0);
+        const torus2 = makeTorus(5, Math.PI/2);
+
+        camera.position.z = 30;
+        let idx = 0;
+        const interval = setInterval(() => {
+          idx = (idx + 1) % 3;
+          const tgt = [-5, 0, 5];
+          gsap.to(torus1.position, { z: tgt[idx], duration: 1, ease: "power2.inOut" });
+          gsap.to(torus2.position, { z: tgt[(idx+2)%3], duration: 1, ease: "power2.inOut" });
+        }, 5000);
+
+        function animate() {
+          requestAnimationFrame(animate);
+          torus1.rotation.x += 0.004; 
+          torus1.rotation.y += 0.004;
+          torus2.rotation.x += 0.004; 
+          torus2.rotation.y += 0.004;
+          particlesMesh.rotation.y += 0.001;
+          material.uniforms.time.value += 0.04;
+          renderer.render(scene, camera);
+        }
+        animate();
+
+        const handleResize = () => {
+          camera.aspect = window.innerWidth / window.innerHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+        
+        window.addEventListener('resize', handleResize);
+        
+        return () => { 
+          clearInterval(interval); 
+          renderer.dispose();
+          window.removeEventListener('resize', handleResize);
+        };
+      }, [seed]);
+
+      return <canvas id="dna-canvas" className="fixed inset-0 z-0 opacity-25" />;
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<DNABackground user={user} />);
+
+    const form = document.getElementById('scanForm');
+    const output = document.getElementById('output');
+
+    async function startScan() {
+        const url = document.getElementById("url").value;
+
+        if (!url) {
+            output.innerHTML = `<div class="error">Please enter a URL to scan.</div>`;
+            return;
+        }
+
+        output.innerHTML = `<div class="scanning">Queuing scan... <div class="spinner"></div></div>`;
+
+        try {
+            const res = await fetch(`/scan?url=${encodeURIComponent(url)}`, { method: 'POST' });
+            const data = await res.json();
+
+            if (data.scan_id) {
+                const scan_id = data.scan_id;
+                output.innerHTML = `<div class="scanning">Scan in progress (ID: ${scan_id})... <div class="spinner"></div></div>`;
+                pollStatus(scan_id);
+            } else {
+                output.innerHTML = `<div class="error">Error starting scan: ${data.error || 'Unknown error'}</div>`;
+            }
+        } catch (err) {
+            output.innerHTML = `<div class="error">Failed to start scan: ${err.message}</div>`;
+        }
+    }
+
+    async function pollStatus(scan_id) {
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch(`/status/${scan_id}`);
+                if (!res.ok) {
+                    clearInterval(interval);
+                    output.innerHTML = `<div class="error">Error fetching status for scan ${scan_id}.</div>`;
+                    return;
+                }
+                const data = await res.json();
+
+                if (data.message) {
+                    output.innerHTML = `<div class="scanning">${data.message} <div class="spinner"></div></div>`;
+                }
+
+                if (data.status === 'complete') {
+                    clearInterval(interval);
+                    output.innerHTML = `
+                        <div class="success">
+                            <p>Scan complete!</p>
+                            <a href="${data.report_path}" target="_blank" class="report-link">
+                                Download Report
+                            </a>
+                        </div>
+                    `;
+                } else if (data.status === 'error') {
+                    clearInterval(interval);
+                    output.innerHTML = `<div class="error">Scan failed: ${data.message || 'An unknown error occurred.'}</div>`;
+                }
+            } catch (err) {
+                clearInterval(interval);
+                output.innerHTML = `<div class="error">Error polling for status: ${err.message}</div>`;
+            }
+        }, 3000); // Poll every 3 seconds
+    }
+  </script>
 </body>
 </html>
