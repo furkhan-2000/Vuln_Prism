@@ -238,11 +238,7 @@ def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
         if dir_analysis['extensions'] & {'.json', '.xml', '.gradle', '.pom', '.csproj', '.yml', '.yaml'}:
             depcheck_output_dir = os.path.join(base_output_dir, "depcheck")
             depcheck_xml = os.path.join(depcheck_output_dir, "dependency-check-report.xml")
-            # Use more flexible path for dependency-check
-            depcheck_binary = "/usr/local/bin/dependency-check.sh"
-            if not os.path.exists(depcheck_binary):
-                depcheck_binary = "dependency-check.sh"  # Fallback to PATH
-            depcheck_cmd = [depcheck_binary, "-s", source_dir, "-f", "XML",
+            depcheck_cmd = ["dependency-check.sh", "-s", source_dir, "-f", "XML",
                             "-o", depcheck_output_dir, "--prettyPrint"]
             scan_tasks["dependency-check"] = (depcheck_cmd, depcheck_xml, parse_dependency_check)
         else:

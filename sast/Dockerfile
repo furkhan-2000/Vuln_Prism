@@ -48,11 +48,11 @@ COPY --from=builder /opt/dependency-check /opt/dependency-check
 # 9) Ensure venv is first in PATH
 ENV PATH="/opt/venv/bin:$PATH"
 
-# 10) Re‑install semgrep & bandit into final venv (guarantees availability)
-RUN pip install --no-cache-dir semgrep bandit
+# 10) Add Dependency-Check to PATH
+ENV PATH="/opt/dependency-check/bin:$PATH"
 
-# 11) Symlink Dependency‑Check CLI into PATH
-RUN ln -s /opt/dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check.sh
+# 11) Re‑install semgrep & bandit into final venv (guarantees availability)
+RUN pip install --no-cache-dir semgrep bandit
 
 # 12) Copy application code
 WORKDIR /sast
