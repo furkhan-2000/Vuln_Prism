@@ -10,9 +10,15 @@ RUN apt-get update && \
     pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
     playwright install chromium --with-deps && \
+    # Clean up immediately to save space
     apt-get purge -y --auto-remove gcc python3-dev && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip && \
+    # Clean up playwright cache to save space
+    find /root/.cache/ms-playwright -name "*.log" -delete 2>/dev/null || true && \
+    find /root/.cache/ms-playwright -name "*.tmp" -delete 2>/dev/null || true && \
+    # Remove unnecessary playwright files
+    find /root/.cache/ms-playwright -name "*.zip" -delete 2>/dev/null || true
 
 COPY app/ app/
 COPY static/ static/
@@ -59,6 +65,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# Create user first to avoid permission issues
+RUN groupadd --system --gid 1000 malware && \
+    useradd --system --uid 1000 --gid 1000 --create-home malware && \
+    mkdir -p /app/static/reports /app/logs /home/malware/.cache
+
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /root/.cache/ms-playwright /home/malware/.cache/ms-playwright
@@ -66,10 +77,8 @@ COPY --from=builder /root/.cache/ms-playwright /home/malware/.cache/ms-playwrigh
 COPY --from=builder /app/app /app/app
 COPY --from=builder /app/static /app/static
 
-RUN groupadd --system --gid 1234 malware && \
-    useradd --system --uid 1002 --gid 1234 --create-home malware && \
-    mkdir -p /app/static/reports /app/logs && \
-    chown -R malware:malware /app /home/malware/.cache
+# Set proper ownership after all files are copied
+RUN chown -R malware:malware /app /home/malware
 
 USER malware
 

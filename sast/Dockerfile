@@ -75,8 +75,8 @@ COPY --from=builder /opt/dependency-check /opt/dependency-check/
 
 COPY . /sast/
 
-RUN groupadd --system --gid 2323 jenkins && \
-    useradd --system --uid 1010 --gid jenkins --create-home --home-dir /home/jenkins jenkins && \
+RUN groupadd --system --gid 1001 jenkins && \
+    useradd --system --uid 1001 --gid 1001 --create-home --home-dir /home/jenkins jenkins && \
     chown -R jenkins:jenkins /sast /home/jenkins /tmp
 
 USER jenkins
