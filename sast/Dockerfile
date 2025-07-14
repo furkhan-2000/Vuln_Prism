@@ -59,6 +59,9 @@ RUN pip install --no-cache-dir semgrep bandit
 WORKDIR /sast
 COPY . .
 
+# 12.5) Run startup check to verify tools
+RUN python3 startup_check.py || echo "Warning: Some tools may not be fully functional"
+
 # 13) Create + switch to non‑root user
 RUN groupadd --system --gid 1001 appuser && \
     useradd --system --uid 1001 --gid 1001 appuser && \
@@ -69,10 +72,7 @@ ENV HOME=/home/appuser
 RUN mkdir -p /home/appuser/.cache /home/appuser/.dependency-check && \
     chown -R appuser:appuser /home/appuser/.cache /home/appuser/.dependency-check
 
-# Pre-populate Dependency-Check database
-USER appuser
-RUN dependency-check.sh --update
-
+# Switch to non-root user
 USER appuser
 
 

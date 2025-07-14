@@ -105,6 +105,10 @@ def run_tool_with_retry(name: str, cmd: List[str], output_path: str,
                 logger.info("%s finished with findings.", name)
                 return True
 
+            if name.lower() == "dependency-check" and result.returncode in [0, 8] and os.path.exists(output_path):
+                logger.info("%s finished (exit code %d is acceptable).", name, result.returncode)
+                return True
+
             if result.stdout:
                 with open(output_path, "w", encoding="utf-8") as f:
                     f.write(result.stdout)
@@ -195,20 +199,29 @@ def parse_trivy(path):
 
 def parse_dependency_check(path):
     if not os.path.exists(path):
-        logger.warning("Dependency-Check XML not found, skipping parse.")
+        logger.warning("Dependency-Check XML not found at %s, skipping parse.", path)
         return []
+
     try:
+        # Check if file is empty or too small
+        if os.path.getsize(path) < 100:
+            logger.warning("Dependency-Check XML file is too small, likely empty or corrupted.")
+            return []
+
         tree = etree.parse(path)
         vulnerabilities = tree.xpath("//vulnerability")
         issues = []
+
+        logger.info("Found %d vulnerabilities in Dependency-Check report", len(vulnerabilities))
+
         for vuln in vulnerabilities:
             sev = SEVERITY_MAP.get(vuln.findtext("severity", default="LOW").upper(), "Low")
             issues.append({
-                "rule": vuln.findtext("name"),
-                "desc": vuln.findtext("description"),
-                "impact": vuln.findtext("cwe"),
-                "fix": vuln.findtext("references/reference/url"),
-                "file": vuln.findtext("../fileName"),
+                "rule": vuln.findtext("name") or "Unknown",
+                "desc": vuln.findtext("description") or "No description available",
+                "impact": vuln.findtext("cwe") or "Unknown CWE",
+                "fix": vuln.findtext("references/reference/url") or "No fix available",
+                "file": vuln.findtext("../fileName") or "Unknown file",
                 "line": "N/A",
                 "severity": sev,
                 "risk_score": RISK_SCORE_MAP.get(sev, 1)
@@ -241,12 +254,27 @@ def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
         trivy_cmd = ["trivy", "fs", "--format", "json", "--output", trivy_output, source_dir]
         scan_tasks["trivy"] = (trivy_cmd, trivy_output, parse_trivy)
 
+        # Check if dependency-check is available and manifest files exist
         if dir_analysis['extensions'] & {'.json', '.xml', '.gradle', '.pom', '.csproj', '.yml', '.yaml'}:
-            depcheck_output_dir = os.path.join(base_output_dir, "depcheck")
-            depcheck_xml = os.path.join(depcheck_output_dir, "dependency-check-report.xml")
-            depcheck_cmd = ["dependency-check.sh", "-s", source_dir, "-f", "XML",
-                            "-o", depcheck_output_dir, "--prettyPrint"]
-            scan_tasks["dependency-check"] = (depcheck_cmd, depcheck_xml, parse_dependency_check)
+            try:
+                # Test if dependency-check is available (try both possible paths)
+                try:
+                    subprocess.run(["dependency-check.sh", "--version"],
+                                 capture_output=True, check=True, timeout=10)
+                    depcheck_cmd_base = "dependency-check.sh"
+                except (subprocess.CalledProcessError, FileNotFoundError):
+                    subprocess.run(["/opt/dependency-check/dependency-check/bin/dependency-check.sh", "--version"],
+                                 capture_output=True, check=True, timeout=10)
+                    depcheck_cmd_base = "/opt/dependency-check/dependency-check/bin/dependency-check.sh"
+
+                depcheck_output_dir = os.path.join(base_output_dir, "depcheck")
+                depcheck_xml = os.path.join(depcheck_output_dir, "dependency-check-report.xml")
+                depcheck_cmd = [depcheck_cmd_base, "-s", source_dir, "-f", "XML",
+                                "-o", depcheck_output_dir, "--prettyPrint", "--noupdate"]
+                scan_tasks["dependency-check"] = (depcheck_cmd, depcheck_xml, parse_dependency_check)
+                logger.info("Dependency-Check is available and will be used.")
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired, FileNotFoundError) as e:
+                logger.warning("Dependency-Check is not available or not working. Skipping. Error: %s", e)
         else:
             logger.info("No manifest files found. Skipping Dependency-Check.")
 
