@@ -29,12 +29,12 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Install semgrep, bandit, trivy, and dependency-check CLI
-RUN pip install --no-cache-dir semgrep bandit && \
+RUN pip install --no-cache-dir semgrep bandit pip-audit && \
     curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin && \
     curl -sLo dependency-check.zip https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.9/dependency-check-9.0.9-release.zip && \
     unzip dependency-check.zip -d /opt && \
     rm dependency-check.zip && \
-    ln -s /opt/dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check.sh
+    ln -s /opt/dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check.sh &&     curl -sfL https://github.com/gitleaks/gitleaks/releases/download/v8.18.1/gitleaks_8.18.1_linux_x64.tar.gz -o gitleaks.tar.gz &&     tar -xzf gitleaks.tar.gz -C /usr/local/bin &&     rm gitleaks.tar.gz
 
 # Final stage
 FROM python:3.11.9-slim

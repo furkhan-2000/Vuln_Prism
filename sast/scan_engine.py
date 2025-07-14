@@ -189,6 +189,50 @@ def parse_trivy(path):
         logger.error("Error parsing Trivy output: %s", e, exc_info=True)
         return []
 
+def parse_pip_audit(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        issues = []
+        for vuln in data.get("vulnerabilities", []):
+            sev = SEVERITY_MAP.get(vuln.get("severity", "LOW").upper(), "Low")
+            issues.append({
+                "rule": vuln.get("id"),
+                "desc": vuln.get("description"),
+                "impact": f"{vuln.get("package", {}).get("name")}@{vuln.get("package", {}).get("version")}",
+                "fix": vuln.get("fix_versions", ["Review manually."])[0],
+                "file": "requirements.txt", # Assuming vulnerabilities are from requirements.txt
+                "line": "N/A",
+                "severity": sev,
+                "risk_score": RISK_SCORE_MAP.get(sev, 1)
+            })
+        return issues
+    except Exception as e:
+        logger.error("Error parsing pip-audit output: %s", e, exc_info=True)
+        return []
+
+def parse_gitleaks(path):
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        issues = []
+        for finding in data:
+            sev = SEVERITY_MAP.get(finding.get("Severity", "LOW").upper(), "Low")
+            issues.append({
+                "rule": finding.get("RuleID"),
+                "desc": finding.get("Description"),
+                "impact": finding.get("Match"),
+                "fix": "Review and remove hardcoded secret.",
+                "file": finding.get("File"),
+                "line": finding.get("StartLine"),
+                "severity": sev,
+                "risk_score": RISK_SCORE_MAP.get(sev, 1)
+            })
+        return issues
+    except Exception as e:
+        logger.error("Error parsing Gitleaks output: %s", e, exc_info=True)
+        return []
+
 def parse_dependency_check(path):
     if not os.path.exists(path):
         logger.warning("Dependency-Check XML not found, skipping parse.")
@@ -225,7 +269,7 @@ def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
         scan_tasks = {}
 
         semgrep_output = os.path.join(base_output_dir, "semgrep.json")
-        semgrep_cmd = ["semgrep", "--json", "--metrics=off", "--output", semgrep_output, source_dir, "--config", "p/all"]
+        semgrep_cmd = ["semgrep", "--json", "--metrics=off", "--output", semgrep_output, source_dir, "--config", "p/all", "--config", "p/security-audit", "--config", "p/owasp-top-10", "--config", "p/python-security"]
         scan_tasks["semgrep"] = (semgrep_cmd, semgrep_output, parse_semgrep)
 
         if '.py' in dir_analysis['extensions']:
@@ -237,11 +281,22 @@ def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
         trivy_cmd = ["trivy", "fs", "--format", "json", "--output", trivy_output, source_dir]
         scan_tasks["trivy"] = (trivy_cmd, trivy_output, parse_trivy)
 
+        gitleaks_output = os.path.join(base_output_dir, "gitleaks.json")
+        gitleaks_cmd = ["gitleaks", "detect", "--source", source_dir, "--report-path", gitleaks_output, "--format", "json"]
+        scan_tasks["gitleaks"] = (gitleaks_cmd, gitleaks_output, parse_gitleaks)
+
+        if '.py' in dir_analysis['extensions']:
+            pip_audit_output = os.path.join(base_output_dir, "pip_audit.json")
+            pip_audit_cmd = ["pip-audit", "--json", "-r", os.path.join(source_dir, "requirements.txt")]
+            scan_tasks["pip-audit"] = (pip_audit_cmd, pip_audit_output, parse_pip_audit)
+
         if dir_analysis['extensions'] & {'.json', '.xml', '.gradle', '.pom', '.csproj', '.yml', '.yaml'}:
             depcheck_output_dir = os.path.join(base_output_dir, "depcheck")
             depcheck_xml = os.path.join(depcheck_output_dir, "dependency-check-report.xml")
+            depcheck_data_dir = os.path.join(base_output_dir, "depcheck_data")
+            os.makedirs(depcheck_data_dir, exist_ok=True)
             depcheck_cmd = ["/usr/local/bin/dependency-check.sh", "-s", source_dir, "-f", "XML",
-                            "-o", depcheck_output_dir, "--prettyPrint"]
+                            "-o", depcheck_output_dir, "--prettyPrint", "--data", depcheck_data_dir]
             scan_tasks["dependency-check"] = (depcheck_cmd, depcheck_xml, parse_dependency_check)
         else:
             logger.info("No manifest files found. Skipping Dependency-Check.")
