@@ -88,12 +88,11 @@ def run_tool_with_retry(name: str, cmd: List[str], output_path: str,
     for attempt in range(retries + 1):
         try:
             logger.info("Running %s (attempt %d/%d): %s", name, attempt + 1, retries + 1, " ".join(cmd))
-            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                    text=True, timeout=timeout)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
             logger.info("%s exit code %d", name, result.returncode)
-            logger.debug("%s STDOUT (first 500): %s", name, result.stdout[:500])
-            logger.debug("%s STDERR (first 500): %s", name, result.stderr[:500])
+            logger.info("%s STDOUT (first 500): %s", name, result.stdout[:500])
+            logger.info("%s STDERR (first 500): %s", name, result.stderr[:500])
 
             if name.lower() == "semgrep" and result.returncode == 7:
                 logger.info("%s finished with no findings.", name)
@@ -102,9 +101,12 @@ def run_tool_with_retry(name: str, cmd: List[str], output_path: str,
             if result.stdout:
                 with open(output_path, "w", encoding="utf-8") as f:
                     f.write(result.stdout)
+            elif is_xml and result.stderr: # If XML is expected but stdout is empty, check stderr
+                with open(output_path, "w", encoding="utf-8") as f:
+                    f.write(result.stderr)
 
             if is_xml:
-                if os.path.exists(output_path):
+                if os.path.exists(output_path) and os.path.getsize(output_path) > 0: # Ensure file exists and is not empty
                     return True
             else:
                 if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
