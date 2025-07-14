@@ -1,11 +1,7 @@
-# Dockerfile
-
-# Builder stage
 FROM python:3.11.9-slim AS builder
 
 WORKDIR /app
 
-# Install build and runtime dependencies (including Java 17)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       build-essential \
@@ -20,11 +16,12 @@ RUN apt-get update && \
       unzip \
       openjdk-17-jre-headless \
       libgl1-mesa-glx \
-      libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
+      libglib2.0-0 && \
+      rm -rf /var/lib/apt/lists/*
 
-# Copy and install Python dependencies
+
 COPY requirements.txt .
+
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
@@ -36,12 +33,14 @@ RUN pip install --no-cache-dir semgrep bandit && \
     rm dependency-check.zip && \
     ln -s /opt/dependency-check/bin/dependency-check.sh /usr/local/bin/dependency-check.sh
 
-# Final stage
 FROM python:3.11.9-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 
 
 WORKDIR /sast
 
-# Install runtime libraries and Java
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
       git \
@@ -55,8 +54,8 @@ RUN apt-get update && \
       tini \
       openjdk-17-jre-headless \
       libgl1-mesa-glx \
-      libglib2.0-0 \
-    && rm -rf /var/lib/apt/lists/*
+      libglib2.0-0 && \
+      rm -rf /var/lib/apt/lists/*
 
 # Java environment
 ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
@@ -69,26 +68,24 @@ ENV MATPLOTLIBRC=/tmp
 RUN mkdir -p /tmp && chmod 777 /tmp && \
     echo "backend: Agg" > /tmp/matplotlibrc
 
-# Copy installed Python packages & tools from builder
 COPY --from=builder /app/requirements.txt /sast/requirements.txt
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages/
 COPY --from=builder /usr/local/bin /usr/local/bin/
 COPY --from=builder /opt/dependency-check /opt/dependency-check/
 
-# Copy application source
 COPY . /sast/
 
-# Create non-root user
-RUN groupadd --system jenkins && \
-    useradd --system --gid jenkins --create-home --home-dir /home/jenkins jenkins && \
+RUN groupadd --system --gid 2323 jenkins && \
+    useradd --system --uid 1010 --gid jenkins --create-home --home-dir /home/jenkins jenkins && \
     chown -R jenkins:jenkins /sast /home/jenkins /tmp
 
 USER jenkins
 
-# Healthcheck and entrypoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD curl --fail http://localhost:5050/health || exit 1
+    CMD curl -f http://localhost:5050/health || exit 1
 
 EXPOSE 5050
+
 ENTRYPOINT ["/usr/bin/tini", "--"]
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050"]

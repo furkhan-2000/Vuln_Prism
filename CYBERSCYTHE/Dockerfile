@@ -1,33 +1,30 @@
-# ----------------------
-# Builder stage
-# ----------------------
 FROM python:3.11-slim AS builder
 
 WORKDIR /app
 
-# Install system dependencies and Python dependencies
 COPY requirements.txt .
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        gcc python3-dev \
-    && pip install --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt \
-    && playwright install chromium --with-deps \
-    && apt-get purge -y --auto-remove gcc python3-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        gcc python3-dev && \
+    pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    playwright install chromium --with-deps && \
+    apt-get purge -y --auto-remove gcc python3-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 COPY app/ app/
 COPY static/ static/
 
-# ----------------------
-# Final stage
-# ----------------------
 FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 
 
 WORKDIR /app
 
-# Install minimal libraries required by headless Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libnss3 \
     libatk1.0-0 \
@@ -60,9 +57,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-liberation \
     wget \
     ca-certificates \
-  && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy Python packages, Playwright browsers, and app code
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /root/.cache/ms-playwright /home/malware/.cache/ms-playwright
@@ -70,20 +66,17 @@ COPY --from=builder /root/.cache/ms-playwright /home/malware/.cache/ms-playwrigh
 COPY --from=builder /app/app /app/app
 COPY --from=builder /app/static /app/static
 
-# Create non-root user and set permissions
-RUN groupadd --system --gid 1234 malware \
- && useradd --system --uid 1002 --gid 1234 --create-home malware \
- && mkdir -p /app/static/reports /app/logs \
- && chown -R malware:malware /app /home/malware/.cache
+RUN groupadd --system --gid 1234 malware && \
+    useradd --system --uid 1002 --gid 1234 --create-home malware && \
+    mkdir -p /app/static/reports /app/logs && \
+    chown -R malware:malware /app /home/malware/.cache
 
 USER malware
 
 EXPOSE 5051
 
-# Healthcheck
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD python -c "import httpx; httpx.get('http://0.0.0.0:5051/health')" || exit 1
 
-# Start the FastAPI server
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5051"]
 

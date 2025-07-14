@@ -1,0 +1,76 @@
+# Python bytecode / compiled files (optional)
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Build artifacts
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.coverage
+.cache/
+pytest_cache/
+
+# Virtual environments
+venv/
+env/
+.venv/
+ENV/
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs / temp files
+*.log
+*.tmp
+*.bak
+
+# Git / SCM
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD metadata (optional)
+.github/
+.gitlab/
+
+# Docker compose / local overrides
+docker-compose.yml
+docker-compose.override.yml
+docker-compose.*.yml
+
+# Dependency lock files (optional)
+Pipfile
+Pipfile.lock
+poetry.lock
+pyproject.toml
+
+# Databases & secrets
+*.db
+*.sqlite
+.env
+.env.*
+
+# Local reports / artifacts
+reports/
+output/
+results/
+
+# Large data not for image
+data/
+datasets/
+files/
+uploads/
