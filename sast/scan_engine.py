@@ -282,12 +282,12 @@ def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
         scan_tasks["trivy"] = (trivy_cmd, trivy_output, parse_trivy)
 
         gitleaks_output = os.path.join(base_output_dir, "gitleaks.json")
-        gitleaks_cmd = ["gitleaks", "detect", "--source", source_dir, "--report-path", gitleaks_output, "--format", "json"]
+        gitleaks_cmd = ["gitleaks", "detect", "--source", source_dir, "--report-path", gitleaks_output, "--json"]
         scan_tasks["gitleaks"] = (gitleaks_cmd, gitleaks_output, parse_gitleaks)
 
         if '.py' in dir_analysis['extensions']:
             pip_audit_output = os.path.join(base_output_dir, "pip_audit.json")
-            pip_audit_cmd = ["pip-audit", "--json", "-r", os.path.join(source_dir, "requirements.txt")]
+            pip_audit_cmd = ["pip-audit", "-r", os.path.join(source_dir, "requirements.txt"), "--json-output", pip_audit_output]
             scan_tasks["pip-audit"] = (pip_audit_cmd, pip_audit_output, parse_pip_audit)
 
         if dir_analysis['extensions'] & {'.json', '.xml', '.gradle', '.pom', '.csproj', '.yml', '.yaml'}:
@@ -296,7 +296,7 @@ def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
             depcheck_data_dir = os.path.join(base_output_dir, "depcheck_data")
             os.makedirs(depcheck_data_dir, exist_ok=True)
             depcheck_cmd = ["/usr/local/bin/dependency-check.sh", "-s", source_dir, "-f", "XML",
-                            "-o", depcheck_output_dir, "--prettyPrint", "--data", depcheck_data_dir]
+                            "-o", depcheck_output_dir, "--prettyPrint", "--data", depcheck_data_dir, "--disableNvdUpdate"]
             scan_tasks["dependency-check"] = (depcheck_cmd, depcheck_xml, parse_dependency_check)
         else:
             logger.info("No manifest files found. Skipping Dependency-Check.")
