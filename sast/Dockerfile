@@ -59,7 +59,10 @@ RUN mkdir -p /tmp && chmod 777 /tmp && \
 
 COPY --from=builder /app/requirements.txt /sast/requirements.txt
 COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages/
-COPY --from=builder /usr/local/bin /usr/local/bin/
+COPY --from=builder /usr/local/bin/semgrep /usr/local/bin/semgrep
+COPY --from=builder /usr/local/bin/bandit /usr/local/bin/bandit
+COPY --from=builder /usr/local/bin/trivy /usr/local/bin/trivy
+COPY --from=builder /usr/local/bin/dependency-check.sh /usr/local/bin/dependency-check.sh
 COPY --from=builder /opt/dependency-check /opt/dependency-check/
 
 COPY . /sast/
