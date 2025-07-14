@@ -58,6 +58,7 @@ COPY --from=builder /usr/local/bin/semgrep /usr/local/bin/semgrep
 COPY --from=builder /usr/local/bin/bandit /usr/local/bin/bandit
 COPY --from=builder /usr/local/bin/trivy /usr/local/bin/trivy
 COPY --from=builder /usr/local/bin/dependency-check.sh /usr/local/bin/dependency-check.sh
+COPY --from=builder /usr/local/bin/uvicorn /usr/local/bin/uvicorn
 COPY --from=builder /opt/dependency-check /opt/dependency-check/
 
 COPY . /sast/
