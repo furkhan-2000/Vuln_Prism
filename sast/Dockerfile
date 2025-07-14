@@ -50,7 +50,7 @@ COPY --from=builder /opt/dependency-check /opt/dependency-check
 ENV PATH="/opt/venv/bin:$PATH"
 
 # 10) Add Dependency-Check to PATH
-ENV PATH="/opt/dependency-check/bin:$PATH"
+ENV PATH="/opt/dependency-check/dependency-check/bin:$PATH"
 
 # 11) Re‑install semgrep & bandit into final venv (guarantees availability)
 RUN pip install --no-cache-dir semgrep bandit

@@ -92,8 +92,10 @@ def run_tool_with_retry(name: str, cmd: List[str], output_path: str,
                                     text=True, timeout=timeout)
 
             logger.info("%s exit code %d", name, result.returncode)
-            logger.debug("%s STDOUT (first 500): %s", name, result.stdout[:500])
-            logger.debug("%s STDERR (first 500): %s", name, result.stderr[:500])
+            if result.stdout:
+                logger.info("%s STDOUT: %s", name, result.stdout)
+            if result.stderr:
+                logger.error("%s STDERR: %s", name, result.stderr)
 
             if name.lower() == "semgrep" and result.returncode == 7:
                 logger.info("%s finished with no findings.", name)
