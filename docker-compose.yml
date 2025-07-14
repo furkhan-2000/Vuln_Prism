@@ -3,13 +3,29 @@ services:
     build: ./chatbot-frontend
     ports:
       - "3000:3000"
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+    env_file:
+      - .env
+      - ./chatbot-frontend/.env
 
   sast:
     build: ./sast
     ports:
       - "5050:5050"
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+    env_file:
+      - .env
+      - ./sast/.env
+
   cyberscythe:
     build: ./CYBERSCYTHE
     ports:
       - "5051:5051"
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+    env_file:
+      - .env
+      - ./CYBERSCYTHE/.env
 
