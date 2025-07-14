@@ -60,9 +60,7 @@ WORKDIR /sast
 COPY . .
 
 # 13) Create + switch to non‑root user
-RUN groupadd --system --gid 1001 appuser && \
-    useradd --system --uid 1001 --gid 1001 appuser && \
-    chown -R appuser:appuser /sast
+RUN groupadd --system --gid 1001 appuser &&     useradd --system --uid 1001 --gid 1001 appuser &&     mkdir -p /home/appuser &&     chown -R appuser:appuser /home/appuser /sast
 USER appuser
 
 # 14) Healthcheck & entrypoint
