@@ -101,6 +101,10 @@ def run_tool_with_retry(name: str, cmd: List[str], output_path: str,
                 logger.info("%s finished with no findings.", name)
                 return True
 
+            if name.lower() == "bandit" and result.returncode == 1 and os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                logger.info("%s finished with findings.", name)
+                return True
+
             if result.stdout:
                 with open(output_path, "w", encoding="utf-8") as f:
                     f.write(result.stdout)

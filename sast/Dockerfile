@@ -61,7 +61,17 @@ COPY . .
 
 # 13) Create + switch to non‑root user
 RUN groupadd --system --gid 1001 appuser &&     useradd --system --uid 1001 --gid 1001 appuser &&     mkdir -p /home/appuser &&     chown -R appuser:appuser /home/appuser /sast
+ENV HOME=/home/appuser
+RUN mkdir -p /home/appuser/.cache /home/appuser/.dependency-check && \
+    chown -R appuser:appuser /home/appuser/.cache /home/appuser/.dependency-check
+
+# Pre-populate Dependency-Check database
 USER appuser
+RUN dependency-check.sh --update || true
+USER root # Switch back to root for subsequent commands if needed, or stay as appuser if all subsequent commands are user-specific
+
+USER appuser
+
 
 # 14) Healthcheck & entrypoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
