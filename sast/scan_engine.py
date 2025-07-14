@@ -8,13 +8,19 @@ import time
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import random
 
 import pdf_report
 from lxml import etree
 
+# Configure logging
 logger = logging.getLogger("app.scan_engine")
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
 
+# Severity and scoring maps
 SEVERITY_MAP = {
     "CRITICAL": "Critical", "HIGH": "High", "MEDIUM": "Medium", "MODERATE": "Medium",
     "LOW": "Low", "INFO": "Info", "INFORMATIONAL": "Info", "NOTE": "Info",
@@ -22,9 +28,9 @@ SEVERITY_MAP = {
     "DEFCON1": "Critical", "URGENT": "High", "IMPORTANT": "High",
     "UNKNOWN": "Info"
 }
-
 RISK_SCORE_MAP = {"Critical": 10, "High": 8, "Medium": 5, "Low": 2, "Info": 1}
 
+# Auto-fix suggestions
 AUTO_FIX_SUGGESTIONS = {
     "sql-injection": "Use parameterized queries.",
     "hardcoded-secret": "Move secrets to environment variables.",
@@ -55,167 +61,185 @@ AUTO_FIX_SUGGESTIONS = {
 }
 
 def validate_source_directory(source_path: str) -> Dict[str, Any]:
-    if not os.path.exists(source_path):
-        raise Exception(f"Source path does not exist: {source_path}")
     if not os.path.isdir(source_path):
-        raise Exception(f"Source path is not a directory: {source_path}")
+        raise Exception(f"Invalid source directory: {source_path}")
 
-    file_count, total_size, extensions = 0, 0, set()
+    file_count = total_size = 0
+    extensions = set()
     for root, _, files in os.walk(source_path):
-        for file in files:
-            path = os.path.join(root, file)
+        for fname in files:
+            fpath = os.path.join(root, fname)
             try:
-                stat = os.stat(path)
+                st = os.stat(fpath)
                 file_count += 1
-                total_size += stat.st_size
-                ext = Path(file).suffix.lower()
+                total_size += st.st_size
+                ext = Path(fname).suffix.lower()
                 if ext:
                     extensions.add(ext)
-            except:
+            except OSError:
                 continue
+
     return {
         "file_count": file_count,
         "total_size": total_size,
         "extensions": extensions,
-        "has_code": bool(extensions & {'.py', '.js', '.java', '.cpp', '.c', '.cs', '.rb', '.php', '.go', '.rs', '.ts', '.jsx', '.tsx'})
+        "has_code": bool(extensions & {'.py', '.js', '.java', '.cpp', '.c', '.cs',
+                                       '.rb', '.php', '.go', '.rs', '.ts', '.jsx', '.tsx'})
     }
 
 def run_tool_with_retry(name: str, cmd: List[str], output_path: str,
-                        timeout: int = 600, retries: int = 2) -> bool:
+                        timeout: int = 600, retries: int = 5) -> bool:
+    """
+    Run a scanning tool with retries and exponential backoff + jitter.
+    Write stdout for JSON tools or stderr for XML tools, then treat
+    existence of a non-empty output file as success.
+    """
     is_xml = output_path.lower().endswith(".xml")
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     for attempt in range(retries + 1):
+        logger.info("Running %s (attempt %d/%d): %s", name, attempt+1, retries+1, " ".join(cmd))
         try:
-            logger.info("Running %s (attempt %d/%d): %s", name, attempt + 1, retries + 1, " ".join(cmd))
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
-
             logger.info("%s exit code %d", name, result.returncode)
-            logger.info("%s STDOUT (first 500): %s", name, result.stdout[:500])
-            logger.info("%s STDERR (first 500): %s", name, result.stderr[:500])
+            logger.debug("%s stdout: %s", name, result.stdout[:500])
+            logger.debug("%s stderr: %s", name, result.stderr[:500])
 
+            # Semgrep: exit code 7 = no findings (we treat as success)
             if name.lower() == "semgrep" and result.returncode == 7:
-                logger.info("%s finished with no findings.", name)
                 return True
 
-            if result.stdout:
+            # Write output: for JSON-based tools use stdout, for XML use stderr if empty
+            out = result.stdout if result.stdout else (result.stderr if is_xml else "")
+            if out:
                 with open(output_path, "w", encoding="utf-8") as f:
-                    f.write(result.stdout)
-            elif is_xml and result.stderr:
-                with open(output_path, "w", encoding="utf-8") as f:
-                    f.write(result.stderr)
+                    f.write(out)
 
+            # Success if file exists and is non-empty
             if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
                 return True
 
-            logger.warning("%s produced no valid output on attempt %d.", name, attempt + 1)
+            logger.warning("%s produced no valid output on attempt %d", name, attempt+1)
 
         except subprocess.TimeoutExpired:
-            logger.error("%s timed out on attempt %d.", name, attempt + 1)
+            logger.error("%s timed out on attempt %d", name, attempt+1)
 
-        time.sleep(2 ** attempt)
+        # Exponential backoff + jitter
+        time.sleep((2 ** attempt) + random.uniform(0, 1))
 
-    logger.error("%s failed after %d attempts.", name, retries + 1)
+    logger.error("%s failed after %d attempts", name, retries+1)
     return False
 
-def parse_semgrep(path):
+def parse_semgrep(path: str) -> List[Dict[str, Any]]:
+    issues = []
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        issues = []
-        for finding in data.get("results", []):
-            sev = SEVERITY_MAP.get(finding.get("extra", {}).get("severity", "INFO").upper(), "Info")
+        data = json.load(open(path, encoding="utf-8"))
+        for r in data.get("results", []):
+            sev = SEVERITY_MAP.get(r.get("extra", {}).get("severity", "INFO").upper(), "Info")
             issues.append({
-                "rule": finding.get("check_id"),
-                "desc": finding.get("extra", {}).get("message"),
-                "impact": finding.get("path"),
-                "fix": AUTO_FIX_SUGGESTIONS.get(finding.get("check_id"), "Review manually."),
-                "file": finding.get("path"),
-                "line": finding.get("start", {}).get("line"),
+                "rule": r.get("check_id"),
+                "desc": r.get("extra", {}).get("message"),
+                "impact": r.get("path"),
+                "fix": AUTO_FIX_SUGGESTIONS.get(r.get("check_id"), "Review manually."),
+                "file": r.get("path"),
+                "line": r.get("start", {}).get("line"),
                 "severity": sev,
                 "risk_score": RISK_SCORE_MAP.get(sev, 1)
             })
-        return issues
     except Exception as e:
         logger.error("Error parsing Semgrep output: %s", e, exc_info=True)
-        return []
+    return issues
 
-def parse_bandit(path):
+def parse_bandit(path: str) -> List[Dict[str, Any]]:
+    issues = []
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        issues = []
-        for finding in data.get("results", []):
-            sev = SEVERITY_MAP.get(finding.get("issue_severity", "LOW").upper(), "Low")
+        data = json.load(open(path, encoding="utf-8"))
+        for r in data.get("results", []):
+            sev = SEVERITY_MAP.get(r.get("issue_severity", "LOW").upper(), "Low")
             issues.append({
-                "rule": finding.get("test_id"),
-                "desc": finding.get("issue_text"),
-                "impact": finding.get("issue_confidence"),
-                "fix": AUTO_FIX_SUGGESTIONS.get(finding.get("test_name"), "Review manually."),
-                "file": finding.get("filename"),
-                "line": finding.get("line_number"),
+                "rule": r.get("test_id"),
+                "desc": r.get("issue_text"),
+                "impact": r.get("issue_confidence"),
+                "fix": AUTO_FIX_SUGGESTIONS.get(r.get("test_name"), "Review manually."),
+                "file": r.get("filename"),
+                "line": r.get("line_number"),
                 "severity": sev,
                 "risk_score": RISK_SCORE_MAP.get(sev, 1)
             })
-        return issues
     except Exception as e:
         logger.error("Error parsing Bandit output: %s", e, exc_info=True)
-        return []
+    return issues
 
-def parse_trivy(path):
+def parse_trivy(path: str) -> List[Dict[str, Any]]:
+    issues = []
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        issues = []
-        for target in data.get("Results", []):
-            for vuln in target.get("Vulnerabilities", []):
-                sev = SEVERITY_MAP.get(vuln.get("Severity", "LOW").upper(), "Low")
+        data = json.load(open(path, encoding="utf-8"))
+        for result in data.get("Results", []):
+            for v in result.get("Vulnerabilities", []):
+                sev = SEVERITY_MAP.get(v.get("Severity", "LOW").upper(), "Low")
                 issues.append({
-                    "rule": vuln.get("VulnerabilityID"),
-                    "desc": vuln.get("Title"),
-                    "impact": vuln.get("PkgName"),
-                    "fix": vuln.get("PrimaryURL"),
-                    "file": target.get("Target"),
+                    "rule": v.get("VulnerabilityID"),
+                    "desc": v.get("Title"),
+                    "impact": v.get("PkgName"),
+                    "fix": v.get("PrimaryURL"),
+                    "file": result.get("Target"),
                     "line": "N/A",
                     "severity": sev,
                     "risk_score": RISK_SCORE_MAP.get(sev, 1)
                 })
-        return issues
     except Exception as e:
         logger.error("Error parsing Trivy output: %s", e, exc_info=True)
-        return []
+    return issues
 
-def parse_pip_audit(path):
+def parse_gitleaks(path: str) -> List[Dict[str, Any]]:
+    issues = []
     try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        issues = []
-        for vuln in data.get("vulnerabilities", []):
-            sev = SEVERITY_MAP.get(vuln.get("severity", "LOW").upper(), "Low")
+        data = json.load(open(path, encoding="utf-8"))
+        for r in data:
+            sev = SEVERITY_MAP.get(r.get("Severity", "LOW").upper(), "Low")
             issues.append({
-                "rule": vuln.get("id"),
-                "desc": vuln.get("description"),
-                "impact": f"{vuln.get('package', {}).get('name')}@{vuln.get('package', {}).get('version')}",
-                "fix": vuln.get("fix_versions", ["Review manually."])[0],
+                "rule": r.get("RuleID"),
+                "desc": r.get("Description"),
+                "impact": r.get("Match"),
+                "fix": "Review manually.",
+                "file": r.get("File"),
+                "line": r.get("StartLine"),
+                "severity": sev,
+                "risk_score": RISK_SCORE_MAP.get(sev, 1)
+            })
+    except Exception as e:
+        logger.error("Error parsing Gitleaks output: %s", e, exc_info=True)
+    return issues
+
+def parse_pip_audit(path: str) -> List[Dict[str, Any]]:
+    issues = []
+    try:
+        data = json.load(open(path, encoding="utf-8"))
+        for v in data.get("vulnerabilities", []):
+            sev = SEVERITY_MAP.get(v.get("severity", "LOW").upper(), "Low")
+            pkg = v.get("package", {})
+            issues.append({
+                "rule": v.get("id"),
+                "desc": v.get("description"),
+                "impact": f"{pkg.get('name')}@{pkg.get('version')}",
+                "fix": v.get("fix_versions", ["Review manually."])[0],
                 "file": "requirements.txt",
                 "line": "N/A",
                 "severity": sev,
                 "risk_score": RISK_SCORE_MAP.get(sev, 1)
             })
-        return issues
     except Exception as e:
         logger.error("Error parsing pip-audit output: %s", e, exc_info=True)
-        return []
+    return issues
 
-def parse_dependency_check(path):
+def parse_dependency_check(path: str) -> List[Dict[str, Any]]:
+    issues = []
     if not os.path.exists(path):
-        logger.warning("Dependency-Check XML not found, skipping parse.")
-        return []
+        logger.warning("Dependency-Check XML not found; skipping.")
+        return issues
     try:
         tree = etree.parse(path)
-        vulnerabilities = tree.xpath("//vulnerability")
-        issues = []
-        for vuln in vulnerabilities:
+        for vuln in tree.xpath("//vulnerability"):
             sev = SEVERITY_MAP.get(vuln.findtext("severity", default="LOW").upper(), "Low")
             issues.append({
                 "rule": vuln.findtext("name"),
@@ -227,79 +251,94 @@ def parse_dependency_check(path):
                 "severity": sev,
                 "risk_score": RISK_SCORE_MAP.get(sev, 1)
             })
-        return issues
-    except etree.XMLSyntaxError as e:
-        logger.error("Invalid XML format in Dependency-Check output: %s", e)
-        return []
     except Exception as e:
         logger.error("Error parsing Dependency-Check XML: %s", e, exc_info=True)
-        return []
+    return issues
 
 def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
-    base_output_dir = os.path.join("/tmp", f"scan_results_{temp_id}")
-    os.makedirs(base_output_dir, exist_ok=True)
-    try:
-        dir_analysis = validate_source_directory(source_dir)
-        logger.info("Source analysis: %s", dir_analysis)
+    base_output = os.path.join("/tmp", f"scan_results_{temp_id}")
+    os.makedirs(base_output, exist_ok=True)
 
-        all_issues = []
-        scan_tasks = {}
+    dir_info = validate_source_directory(source_dir)
+    logger.info("Source analysis: %s", dir_info)
 
-        semgrep_output = os.path.join(base_output_dir, "semgrep.json")
-        semgrep_cmd = ["semgrep", "--json", "--metrics=off", "--output", semgrep_output, source_dir, "--config", "p/all", "--config", "p/security-audit", "--config", "p/owasp-top-10", "--config", "p/python-security"]
-        scan_tasks["semgrep"] = (semgrep_cmd, semgrep_output, parse_semgrep)
+    tasks: Dict[str, Any] = {}
 
-        if '.py' in dir_analysis['extensions']:
-            bandit_output = os.path.join(base_output_dir, "bandit.json")
-            bandit_cmd = ["bandit", "-r", source_dir, "-f", "json", "-o", bandit_output]
-            scan_tasks["bandit"] = (bandit_cmd, bandit_output, parse_bandit)
+    # Semgrep
+    semgrep_out = os.path.join(base_output, "semgrep.json")
+    tasks["semgrep"] = (
+        ["semgrep", "--json", "--metrics=off", "--timeout", "600",
+         "--output", semgrep_out, source_dir,
+         "--config", "p/all", "--config", "p/security-audit",
+         "--config", "p/owasp-top-10", "--config", "p/python-security"],
+        semgrep_out, parse_semgrep
+    )
 
-            req_file = os.path.join(source_dir, "requirements.txt")
-            if os.path.exists(req_file) and os.path.getsize(req_file) > 0:
-                pip_audit_output = os.path.join(base_output_dir, "pip_audit.json")
-                pip_audit_cmd = ["pip-audit", "-r", req_file, "--format", "json", "--output", pip_audit_output]
-                scan_tasks["pip-audit"] = (pip_audit_cmd, pip_audit_output, parse_pip_audit)
+    # Bandit
+    if '.py' in dir_info['extensions']:
+        bandit_out = os.path.join(base_output, "bandit.json")
+        tasks["bandit"] = (
+            ["bandit", "-r", source_dir, "-f", "json", "-o", bandit_out],
+            bandit_out, parse_bandit
+        )
+
+    # Trivy
+    trivy_out = os.path.join(base_output, "trivy.json")
+    tasks["trivy"] = (
+        ["trivy", "fs", "--format", "json", "--output", trivy_out, source_dir],
+        trivy_out, parse_trivy
+    )
+
+    # Gitleaks
+    g_out = os.path.join(base_output, "gitleaks.json")
+    tasks["gitleaks"] = (
+        ["gitleaks", "detect", "--source", source_dir,
+         "--report-path", g_out, "--report-format", "json"],
+        g_out, parse_gitleaks
+    )
+
+    # Pip-audit
+    req_file = os.path.join(source_dir, "requirements.txt")
+    if os.path.exists(req_file) and os.path.getsize(req_file) > 0:
+        pip_out = os.path.join(base_output, "pip_audit.json")
+        tasks["pip-audit"] = (
+            ["pip-audit", "-r", req_file, "--format", "json", "--output", pip_out],
+            pip_out, parse_pip_audit
+        )
+    else:
+        logger.info("No valid requirements.txt; skipping pip-audit.")
+
+    # Dependency-Check
+    dep_dir = os.path.join(base_output, "depcheck")
+    os.makedirs(dep_dir, exist_ok=True)
+    dep_xml = os.path.join(dep_dir, "dependency-check-report.xml")
+    tasks["dependency-check"] = (
+        ["/usr/local/bin/dependency-check.sh", "-s", source_dir,
+         "-f", "XML", "-o", dep_dir, "--prettyPrint"],
+        dep_xml, parse_dependency_check
+    )
+
+    all_issues: List[Dict[str, Any]] = []
+    with ThreadPoolExecutor(max_workers=os.cpu_count() + 2) as executor:
+        future_map = {
+            executor.submit(run_tool_with_retry, name, cmd, out): (name, out, parser)
+            for name, (cmd, out, parser) in tasks.items()
+        }
+        for future in as_completed(future_map):
+            name, out, parser = future_map[future]
+            if future.result():
+                all_issues.extend(parser(out))
             else:
-                logger.info("No valid requirements.txt found. Skipping pip-audit.")
+                logger.warning("%s: skipped (no output or error)", name)
 
-        trivy_output = os.path.join(base_output_dir, "trivy.json")
-        trivy_cmd = ["trivy", "fs", "--format", "json", "--output", trivy_output, source_dir]
-        scan_tasks["trivy"] = (trivy_cmd, trivy_output, parse_trivy)
+    # Summarize
+    summary = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0, "Info": 0}
+    for issue in all_issues:
+        sev = issue.get("severity", "Info")
+        summary[sev] += 1
 
-        depcheck_output_dir = os.path.join(base_output_dir, "depcheck")
-        depcheck_xml = os.path.join(depcheck_output_dir, "dependency-check-report.xml")
-        depcheck_data_dir = os.path.join(base_output_dir, "depcheck_data")
-        os.makedirs(depcheck_data_dir, exist_ok=True)
-        depcheck_cmd = [
-            "/usr/local/bin/dependency-check.sh", "-s", source_dir, "-f", "XML",
-            "-o", depcheck_output_dir, "--prettyPrint",
-            "--data", depcheck_data_dir, "--nvdApiKey", "YOUR_NVD_API_KEY_HERE"
-        ]
-        scan_tasks["dependency-check"] = (depcheck_cmd, depcheck_xml, parse_dependency_check)
-
-        with ThreadPoolExecutor(max_workers=len(scan_tasks)) as executor:
-            future_to_tool = {
-                executor.submit(run_tool_with_retry, name, cmd, output): (name, output, parser)
-                for name, (cmd, output, parser) in scan_tasks.items()
-            }
-            for future in as_completed(future_to_tool):
-                name, output_file, parser_func = future_to_tool[future]
-                success = future.result()
-                if success:
-                    all_issues.extend(parser_func(output_file))
-                else:
-                    logger.warning("%s: no valid output or scan failed", name)
-
-        summary = {"critical": 0, "high": 0, "medium": 0, "low": 0, "info": 0}
-        for issue in all_issues:
-            sev = issue.get("severity", "Info").lower()
-            summary[sev] = summary.get(sev, 0) + 1
-
-        report_file = os.path.join(base_output_dir, f"VulnPrism_Report_{temp_id}.pdf")
-        pdf_report.build_pdf_with_enhancements(summary, all_issues, report_file)
-        return report_file
-
-    except Exception as e:
-        logger.critical("Full scan failed: %s", e, exc_info=True)
-        return None
+    # Build PDF
+    report_file = os.path.join(base_output, f"VulnPrism_Report_{temp_id}.pdf")
+    pdf_report.build_pdf_with_enhancements(summary, all_issues, report_file)
+    return report_file
 
