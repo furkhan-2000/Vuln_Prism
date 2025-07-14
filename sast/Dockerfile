@@ -2,12 +2,7 @@
 FROM python:3.11.9-slim AS builder
 
 # Install essential build tools and dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    git \
-    curl \
-    unzip \
-    openjdk-17-jre-headless \
+RUN apt-get update && apt-get install -y --no-install-recommends     build-essential     pkg-config     libcairo2-dev     git     curl     unzip     openjdk-17-jre-headless 
     && rm -rf /var/lib/apt/lists/*
 
 # Set up a virtual environment
