@@ -489,4 +489,96 @@
     </p>
   </footer>
 
-  
+  <script>
+    console.log("🚀 SAST Frontend JavaScript Loaded");
+
+    document.getElementById('scanForm').addEventListener('submit', async function(e) {
+      console.log("📝 Form submission started");
+      e.preventDefault();
+
+      const formData = new FormData(this);
+      const progressContainer = document.getElementById('progressContainer');
+      const progressBar = document.getElementById('progressBar');
+      const statusText = document.getElementById('statusText');
+
+      // Log form data
+      console.log("📊 Form data contents:");
+      for (let [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          console.log(`  - ${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
+        } else {
+          console.log(`  - ${key}: ${value}`);
+        }
+      }
+
+      // Show progress
+      console.log("📈 Showing progress UI");
+      progressContainer.style.display = 'block';
+      progressBar.style.width = '0%';
+      statusText.textContent = 'Starting scan...';
+
+      try {
+        // Animate progress bar
+        console.log("🎬 Starting progress animation");
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+          progress += Math.random() * 15;
+          if (progress > 90) progress = 90;
+          progressBar.style.width = progress + '%';
+        }, 500);
+
+        console.log("📤 Sending POST request to /scan");
+        const response = await fetch('/scan', {
+          method: 'POST',
+          body: formData
+        });
+
+        console.log("📥 Response received:");
+        console.log("  - Status:", response.status);
+        console.log("  - Status Text:", response.statusText);
+        console.log("  - Headers:", Object.fromEntries(response.headers.entries()));
+
+        clearInterval(progressInterval);
+        progressBar.style.width = '100%';
+
+        if (response.ok) {
+          console.log("✅ Response OK - processing PDF");
+          statusText.textContent = 'Scan complete! Downloading report...';
+
+          // Handle PDF download
+          const blob = await response.blob();
+          console.log("📄 PDF blob received, size:", blob.size, "bytes");
+
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'VulnPrism_SAST_Report.pdf';
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+
+          console.log("✅ PDF download triggered");
+          statusText.textContent = 'Report downloaded successfully!';
+          setTimeout(() => {
+            progressContainer.style.display = 'none';
+            this.reset();
+            console.log("🧹 UI reset completed");
+          }, 3000);
+        } else {
+          console.error("❌ Response not OK");
+          const errorText = await response.text();
+          console.error("  - Error text:", errorText);
+          statusText.textContent = `Error: ${errorText}`;
+          progressBar.style.backgroundColor = '#ff4444';
+        }
+      } catch (error) {
+        console.error("💥 Error in form submission:", error);
+        clearInterval(progressInterval);
+        statusText.textContent = `Error: ${error.message}`;
+        progressBar.style.backgroundColor = '#ff4444';
+      }
+    });
+
+    console.log("✅ Event listener attached to SAST form");
+  </script>
