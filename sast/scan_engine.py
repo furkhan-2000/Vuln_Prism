@@ -250,7 +250,7 @@ def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
         else:
             logger.info("No manifest files found. Skipping Dependency-Check.")
 
-        with ThreadPoolExecutor(max_workers=len(scan_tasks)) as executor:
+        with ThreadPoolExecutor(max_workers=min(len(scan_tasks), 4)) as executor:
             future_to_tool = {
                 executor.submit(run_tool_with_retry, name, cmd, output): (name, output, parser)
                 for name, (cmd, output, parser) in scan_tasks.items()

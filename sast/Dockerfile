@@ -45,7 +45,6 @@ RUN apt-get update && \
 COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /usr/local/bin/trivy /usr/local/bin/trivy
 COPY --from=builder /opt/dependency-check /opt/dependency-check
-RUN chown -R appuser:appuser /opt/dependency-check
 
 # 9) Ensure venv is first in PATH
 ENV PATH="/opt/venv/bin:$PATH"
@@ -61,7 +60,11 @@ WORKDIR /sast
 COPY . .
 
 # 13) Create + switch to non‑root user
-RUN groupadd --system --gid 1001 appuser &&     useradd --system --uid 1001 --gid 1001 appuser &&     mkdir -p /home/appuser &&     chown -R appuser:appuser /home/appuser /sast
+RUN groupadd --system --gid 1001 appuser && \
+    useradd --system --uid 1001 --gid 1001 appuser && \
+    mkdir -p /home/appuser && \
+    chown -R appuser:appuser /home/appuser /sast /opt/dependency-check
+
 ENV HOME=/home/appuser
 RUN mkdir -p /home/appuser/.cache /home/appuser/.dependency-check && \
     chown -R appuser:appuser /home/appuser/.cache /home/appuser/.dependency-check
@@ -69,7 +72,6 @@ RUN mkdir -p /home/appuser/.cache /home/appuser/.dependency-check && \
 # Pre-populate Dependency-Check database
 USER appuser
 RUN dependency-check.sh --update
-USER root # Switch back to root for subsequent commands if needed, or stay as appuser if all subsequent commands are user-specific
 
 USER appuser
 

@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 import uuid
 import logging
@@ -32,7 +33,7 @@ logging.basicConfig(
 logger = logging.getLogger("app.main")
 logger.info("🚀 SAST Service Starting Up...")
 logger.info("📁 Working Directory: %s", os.getcwd())
-logger.info("🐍 Python Version: %s", os.sys.version)
+logger.info("🐍 Python Version: %s", sys.version)
 logger.info("📦 Available Tools Check:")
 try:
     subprocess.run(["git", "--version"], capture_output=True, check=True)
