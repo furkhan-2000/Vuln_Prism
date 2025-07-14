@@ -30,7 +30,7 @@ RUN curl -sLo /tmp/dc.zip \
       https://github.com/jeremylong/DependencyCheck/releases/download/v9.0.9/dependency-check-9.0.9-release.zip && \
     unzip /tmp/dc.zip -d /opt/dependency-check && \
     rm /tmp/dc.zip && \
-    chmod +x /opt/dependency-check/bin/dependency-check.sh
+    chmod +x /opt/dependency-check/dependency-check/bin/dependency-check.sh
 
 # ─── Stage 2: Runtime ─────────────────────────────────────────────────────────
 
