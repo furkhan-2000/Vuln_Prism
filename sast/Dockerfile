@@ -67,7 +67,7 @@ RUN mkdir -p /home/appuser/.cache /home/appuser/.dependency-check && \
 
 # Pre-populate Dependency-Check database
 USER appuser
-RUN dependency-check.sh --update || true
+RUN dependency-check.sh --update
 USER root # Switch back to root for subsequent commands if needed, or stay as appuser if all subsequent commands are user-specific
 
 USER appuser
