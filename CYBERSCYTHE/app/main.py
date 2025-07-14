@@ -102,15 +102,18 @@ def health_check():
 
 
 
+class ScanRequest(BaseModel):
+    url: str
+
 @app.post("/scan")
-async def scan(background_tasks: BackgroundTasks, url: str = Query(..., description="Target URL to scan")):
+async def scan(background_tasks: BackgroundTasks, request: ScanRequest):
     scan_id = str(uuid.uuid4())
     
     # Immediately create a status file to indicate the process has started
     update_scan_status(scan_id, "queued", message="Scan has been queued.")
     
     # Add the long-running task to the background
-    background_tasks.add_task(run_scan_and_generate_report, scan_id, url)
+    background_tasks.add_task(run_scan_and_generate_report, scan_id, request.url)
     
     # Return immediately with the scan_id
     return {"message": "Scan initiated.", "scan_id": scan_id}

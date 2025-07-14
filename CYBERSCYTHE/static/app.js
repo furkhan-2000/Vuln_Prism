@@ -13,7 +13,13 @@ async function startScan() {
 
     try {
         // Use POST for the scan endpoint now
-        const res = await fetch(`/scan?url=${encodeURIComponent(url)}`, { method: 'POST' });
+        const res = await fetch(`/scan`, { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url })
+        });
         const data = await res.json();
 
         if (data.scan_id) {
