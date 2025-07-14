@@ -110,12 +110,13 @@ def run_tool_with_retry(name: str, cmd: List[str], output_path: str,
                 return True
 
             # Write output: for JSON-based tools use stdout, for XML use stderr if empty
-            out = result.stdout if result.stdout else (result.stderr if is_xml else "")
-            if out:
-                with open(output_path, "w", encoding="utf-8") as f:
-                    f.write(out)
+            if not is_xml: # Only capture stdout for non-XML tools
+                out = result.stdout
+                if out:
+                    with open(output_path, "w", encoding="utf-8") as f:
+                        f.write(out)
 
-            # Success if file exists and is non-empty
+            # Success if file exists and is non-empty (for XML tools, it's written directly)
             if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
                 return True
 
