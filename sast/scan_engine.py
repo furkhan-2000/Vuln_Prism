@@ -199,7 +199,7 @@ def parse_pip_audit(path):
             issues.append({
                 "rule": vuln.get("id"),
                 "desc": vuln.get("description"),
-                "impact": f"{vuln.get("package", {}).get("name")}@{vuln.get("package", {}).get("version")}",
+                "impact": f"{vuln.get('package', {}).get('name')}@{vuln.get('package', {}).get('version')}",
                 "fix": vuln.get("fix_versions", ["Review manually."])[0],
                 "file": "requirements.txt", # Assuming vulnerabilities are from requirements.txt
                 "line": "N/A",
