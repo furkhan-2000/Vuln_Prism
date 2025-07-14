@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>VulnPrism SAST & SCA</title>
+  <title>SAST / SCA</title>
   
   <!-- External Libraries -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -78,6 +78,7 @@
       background: linear-gradient(90deg, transparent, var(--cyber-teal), transparent);
       animation: scan 3s linear infinite;
       z-index: -1;
+      pointer-events: none;
     }
     
     @keyframes scan {
@@ -311,6 +312,13 @@
       margin-top: 30px;
     }
 
+    .linkedin-link {
+      color: #eee;
+      text-decoration: none;
+      position: relative;
+      z-index: 999;
+      pointer-events: auto;
+    }
     .linkedin-link:hover {
       color: #0077B5;
       text-shadow: 0 0 8px #0077B5;
@@ -390,12 +398,12 @@
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  
   <div class="fog"></div>
   <div class="scan-line"></div>
 
   <div class="container">
-    <h1 class="shimmer-text">VulnPrism SAST & SCA</h1>
+    <h1 class="shimmer-text">SAST / SCA</h1>
     
     <!-- Main Tool Interface -->
     <div class="tool-interface">
@@ -472,216 +480,13 @@
     </div>
   </div>
 
-  <footer style="text-align: center; padding: 20px; margin-top: 50px; color: #aaa;">
+  <footer style="text-align: center; padding: 20px; margin-top: 50px; color: #aaa; position: relative; z-index: 10;">
     <p style="font-size: 0.9rem;">
       Designed & developed by Khan Mohammed © 2025 All rights reserved |
-      <a href="https://www.linkedin.com/in/khan-mohammed-790b18214" target="_blank" rel="noopener noreferrer" class="linkedin-link" style="color: #eee; text-decoration: none;">
+      <a href="https://www.linkedin.com/in/khan-mohammed-790b18214" target="_blank" rel="noopener noreferrer" class="linkedin-link">
         www.linkedin.com/in/khan-mohammed-790b18214
       </a>
     </p>
   </footer>
 
-  <script type="text/babel">
-    const CYBER_PALETTE = {
-      black: '#000000',
-      cyberTeal: '#38bdf8',
-      holographicPurple: '#c084fc',
-      matrixGreen: '#0f0',
-      deepSpace: '#0a0a15'
-    };
-
-    const user = { id: 'user123', fingerprint: 'unique-biometric-token' };
-
-    function DNABackground({ user }) {
-      const dnaHash = CryptoJS.SHA256(user.fingerprint + user.id).toString();
-      const seed = parseInt(dnaHash.slice(0, 8), 16);
-
-      React.useEffect(() => {
-        const canvas = document.getElementById('dna-canvas');
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({
-          canvas,
-          alpha: true,
-          antialias: true
-        });
-
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setClearColor(0x000000, 0);
-
-        const particlesGeometry = new THREE.BufferGeometry();
-        const particlesCount = 2000;
-        const posArray = new Float32Array(particlesCount * 3);
-
-        for(let i = 0; i < particlesCount * 3; i++) {
-          posArray[i] = (Math.random() - 0.5) * 100;
-        }
-
-        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const particlesMaterial = new THREE.PointsMaterial({
-          size: 0.1,
-          color: CYBER_PALETTE.cyberTeal,
-          transparent: true,
-          opacity: 0.6
-        });
-
-        const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-        scene.add(particlesMesh);
-
-        const vertexShader = `
-          varying vec2 vUv;
-          void main() {
-            vUv = uv;
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-          }
-        `;
-
-        const fragmentShader = `
-          uniform float time;
-          uniform vec3 color1;
-          uniform vec3 color2;
-          varying vec2 vUv;
-          void main() {
-            float t = (sin(time + vUv.x*10.0 + vUv.y*10.0) +
-                       sin(time*1.5 + vUv.x*5.0 - vUv.y*5.0)) * 0.25 + 0.5;
-            vec3 color = mix(color1, color2, t);
-            float pulse = sin(time*2.0)*0.1 + 0.6;
-            gl_FragColor = vec4(color, pulse * 0.4);
-          }
-        `;
-
-        const material = new THREE.ShaderMaterial({
-          uniforms: {
-            time:   { value: 0 },
-            color1: { value: new THREE.Color(CYBER_PALETTE.cyberTeal) },
-            color2: { value: new THREE.Color(CYBER_PALETTE.holographicPurple) }
-          },
-          vertexShader,
-          fragmentShader,
-          wireframe: true,
-          transparent: true
-        });
-
-        function makeTorus(x, ry=0) {
-          const geo = new THREE.TorusGeometry(12, 2, 64, 200);
-          const mesh = new THREE.Mesh(geo, material);
-          mesh.position.x = x;
-          mesh.rotation.y = ry;
-          scene.add(mesh);
-          return mesh;
-        }
-
-        const torus1 = makeTorus(-5, 0);
-        const torus2 = makeTorus(5, Math.PI/2);
-
-        camera.position.z = 30;
-        let idx = 0;
-        const interval = setInterval(() => {
-          idx = (idx + 1) % 3;
-          const tgt = [-5, 0, 5];
-          gsap.to(torus1.position, { z: tgt[idx], duration: 1, ease: "power2.inOut" });
-          gsap.to(torus2.position, { z: tgt[(idx+2)%3], duration: 1, ease: "power2.inOut" });
-        }, 5000);
-
-        function animate() {
-          requestAnimationFrame(animate);
-          torus1.rotation.x += 0.004;
-          torus1.rotation.y += 0.004;
-          torus2.rotation.x += 0.004;
-          torus2.rotation.y += 0.004;
-          particlesMesh.rotation.y += 0.001;
-          material.uniforms.time.value += 0.04;
-          renderer.render(scene, camera);
-        }
-        animate();
-
-        const handleResize = () => {
-          camera.aspect = window.innerWidth / window.innerHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(window.innerWidth, window.innerHeight);
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-          clearInterval(interval);
-          renderer.dispose();
-          window.removeEventListener('resize', handleResize);
-        };
-      }, [seed]);
-
-      return <canvas id="dna-canvas" className="fixed inset-0 z-0 opacity-25" />;
-    }
-
-    ReactDOM.createRoot(document.getElementById('root')).render(<DNABackground user={user} />);
-
-    const form = document.getElementById('scanForm');
-    const progressContainer = document.getElementById('progressContainer');
-    const progressBar = document.getElementById('progressBar');
-    const statusText = document.getElementById('statusText');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      // Show progress UI
-      progressContainer.style.display = 'block';
-      progressBar.style.width = '10%';
-      statusText.textContent = 'Preparing scan...';
-      statusText.className = '';
-
-      const formData = new FormData(form);
-
-      try {
-        const response = await fetch('/scan', {
-          method: 'POST',
-          body: formData
-        });
-
-        if (!response.ok) {
-          const error = await response.text();
-          throw new Error(error || 'Scan failed');
-        }
-
-        // Update progress
-        progressBar.style.width = '70%';
-        statusText.textContent = 'Generating report...';
-
-        // Get filename from headers
-        const contentDisposition = response.headers.get('Content-Disposition');
-        const filename = contentDisposition
-          ? contentDisposition.split('filename=')[1].replace(/"/g, '')
-          : `VulnPrism_Report_${Date.now()}.pdf`;
-
-        // Create download
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-
-        // Cleanup
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-
-        // Final UI update
-        progressBar.style.width = '100%';
-        statusText.textContent = 'Scan complete! Report downloaded.';
-        statusText.className = 'success';
-
-        // Reset after delay
-        setTimeout(() => {
-          progressContainer.style.display = 'none';
-          form.reset();
-        }, 3000);
-
-      } catch (error) {
-        console.error('Scan error:', error);
-        progressBar.style.background = '#f44336';
-        statusText.textContent = `Error: ${error.message}`;
-        statusText.className = 'error';
-      }
-    });
-  </script>
+  
