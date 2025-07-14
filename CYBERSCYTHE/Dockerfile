@@ -1,84 +1,45 @@
-FROM python:3.11-slim AS builder
-
-WORKDIR /app
-
-COPY requirements.txt .
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        gcc python3-dev && \
-    pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    playwright install chromium --with-deps && \
-    # Clean up immediately to save space
-    apt-get purge -y --auto-remove gcc python3-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip && \
-    # Clean up playwright cache to save space
-    find /root/.cache/ms-playwright -name "*.log" -delete 2>/dev/null || true && \
-    find /root/.cache/ms-playwright -name "*.tmp" -delete 2>/dev/null || true && \
-    # Remove unnecessary playwright files
-    find /root/.cache/ms-playwright -name "*.zip" -delete 2>/dev/null || true
-
-COPY app/ app/
-COPY static/ static/
-
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 
+    PIP_NO_CACHE_DIR=1
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libnss3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libx11-xcb1 \
-    libxcb1 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxext6 \
-    libxfixes3 \
-    libxi6 \
-    libpango-1.0-0 \
-    libcairo2 \
-    libglib2.0-0 \
-    libdbus-1-3 \
-    libdrm2 \
-    libgbm1 \
-    libasound2 \
-    libpangocairo-1.0-0 \
-    libxrandr2 \
-    libxss1 \
-    libwayland-client0 \
-    libwayland-cursor0 \
-    libwayland-egl1 \
-    libjpeg62-turbo \
-    libwebp7 \
-    libcups2 \
-    libxkbcommon0 \
-    fonts-liberation \
-    wget \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
-
-# Create user first to avoid permission issues
+# Create user first
 RUN groupadd --system --gid 1000 malware && \
-    useradd --system --uid 1000 --gid 1000 --create-home malware && \
-    mkdir -p /app/static/reports /app/logs /home/malware/.cache
+    useradd --system --uid 1000 --gid 1000 --create-home malware
 
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
-COPY --from=builder /root/.cache/ms-playwright /home/malware/.cache/ms-playwright
+# Install system dependencies and Python packages in one layer
+COPY requirements.txt .
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc python3-dev \
+    libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1 \
+    libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 \
+    libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3 \
+    libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2 \
+    libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1 \
+    libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation \
+    wget ca-certificates && \
+    pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    playwright install chromium --with-deps && \
+    # Aggressive cleanup
+    apt-get purge -y --auto-remove gcc python3-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip && \
+    find /root/.cache/ms-playwright -type f \( -name "*.log" -o -name "*.tmp" -o -name "*.zip" \) -delete 2>/dev/null || true && \
+    find /root/.cache/ms-playwright -name "*firefox*" -type d -exec rm -rf {} + 2>/dev/null || true && \
+    find /root/.cache/ms-playwright -name "*webkit*" -type d -exec rm -rf {} + 2>/dev/null || true && \
+    find /usr/local/lib/python3.11/site-packages -name "*.pyc" -delete && \
+    find /usr/local/lib/python3.11/site-packages -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 
-COPY --from=builder /app/app /app/app
-COPY --from=builder /app/static /app/static
-
-# Set proper ownership after all files are copied
-RUN chown -R malware:malware /app /home/malware
+# Copy application files and set up directories
+COPY app/ app/
+COPY static/ static/
+RUN mkdir -p /app/static/reports /app/logs /home/malware/.cache && \
+    mv /root/.cache/ms-playwright /home/malware/.cache/ 2>/dev/null || true && \
+    chown -R malware:malware /app /home/malware
 
 USER malware
 
