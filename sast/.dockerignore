@@ -1,77 +1,20 @@
-# Python bytecode / compiled files (optional)
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-*.so
+# Ignore Git metadata
+.git
 
-# Build artifacts
-*.egg
-*.egg-info/
-dist/
-build/
-.eggs/
-.coverage
-.cache/
-pytest_cache/
+# Ignore Python caches
+__pycache__
+*.pyc
 
-# Virtual environments
-venv/
-env/
-.venv/
-ENV/
-
-# Jupyter notebooks checkpoints
-.ipynb_checkpoints/
-
-# IDE / editor
-.vscode/
-.idea/
-*.swp
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# Logs / temp files
+# Ignore logs and temp files
 *.log
-*.tmp
-*.bak
+tmp
+reports
 
-# Git / SCM
-.git/
-.gitignore
-.gitattributes
+# Ignore markdown docs and CSVs
+*.md
+*.csv
 
-# CI/CD metadata (optional)
-.github/
-.gitlab/
+# Ignore all .txt files EXCEPT requirements.txt
+*.txt
+!requirements.txt
 
-# Docker compose / local overrides
-docker-compose.yml
-docker-compose.override.yml
-docker-compose.*.yml
-
-# Dependency lock files (optional)
-Pipfile
-Pipfile.lock
-poetry.lock
-pyproject.toml
-
-# Databases & secrets
-*.db
-*.sqlite
-# .env files are needed for API keys
-# .env
-# .env.*
-
-# Local reports / artifacts
-reports/
-output/
-results/
-
-# Large data not for image
-data/
-datasets/
-files/
-uploads/
