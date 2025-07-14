@@ -3,12 +3,7 @@ FROM python:3.11.9-slim AS builder
 WORKDIR /app
 
 # Install build dependencies and clean up in single layer
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-      build-essential pkg-config libcairo2-dev libfreetype6-dev \
-      libpng-dev libjpeg-dev python3-dev git curl unzip \
-      openjdk-17-jre-headless libgl1-mesa-glx libglib2.0-0 && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apt-get update &&     apt-get install -y --no-install-recommends       build-essential pkg-config libcairo2-dev libfreetype6-dev       libpng-dev libjpeg-dev python3-dev git curl unzip       openjdk-17-jre-headless libgl1-mesa-glx libglib2.0-0 &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && apt-get clean
 
 COPY requirements.txt .
 
