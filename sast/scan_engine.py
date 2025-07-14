@@ -101,16 +101,12 @@ def run_tool_with_retry(name: str, cmd: List[str], output_path: str,
             if result.stdout:
                 with open(output_path, "w", encoding="utf-8") as f:
                     f.write(result.stdout)
-            elif is_xml and result.stderr: # If XML is expected but stdout is empty, check stderr
+            elif is_xml and result.stderr:
                 with open(output_path, "w", encoding="utf-8") as f:
                     f.write(result.stderr)
 
-            if is_xml:
-                if os.path.exists(output_path) and os.path.getsize(output_path) > 0: # Ensure file exists and is not empty
-                    return True
-            else:
-                if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
-                    return True
+            if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                return True
 
             logger.warning("%s produced no valid output on attempt %d.", name, attempt + 1)
 
@@ -201,7 +197,7 @@ def parse_pip_audit(path):
                 "desc": vuln.get("description"),
                 "impact": f"{vuln.get('package', {}).get('name')}@{vuln.get('package', {}).get('version')}",
                 "fix": vuln.get("fix_versions", ["Review manually."])[0],
-                "file": "requirements.txt", # Assuming vulnerabilities are from requirements.txt
+                "file": "requirements.txt",
                 "line": "N/A",
                 "severity": sev,
                 "risk_score": RISK_SCORE_MAP.get(sev, 1)
@@ -209,28 +205,6 @@ def parse_pip_audit(path):
         return issues
     except Exception as e:
         logger.error("Error parsing pip-audit output: %s", e, exc_info=True)
-        return []
-
-def parse_gitleaks(path):
-    try:
-        with open(path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-        issues = []
-        for finding in data:
-            sev = SEVERITY_MAP.get(finding.get("Severity", "LOW").upper(), "Low")
-            issues.append({
-                "rule": finding.get("RuleID"),
-                "desc": finding.get("Description"),
-                "impact": finding.get("Match"),
-                "fix": "Review and remove hardcoded secret.",
-                "file": finding.get("File"),
-                "line": finding.get("StartLine"),
-                "severity": sev,
-                "risk_score": RISK_SCORE_MAP.get(sev, 1)
-            })
-        return issues
-    except Exception as e:
-        logger.error("Error parsing Gitleaks output: %s", e, exc_info=True)
         return []
 
 def parse_dependency_check(path):
@@ -254,6 +228,9 @@ def parse_dependency_check(path):
                 "risk_score": RISK_SCORE_MAP.get(sev, 1)
             })
         return issues
+    except etree.XMLSyntaxError as e:
+        logger.error("Invalid XML format in Dependency-Check output: %s", e)
+        return []
     except Exception as e:
         logger.error("Error parsing Dependency-Check XML: %s", e, exc_info=True)
         return []
@@ -277,29 +254,28 @@ def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
             bandit_cmd = ["bandit", "-r", source_dir, "-f", "json", "-o", bandit_output]
             scan_tasks["bandit"] = (bandit_cmd, bandit_output, parse_bandit)
 
+            req_file = os.path.join(source_dir, "requirements.txt")
+            if os.path.exists(req_file) and os.path.getsize(req_file) > 0:
+                pip_audit_output = os.path.join(base_output_dir, "pip_audit.json")
+                pip_audit_cmd = ["pip-audit", "-r", req_file, "--format", "json", "--output", pip_audit_output]
+                scan_tasks["pip-audit"] = (pip_audit_cmd, pip_audit_output, parse_pip_audit)
+            else:
+                logger.info("No valid requirements.txt found. Skipping pip-audit.")
+
         trivy_output = os.path.join(base_output_dir, "trivy.json")
         trivy_cmd = ["trivy", "fs", "--format", "json", "--output", trivy_output, source_dir]
         scan_tasks["trivy"] = (trivy_cmd, trivy_output, parse_trivy)
 
-        gitleaks_output = os.path.join(base_output_dir, "gitleaks.json")
-        gitleaks_cmd = ["gitleaks", "detect", "--source", source_dir, "--report-path", gitleaks_output, "--json"]
-        scan_tasks["gitleaks"] = (gitleaks_cmd, gitleaks_output, parse_gitleaks)
-
-        if '.py' in dir_analysis['extensions']:
-            pip_audit_output = os.path.join(base_output_dir, "pip_audit.json")
-            pip_audit_cmd = ["pip-audit", "-r", os.path.join(source_dir, "requirements.txt"), "--json-output", pip_audit_output]
-            scan_tasks["pip-audit"] = (pip_audit_cmd, pip_audit_output, parse_pip_audit)
-
-        if dir_analysis['extensions'] & {'.json', '.xml', '.gradle', '.pom', '.csproj', '.yml', '.yaml'}:
-            depcheck_output_dir = os.path.join(base_output_dir, "depcheck")
-            depcheck_xml = os.path.join(depcheck_output_dir, "dependency-check-report.xml")
-            depcheck_data_dir = os.path.join(base_output_dir, "depcheck_data")
-            os.makedirs(depcheck_data_dir, exist_ok=True)
-            depcheck_cmd = ["/usr/local/bin/dependency-check.sh", "-s", source_dir, "-f", "XML",
-                            "-o", depcheck_output_dir, "--prettyPrint", "--data", depcheck_data_dir, "--disableNvdUpdate"]
-            scan_tasks["dependency-check"] = (depcheck_cmd, depcheck_xml, parse_dependency_check)
-        else:
-            logger.info("No manifest files found. Skipping Dependency-Check.")
+        depcheck_output_dir = os.path.join(base_output_dir, "depcheck")
+        depcheck_xml = os.path.join(depcheck_output_dir, "dependency-check-report.xml")
+        depcheck_data_dir = os.path.join(base_output_dir, "depcheck_data")
+        os.makedirs(depcheck_data_dir, exist_ok=True)
+        depcheck_cmd = [
+            "/usr/local/bin/dependency-check.sh", "-s", source_dir, "-f", "XML",
+            "-o", depcheck_output_dir, "--prettyPrint",
+            "--data", depcheck_data_dir, "--nvdApiKey", "YOUR_NVD_API_KEY_HERE"
+        ]
+        scan_tasks["dependency-check"] = (depcheck_cmd, depcheck_xml, parse_dependency_check)
 
         with ThreadPoolExecutor(max_workers=len(scan_tasks)) as executor:
             future_to_tool = {
@@ -326,3 +302,4 @@ def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
     except Exception as e:
         logger.critical("Full scan failed: %s", e, exc_info=True)
         return None
+

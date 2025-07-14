@@ -31,7 +31,7 @@ def check_tool(name, command, expected_codes=[0]):
 
 def main():
     logger.info("🔍 Checking SAST tools availability...")
-    
+
     tools = [
         ("Python", [sys.executable, "--version"]),
         ("Git", ["git", "--version"]),
@@ -39,28 +39,29 @@ def main():
         ("Bandit", ["bandit", "--version"]),
         ("Trivy", ["trivy", "--version"]),
     ]
-    
-    # Check dependency-check with multiple possible paths
+
+    # Check Dependency-Check at its symlink and real install path
     depcheck_paths = [
-        "dependency-check.sh",
-        "/opt/dependency-check/dependency-check/bin/dependency-check.sh"
+        "/usr/local/bin/dependency-check.sh",
+        "/opt/dependency-check/bin/dependency-check.sh"
     ]
-    
+
     depcheck_working = False
     for path in depcheck_paths:
-        if check_tool(f"Dependency-Check ({path})", [path, "--version"]):
+        # Use '-v' for version (returns code 0 or 2 for usage text)
+        if check_tool(f"Dependency-Check ({path})", [path, "-v"], expected_codes=[0, 2]):
             depcheck_working = True
             break
-    
+
     if not depcheck_working:
         logger.warning("⚠️ Dependency-Check not working with any known path")
-    
+
     # Check other tools
     all_working = True
     for name, command in tools:
         if not check_tool(name, command):
             all_working = False
-    
+
     if all_working and depcheck_working:
         logger.info("🎉 All tools are working!")
         return 0
@@ -73,3 +74,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
