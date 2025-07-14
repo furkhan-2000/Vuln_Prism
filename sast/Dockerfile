@@ -1,6 +1,3 @@
-# Dockerfile
-
-# Builder stage
 FROM python:3.11.9-slim AS builder
 
 WORKDIR /app
@@ -75,20 +72,19 @@ COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/pytho
 COPY --from=builder /usr/local/bin /usr/local/bin/
 COPY --from=builder /opt/dependency-check /opt/dependency-check/
 
-# Copy application source
 COPY . /sast/
 
-# Create non-root user
 RUN groupadd --system jenkins && \
     useradd --system --gid jenkins --create-home --home-dir /home/jenkins jenkins && \
     chown -R jenkins:jenkins /sast /home/jenkins /tmp
 
 USER jenkins
 
-# Healthcheck and entrypoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
     CMD curl --fail http://localhost:5050/health || exit 1
 
 EXPOSE 5050
+
 ENTRYPOINT ["/usr/bin/tini", "--"]
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "5050"]

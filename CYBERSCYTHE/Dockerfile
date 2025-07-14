@@ -6,7 +6,6 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Create user first
 RUN groupadd --system --gid 1000 malware && \
     useradd --system --uid 1000 --gid 1000 --create-home malware
 
@@ -24,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt && \
     playwright install chromium --with-deps && \
-    # Aggressive cleanup
+    #  cleanup
     apt-get purge -y --auto-remove gcc python3-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip && \
@@ -36,7 +35,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy application files and set up directories
 COPY app/ app/
+
 COPY static/ static/
+
 RUN mkdir -p /app/static/reports /app/logs /home/malware/.cache && \
     mv /root/.cache/ms-playwright /home/malware/.cache/ 2>/dev/null || true && \
     chown -R malware:malware /app /home/malware
