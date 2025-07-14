@@ -1,3 +1,5 @@
+document.getElementById("scan-button").addEventListener("click", startScan);
+
 async function startScan() {
     const url = document.getElementById("url").value;
     const output = document.getElementById("output");
