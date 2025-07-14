@@ -45,6 +45,7 @@ RUN apt-get update && \
 COPY --from=builder /opt/venv /opt/venv
 COPY --from=builder /usr/local/bin/trivy /usr/local/bin/trivy
 COPY --from=builder /opt/dependency-check /opt/dependency-check
+RUN chown -R appuser:appuser /opt/dependency-check
 
 # 9) Ensure venv is first in PATH
 ENV PATH="/opt/venv/bin:$PATH"
