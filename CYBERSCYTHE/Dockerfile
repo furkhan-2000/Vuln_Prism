@@ -18,7 +18,8 @@ RUN apt-get update && \
         gcc python3-dev \
         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1 \
         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 \
-        libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation         libgtk-3-0 wget ca-certificates &&
+        libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation \
+        libgtk-3-0 wget ca-certificates && \
     # Create a virtual environment at /install
     python -m venv /install && \
     # Install pip and project dependencies into the virtual environment
