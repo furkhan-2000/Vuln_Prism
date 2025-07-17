@@ -9,13 +9,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from dotenv import load_dotenv
 import os
 import httpx
 import uvicorn
-
-# Load environment variables
-load_dotenv(".env")
 
 app = FastAPI(title="VulnPrism Frontend & Chatbot")
 
