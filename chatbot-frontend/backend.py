@@ -48,8 +48,8 @@ async def chat_with_zoya(request: ChatRequest):
     """DeepSeek API integration"""
     api_key = os.getenv("DEEPSEEK_API_KEY")
     if not api_key or not api_key.strip():
-        print("[ERROR] OpenRouter API key is missing or empty in .env file.")
-        raise HTTPException(status_code=500, detail="API key not configured. Please check your .env file.")
+        print("[ERROR] DEEPSEEK_API_KEY environment variable is not set.")
+        raise HTTPException(status_code=500, detail="API key not configured.")
 
     # Optional: Set your site URL and title for OpenRouter rankings
     site_url = "https://your-site-url.com"  # Change to your actual site URL if desired
