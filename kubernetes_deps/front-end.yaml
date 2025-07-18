@@ -179,8 +179,8 @@ spec:
     matchLabels: 
       tier: bmw 
   policyTypes: 
-  - ingress 
-  - egress 
+  - Ingress 
+  - Egress 
   ingress: 
     - from:    # allow traffic from all pods in the same namespace as the pod(s) selected for this NetworkPolicy.
       - ipBlock: 
