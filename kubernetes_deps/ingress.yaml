@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vuln-ingress
+  namespace: mustang
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - path: /vuln
+            pathType: Prefix
+            backend:
+              service:
+                name: vuln-svc
+                port:
+                  number: 3000
+          - path: /sast
+            pathType: prefix 
+            backend: 
+              service: 
+                name: sast-svc 
+                port: 
+                  number: 5050
+          - path: /cyber
+            pathType: prefix 
+            backend: 
+              service: 
+                name: cyber-svc  
+                port: 
+                  number: 5051 

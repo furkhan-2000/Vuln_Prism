@@ -1,0 +1,220 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: vuln-pc
+value: 100000
+preemptionPolicy: PreemptLowerPriority
+globalDefault: false
+description: Priority class for critical Vuln‑Prism
+---
+apiVersion: v1 
+kind: Namespace
+metadata: 
+  name: mustang 
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openrouter-secret
+  namespace: mustang
+type: Opaque
+stringData:
+  apiKey: "hsrrhshs@ghgi302i3420iu" 
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vuln
+  namespace: mustang
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vuln-role
+  namespace: mustang
+rules:
+  - apiGroups: ["", "apps", "rbac.authorization.k8s.io", "networking.k8s.io", "autoscaling"]
+    resources: ["pods", "replicasets", "deployments", "secrets", "horizontalpodautoscalers", "verticalpodautoscalers"]
+    verbs: ["list", "get", "watch", "create", "delete", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vuln-rlbng
+  namespace: mustang
+subjects:
+  - kind: ServiceAccount
+    name: vuln
+    namespace: mustang
+roleRef:
+  kind: Role
+  name: vuln-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1 
+kind: PersistentVolume 
+metadata: 
+  name: vuln-pv 
+spec: 
+  persistentVolumeReclaimPolicy: Retain 
+  capacity: 
+    storage: 500Mi 
+  accessModes: 
+    - ReadWriteMany 
+  hostPath: 
+    path: /tmp/vuln-data 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vuln-pvc
+  namespace: mustang
+spec:
+  volumeName: vuln-pv 
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: "500Mi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vuln-dep
+  namespace: mustang
+  labels:
+    prod: "true"
+    tier: bmw
+  annotations: 
+    prometheus.io/scrape: "true" 
+    prometheus.io/port: "3000" 
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      tier: bmw
+  template:
+    metadata:
+      labels:
+        tier: bmw
+    spec:
+      priorityClassName: vuln-pc
+      serviceAccountName: vuln
+      affinity: 
+        podAntiAffinity: 
+          requiredDuringSchedulingIgnoredExecution: 
+            labelSelector: 
+              matchLabels: 
+                tier: bmw 
+              topologyKey: "kubernetes.io/hostname"
+      securityContext:
+        runAsUser: 1010
+        runAsGroup: 1010
+        fsGroup: 1010
+        runAsNonRoot: true
+      containers:
+        - name: vuln-con
+          image: furkhan2000/shark:frontend
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true 
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - secretRef:
+                name: openrouter-secret
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "300Mi"
+            limits:
+              cpu: "500m"
+              memory: "650Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 8
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 8
+            periodSeconds: 10
+          volumeMounts:
+            - name: store-room 
+              mountPath: /pvcstore
+      volumes:
+        - name: store-room 
+          persistentVolumeClaim:
+            claimName: vuln-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vuln-svc
+  namespace: mustang
+spec:
+  selector:
+    tier: bmw
+  ports:
+    - port: 3000
+      protocol: TCP
+      targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1 
+kind: NetworkPolicy 
+metadata: 
+  name: vuln-np 
+  namespace: mustang 
+spec:   
+  podSelector: 
+    matchLabels: 
+      tier: bmw 
+  policyTypes: 
+  - ingress 
+  - egress 
+  ingress: 
+    - from:    # allow traffic from all pods in the same namespace as the pod(s) selected for this NetworkPolicy.
+      - ipBlock: 
+          cidr: 0.0.0.0/0  
+      ports: 
+        - protocol: TCP 
+          port: 3000 
+  egress: 
+    - to:  
+      - ipBlock: 
+          cidr: 0.0.0.0/0 
+      ports: 
+        - protocol: TCP 
+          port: 443 
+        - protocol: TCP 
+          port: 80 
+        - protocol: UDP 
+          port: 53 
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: vuln-hpa
+  namespace: mustang
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: vuln-dep
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 75 
