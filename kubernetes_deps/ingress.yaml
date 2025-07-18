@@ -18,16 +18,16 @@ spec:
                 port:
                   number: 3000
           - path: /sast
-            pathType: prefix 
-            backend: 
-              service: 
-                name: sast-svc 
-                port: 
+            pathType: Prefix
+            backend:
+              service:
+                name: sast-svc
+                port:
                   number: 5050
           - path: /cyber
-            pathType: prefix 
-            backend: 
-              service: 
-                name: cyber-svc  
-                port: 
-                  number: 5051 
+            pathType: Prefix
+            backend:
+              service:
+                name: cyber-svc
+                port:
+                  number: 5051
