@@ -1,204 +1,205 @@
-apiVersion: v1 
-kind: ServiceAccount 
-metadata: 
-  name: cyber 
-  namespace: mustang 
---- 
-apiVersion: rbac.authorization.k8s.io/v1 
-kind: Role 
-metadata: 
-  name: cyber-role 
-  namespace: mustang 
-rules: 
-  - apiGroup: ["", "apps", "rbac.authorization.k8s.io", "networking.k8s.io", "autoscaling"]
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cyber
+  namespace: mustang
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cyber-role
+  namespace: mustang
+rules:
+  - apiGroups: ["", "apps", "rbac.authorization.k8s.io", "networking.k8s.io", "autoscaling"]
     resources: ["pods", "replicasets", "deployments", "networkpolicies", "horizontalpodautoscalers", "verticalpodautoscalers", "configmaps"]
     verbs: ["get", "create", "list", "watch", "update", "delete"]
---- 
+---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding 
-metadata: 
+kind: RoleBinding
+metadata:
   name: cyber-rb
-  namespace: mustang 
-subjects: 
-  - kind: ServiceAccount 
+  namespace: mustang
+subjects:
+  - kind: ServiceAccount
     name: cyber
-    namespace: mustang 
-roleRef: 
-  kind: Role 
-  name: cyber-role 
+    namespace: mustang
+roleRef:
+  kind: Role
+  name: cyber-role
   apiGroup: rbac.authorization.k8s.io
---- 
-apiVersion: v1 
-kind: PersistentVolume 
-metadata: 
-  name: cyber-pv 
-spec: 
-  persistentVolumeReclaimPolicy: Retain 
-  capacity: 
-    storage: 700Mi 
-  accessModes: 
-    - ReadWriteMany 
-  hostPath: 
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: cyber-pv
+spec:
+  persistentVolumeReclaimPolicy: Retain
+  capacity:
+    storage: 700Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
     path: /tmp/cyber
---- 
-apiVersion: v1 
-kind: PersistentVolumeClaim 
-metadata: 
-  name: cyber-pvc 
-  namespace: mustang 
-spec: 
-  volumeName: cyber-pv 
-  accessModes: 
-    - ReadWriteMany 
-  resources: 
-    requests: 
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cyber-pvc
+  namespace: mustang
+spec:
+  storageClassName: ""
+  volumeName: cyber-pv
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
       storage: "500Mi"
 ---
-apiVersion: v1 
-kind: ConfigMap 
-metadata: 
-  name: cyber-conf 
-  namespace: mustang 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cyber-conf
+  namespace: mustang
 data:
   LOG_LEVEL: "debug"
---- 
-apiVersion: apps/v1 
-kind: Deployment 
-metadata: 
-  name: cyber-dep 
-  namespace: mustang 
-  labels: 
-    tier: versace 
-    prod: "true" 
-  annotations: 
-    prometheus.io/scrape: "true" 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cyber-dep
+  namespace: mustang
+  labels:
+    tier: versace
+    prod: "true"
+  annotations:
+    prometheus.io/scrape: "true"
     prometheus.io/path: /metrics
     prometheus.io/port: "5051"
-spec: 
-  replicas: 2 
-  strategy: 
-    type: RollingUpdate 
-    rollingUpdate: 
-      maxSurge: 1 
-      maxUnavailable: 0 
-  selector: 
-    matchLabels: 
-      tier: versace  
-  template: 
-    metadata: 
-      labels: 
-        tier: versace 
-      spec: 
-        serviceAccountName: cyber
-        affinity: 
-          podAntiAffinity: 
-            requiredDuringSchedulingIgnoredDuringExecution: 
-              - labelSelector: 
-                  matchLabels: 
-                    tier: versace 
-                  topologyKey: "kubernetes.io/hostname"
-        securityContext: 
-          runAsNonRoot: true 
-          runAsUser: 1000
-          runAsGroup: 1000
-          fsGroup:  1000
-        containers: 
-          - name: cyber-con 
-            image: furkhan2000/shark:cyberscythe
-            imagePullPolicy: ifNotPresent 
-            securityContext: 
-              allowPrivilegeEscalation: false 
-            ports: 
-              - containerPort: 5051
-            envFrom: 
-              - configMapRef: 
-                  name: cyber-conf 
-            resources: 
-              requests: 
-                cpu: "250m"
-                memory: "300Mi" 
-              limits: 
-                cpu: "500m" 
-                memory: "650Mi" 
-            readinessProbe: 
-              httpGet: 
-                path: /health 
-                port: 5051 
-              initialDelaySeconds: 8 
-              periodSeconds: 10 
-            livenessProbe: 
-              tcpSocket: 
-                port: 5051
-              initialDelaySeconds: 8 
-              periodSeconds: 10 
-            volumeMounts: 
-              - name: cyber-store 
-                mountPath: /cyber_room 
-        volumes: 
-          - name: cyber-store 
-            persistentVolumeClaim: 
-              claimName: cyber-pvc  
---- 
-apiVersion: v1 
-kind: Service 
-metadata: 
-  name: cyber-svc 
-  namespace: mustang 
-spec: 
-  selector: 
-    tier: versace 
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      tier: versace
+  template:
+    metadata:
+      labels:
+        tier: versace
+    spec:
+      serviceAccountName: cyber
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  tier: versace
+              topologyKey: "kubernetes.io/hostname"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      containers:
+        - name: cyber-con
+          image: furkhan2000/shark:cyberscythe
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+          ports:
+            - containerPort: 5051
+          envFrom:
+            - configMapRef:
+                name: cyber-conf
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "300Mi"
+            limits:
+              cpu: "500m"
+              memory: "650Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5051
+            initialDelaySeconds: 8
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 5051
+            initialDelaySeconds: 8
+            periodSeconds: 10
+          volumeMounts:
+            - name: cyber-store
+              mountPath: /cyber_room
+      volumes:
+        - name: cyber-store
+          persistentVolumeClaim:
+            claimName: cyber-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cyber-svc
+  namespace: mustang
+spec:
+  selector:
+    tier: versace
   ports:
     - port: 5051
-      protocol: TCP 
-      targetPort: 5051 
---- 
+      protocol: TCP
+      targetPort: 5051
+---
 apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy 
-metadata: 
-  name: cyber-np 
-  namespace: mustang 
-spec: 
-  podSelector: 
-    matchLabels: 
-      tier: versace 
-  policyTypes: 
-  - ingress 
-  - egress 
-  ingress: 
-    - from: 
-      - ipBlock: 
-          cidr: 0.0.0.0/0 
-      ports:  
-        - protocol: TCP 
+kind: NetworkPolicy
+metadata:
+  name: cyber-np
+  namespace: mustang
+spec:
+  podSelector:
+    matchLabels:
+      tier: versace
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
           port: 5051
-  egress: 
-    - to: 
-      - ipBlock: 
-          cidr: 0.0.0.0/0 
-      ports: 
-        - protocol: TCP 
-          port: 443 
-        - protocol: TCP 
-          port: 80 
-        - protocol: UDP 
-          port: 53 
---- 
-apiVersion: autoscaling/v2 
-kind: HorizontalPodAutoscaler 
-metadata: 
-  name: cyber-hpa 
-  namespace: mustang 
-spec: 
-  scaleTargetRef: 
-    apiVersion: apps/v1 
-    kind: Deployment 
-    name: cyber-dep 
-  minReplicas: 2 
-  maxReplicas: 10 
-  metrics: 
-    - type: Resource 
-      resource: 
-        name: cpu 
-        target: 
-          type: Utilization 
-          averageUtilization: 75 
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+        - protocol: UDP
+          port: 53
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cyber-hpa
+  namespace: mustang
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cyber-dep
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 75

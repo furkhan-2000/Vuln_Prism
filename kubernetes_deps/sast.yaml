@@ -1,205 +1,206 @@
-apiVersion: v1 
-kind: ServiceAccount 
-metadata: 
-  name: sast 
-  namespace: mustang 
---- 
-apiVersion: rbac.authorization.k8s.io/v1 
-kind: Role 
-metadata: 
-  name: sast-role 
-  namespace: mustang 
-rules: 
-  - apiGroup: ["", "apps", "rbac.authorization.k8s.io", "networking.k8s.io", "batch", "autoscaling"]
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sast
+  namespace: mustang
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sast-role
+  namespace: mustang
+rules:
+  - apiGroups: ["", "apps", "rbac.authorization.k8s.io", "networking.k8s.io", "batch", "autoscaling"]
     resources: ["pods", "replicasets", "deployments", "networkpolicies", "horizontalpodautoscalers", "verticalpodautoscalers", "configmaps"]
     verbs: ["get", "create", "list", "watch", "update", "delete"]
---- 
+---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding 
-metadata: 
+kind: RoleBinding
+metadata:
   name: sast-rb
-  namespace: mustang 
-subjects: 
-  - kind: ServiceAccount 
-    name: sast 
-    namespace: mustang 
-roleRef: 
-  kind: Role 
-  name: sast-role 
+  namespace: mustang
+subjects:
+  - kind: ServiceAccount
+    name: sast
+    namespace: mustang
+roleRef:
+  kind: Role
+  name: sast-role
   apiGroup: rbac.authorization.k8s.io
---- 
-apiVersion: v1 
-kind: PersistentVolume 
-metadata: 
-  name: sast-pv 
-spec: 
-  persistentVolumeReclaimPolicy: Retain 
-  capacity: 
-    storage: 700Mi 
-  accessModes: 
-    - ReadWriteMany 
-  hostPath: 
-    path: /tmp/sast 
---- 
-apiVersion: v1 
-kind: PersistentVolumeClaim 
-metadata: 
-  name: sast-pvc 
-  namespace: mustang 
-spec: 
-  volumeName: sast-pv 
-  accessModes: 
-    - ReadWriteMany 
-  resources: 
-    requests: 
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: sast-pv
+spec:
+  persistentVolumeReclaimPolicy: Retain
+  capacity:
+    storage: 700Mi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /tmp/sast
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sast-pvc
+  namespace: mustang
+spec:
+  storageClassName: ""
+  volumeName: sast-pv
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
       storage: "500Mi"
 ---
-apiVersion: v1 
-kind: ConfigMap 
-metadata: 
-  name: sast-conf 
-  namespace: mustang 
-data: 
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sast-conf
+  namespace: mustang
+data:
   LOG_LEVEL: "debug"
---- 
-apiVersion: apps/v1 
-kind: Deployment 
-metadata: 
-  name: sast-dep 
-  namespace: mustang 
-  labels: 
-    tier: porsche 
-    prod: "true" 
-  annotations: 
-    prometheus.io/scrape: "true" 
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sast-dep
+  namespace: mustang
+  labels:
+    tier: porsche
+    prod: "true"
+  annotations:
+    prometheus.io/scrape: "true"
     prometheus.io/path: /metrics
     prometheus.io/port: "5050"
-spec: 
-  replicas: 2 
-  strategy: 
+spec:
+  replicas: 2
+  strategy:
     type: RollingUpdate
-    rollingUpdate: 
-      maxSurge: 1 
-      maxUnavailable: 0 
-  selector: 
-    matchLabels: 
-      tier: porsche 
-  template: 
-    metadata: 
-      labels: 
-        tier: porsche 
-      spec: 
-        serviceAccountName: sast
-        affinity: 
-          podAntiAffinity: 
-            requiredDuringSchedulingIgnoredDuringExecution: 
-              - labelSelector: 
-                  matchLabels: 
-                    tier: porsche 
-                  topologyKey: "kubernetes.io/hostname"
-        securityContext: 
-          runAsNonRoot: true 
-          runAsUser: 1111 
-          runAsGroup: 1111 
-          fsGroup: 1111 
-        containers: 
-          - name: sast-con 
-            image: furkhan2000/shark:sast
-            imagePullPolicy: ifNotPresent 
-            securityContext: 
-              allowPrivilegeEscalation: false 
-              readOnlyRootFilesystem: true 
-            ports: 
-              - containerPort: 5050 
-            envFrom: 
-              - configMapRef: 
-                  name: sast-conf 
-            resources: 
-              requests: 
-                cpu: "250m"
-                memory: "300Mi" 
-              limits: 
-                cpu: "500m" 
-                memory: "650Mi" 
-            readinessProbe: 
-              httpGet: 
-                path: /health 
-                port: 5050 
-              initialDelaySeconds: 8 
-              periodSeconds: 10 
-            livenessProbe: 
-              tcpSocket: 
-                port: 5050 
-              initialDelaySeconds: 8 
-              periodSeconds: 10 
-            volumeMounts: 
-              - name: sast-store 
-                mountPath: /sast_room 
-        volumes: 
-          - name: sast-store 
-            persistentVolumeClaim: 
-              claimName: sast-pvc  
---- 
-apiVersion: v1 
-kind: Service 
-metadata: 
-  name: sast-svc 
-  namespace: mustang 
-spec: 
-  selector: 
-    tier: porsche 
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      tier: porsche
+  template:
+    metadata:
+      labels:
+        tier: porsche
+    spec:
+      serviceAccountName: sast
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  tier: porsche
+              topologyKey: "kubernetes.io/hostname"
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1111
+        runAsGroup: 1111
+        fsGroup: 1111
+      containers:
+        - name: sast-con
+          image: furkhan2000/shark:sast
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+          ports:
+            - containerPort: 5050
+          envFrom:
+            - configMapRef:
+                name: sast-conf
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "300Mi"
+            limits:
+              cpu: "500m"
+              memory: "650Mi"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 5050
+            initialDelaySeconds: 8
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 5050
+            initialDelaySeconds: 8
+            periodSeconds: 10
+          volumeMounts:
+            - name: sast-store
+              mountPath: /sast_room
+      volumes:
+        - name: sast-store
+          persistentVolumeClaim:
+            claimName: sast-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sast-svc
+  namespace: mustang
+spec:
+  selector:
+    tier: porsche
   ports:
     - port: 5050
-      protocol: TCP 
-      targetPort: 5050 
---- 
+      protocol: TCP
+      targetPort: 5050
+---
 apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy 
-metadata: 
-  name: sast-np 
-  namespace: mustang 
-spec: 
-  podSelector: 
-    matchLabels: 
-      tier: porsche 
-  policyTypes: 
-  - ingress 
-  - egress 
-  ingress: 
-    - from: 
-      - ipBlock: 
-          cidr: 0.0.0.0/0 
-      ports:  
-        - protocol: TCP 
-          port: 5050 
-  egress: 
-    - to: 
-      - ipBlock: 
-          cidr: 0.0.0.0/0 
-      ports: 
-        - protocol: TCP 
-          port: 443 
-        - protocol: TCP 
-          port: 80 
-        - protocol: UDP 
-          port: 53 
---- 
-apiVersion: autoscaling/v2 
-kind: HorizontalPodAutoscaler 
-metadata: 
-  name: sast-hpa 
-  namespace: mustang 
-spec: 
-  scaleTargetRef: 
-    apiVersion: apps/v1 
-    kind: Deployment 
-    name: sast-dep 
-  minReplicas: 2 
-  maxReplicas: 10 
-  metrics: 
-    - type: Resource 
-      resource: 
-        name: cpu 
-        target: 
-          type: Utilization 
-          averageUtilization: 75 
+kind: NetworkPolicy
+metadata:
+  name: sast-np
+  namespace: mustang
+spec:
+  podSelector:
+    matchLabels:
+      tier: porsche
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 5050
+  egress:
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 80
+        - protocol: UDP
+          port: 53
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sast-hpa
+  namespace: mustang
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sast-dep
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 75
