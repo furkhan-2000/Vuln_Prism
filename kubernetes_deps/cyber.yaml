@@ -105,7 +105,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: cyber-con
-          image: furkhan2000/shark:cyberscythe
+          image: furkhan2000/shark:cyber
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
