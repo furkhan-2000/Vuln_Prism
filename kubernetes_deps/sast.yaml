@@ -100,9 +100,9 @@ spec:
               topologyKey: "kubernetes.io/hostname"
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1111
-        runAsGroup: 1111
-        fsGroup: 1111
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
       containers:
         - name: sast-con
           image: furkhan2000/shark:sast

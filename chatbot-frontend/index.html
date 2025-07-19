@@ -643,7 +643,7 @@
                 <span className="px-4 py-2 bg-blue-500/10 rounded-full border border-blue-500/20">☁️ Cloud-Native</span>
               </div>
               <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                <a href="http://localhost:5051/" className="cyber-button cta-button group">
+                <a href="/cyber/" className="cyber-button cta-button group">
                   <span className="flex items-center gap-2">
                     🔍 Launch Live Scan
                     <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -651,7 +651,7 @@
                     </svg>
                   </span>
                 </a>
-                <a href="http://localhost:5050/" className="cyber-button bg-transparent border-2 border-cyan-500 hover:bg-cyan-500/10 cta-button group">
+                <a href="/sast/" className="cyber-button bg-transparent border-2 border-cyan-500 hover:bg-cyan-500/10 cta-button group">
                   <span className="flex items-center gap-2">
                     📋 Audit Source Code
                     <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -826,10 +826,10 @@
                 Join thousands of developers who trust VulnPrism for enterprise-grade security.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="http://localhost:5051/" className="cyber-button px-10 py-4 text-xl">
+                <a href="/cyber/" className="cyber-button px-10 py-4 text-xl">
                   Launch Live Scan
                 </a>
-                <a href="http://localhost:5050/" className="cyber-button bg-transparent border border-cyan-500 text-xl">
+                <a href="/sast/" className="cyber-button bg-transparent border border-cyan-500 text-xl">
                   Audit Source Code
                 </a>
                 <a href="#" className="cyber-button bg-transparent border border-purple-500 text-xl relative">
@@ -870,8 +870,8 @@
     const chatSend = document.getElementById('chat-send');
 
     const CHAT_API_URL = '/chat';
-    const SAST_SERVICE_URL = 'http://localhost:5050';
-    const CYBERSCYTHE_SERVICE_URL = 'http://localhost:5051';
+    const SAST_SERVICE_URL = '/sast';
+    const CYBERSCYTHE_SERVICE_URL = '/cyber';
 
     let conversationHistory = [{
       role: 'system',
@@ -989,7 +989,7 @@
         } catch (error) {
             console.error('Error calling chat API:', error);
             removeTypingIndicator();
-            addMessage('bot', `Sorry, I'm having trouble connecting to the chat service: ${error.message}. Please make sure the CyberScythe service is running on port 5051.`);
+            addMessage('bot', `Sorry, I'm having trouble connecting to the chat service: ${error.message}. Please check if the services are running properly.`);
         }
     }
   </script>

@@ -4,27 +4,28 @@ metadata:
   name: vuln-ingress
   namespace: mustang
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /vuln
+          - path: /vuln(/|$)(.*)
             pathType: Prefix
             backend:
               service:
                 name: vuln-svc
                 port:
                   number: 3000
-          - path: /sast
+          - path: /sast(/|$)(.*)
             pathType: Prefix
             backend:
               service:
                 name: sast-svc
                 port:
                   number: 5050
-          - path: /cyber
+          - path: /cyber(/|$)(.*)
             pathType: Prefix
             backend:
               service:

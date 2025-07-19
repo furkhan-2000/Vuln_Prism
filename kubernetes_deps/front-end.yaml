@@ -19,7 +19,7 @@ metadata:
   namespace: mustang
 type: Opaque
 stringData:
-  apiKey: "hsrrhshs@ghgi302i3420iu" 
+  DEEPSEEK_API_KEY: "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"
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -114,9 +114,9 @@ spec:
                   tier: bmw 
               topologyKey: "kubernetes.io/hostname"
       securityContext:
-        runAsUser: 1010
-        runAsGroup: 1010
-        fsGroup: 1010
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
         runAsNonRoot: true
       containers:
         - name: vuln-con
