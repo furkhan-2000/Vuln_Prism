@@ -32,7 +32,7 @@ metadata:
   name: cyber-redirect-ingress
   namespace: mustang
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /static/index.html
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
