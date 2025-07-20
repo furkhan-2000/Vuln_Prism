@@ -24,21 +24,14 @@ spec:
                 name: sast-svc
                 port:
                   number: 5050
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: cyber-redirect-ingress
-  namespace: mustang
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /static/index.html
-spec:
-  ingressClassName: nginx
-  rules:
-    - http:
-        paths:
           - path: /cyber
+            pathType: Prefix
+            backend:
+              service:
+                name: cyber-svc
+                port:
+                  number: 5051
+          - path: /cyber-static
             pathType: Exact
             backend:
               service:
