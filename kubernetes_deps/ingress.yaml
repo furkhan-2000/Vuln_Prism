@@ -24,13 +24,7 @@ spec:
                 name: sast-svc
                 port:
                   number: 5050
-          - path: /cyber
-            pathType: Prefix
-            backend:
-              service:
-                name: cyber-svc
-                port:
-                  number: 5051
+
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
