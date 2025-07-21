@@ -1,25 +1,24 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: sast-config
+  name: sast-config-rds
   namespace: mustang
 data:
-  DB_HOST: "your-rds-endpoint.rds.amazonaws.com"
-  DB_USER: "your_db_user"
-  DB_PORT: "5432"
-  DB_NAME: "vulnprism_sast"
-  REDIS_HOST: "your-valkey-cluster.cache.amazonaws.com"
-  REDIS_PORT: "6379"
-  LOG_LEVEL: "info"
+  DB_HOST: "database-1.c0pogq0w8mxc.us-east-1.rds.amazonaws.com"
+  DB_USER: "admin"
+  DB_PORT: "3306"
+  DB_NAME: "database-1"
+  #REDIS_HOST: "your-valkey-cluster.cache.amazonaws.com"
+ # REDIS_PORT: ""
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: sast-secrets
+  name: sast-secrets-rds
   namespace: mustang
 type: Opaque
 stringData:
-  DB_PASSWORD: "YOUR_DATABASE_PASSWORD"
+  DB_PASSWORD: "JF2WGJIprAESx7jP8aPu"
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -78,14 +77,6 @@ spec:
     requests:
       storage: "500Mi"
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: sast-conf
-  namespace: mustang
-data:
-  LOG_LEVEL: "debug"
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -137,9 +128,9 @@ spec:
             - containerPort: 5050
           envFrom:
             - configMapRef:
-                name: sast-config
+                name: sast-config-rds
             - secretRef:
-                name: sast-secrets
+                name: sast-secrets-rds
           resources:
             requests:
               cpu: "250m"

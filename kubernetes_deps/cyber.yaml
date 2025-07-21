@@ -1,24 +1,24 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cyber-config
+  name: cyber-config-rds
   namespace: mustang
 data:
-  DB_HOST: "your-rds-endpoint.rds.amazonaws.com"
-  DB_USER: "your_db_user"
-  DB_PORT: "5432"
-  DB_NAME: "vulnprism_cyberscythe"
-  REDIS_HOST: "your-valkey-cluster.cache.amazonaws.com"
-  REDIS_PORT: "6379"
+  DB_HOST: "database-1.c0pogq0w8mxc.us-east-1.rds.amazonaws.com"
+  DB_USER: "admin"
+  DB_PORT: "3306"
+  DB_NAME: "database-1"
+  #REDIS_HOST: "your-valkey-cluster.cache.amazonaws.com"
+  #REDIS_PORT: ""
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: cyber-secrets
+  name: cyber-secrets-rds
   namespace: mustang
 type: Opaque
 stringData:
-  DB_PASSWORD: "YOUR_DATABASE_PASSWORD"
+  DB_PASSWORD: "JF2WGJIprAESx7jP8aPu"
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -100,9 +100,9 @@ spec:
             - containerPort: 5051
           envFrom:
             - configMapRef:
-                name: cyber-config
+                name: cyber-config-rds
             - secretRef:
-                name: cyber-secrets
+                name: cyber-secrets-rds
           resources:
             requests:
               cpu: "250m"
