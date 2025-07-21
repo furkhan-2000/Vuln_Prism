@@ -102,10 +102,8 @@ spec:
           ports:
             - containerPort: 3000
           envFrom:
-            - configMapRef:
-                name: app-config
             - secretRef:
-                name: app-secrets
+                name: openrouter-secret
           resources:
             requests:
               cpu: "250m"
