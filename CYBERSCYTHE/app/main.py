@@ -14,7 +14,7 @@ import sys
 from sqlalchemy.orm import Session
 import redis
 
-import database
+from . import database
 
 # Load environment variables
 load_dotenv()
