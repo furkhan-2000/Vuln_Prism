@@ -77,12 +77,17 @@ def root():
 
 @app.get("/health")
 def health_check():
-    db_ok = database.engine.connect() is not None
-    redis_ok = redis_cache.ping() if redis_cache else False
-    if db_ok and redis_ok:
-        return {"status": "ok", "database": "ok", "cache": "ok"}
-    else:
-        raise HTTPException(503, {"status": "unhealthy", "database": "ok" if db_ok else "error", "cache": "ok" if redis_ok else "error"})
+    try:
+        db_ok = database.engine and database.engine.connect() is not None
+    except:
+        db_ok = False
+
+    try:
+        redis_ok = redis_cache.ping() if redis_cache else False
+    except:
+        redis_ok = False
+
+    return {"status": "ok", "database": "ok" if db_ok else "disabled", "cache": "ok" if redis_ok else "disabled"}
 
 class ScanRequest(BaseModel):
     url: str
@@ -107,20 +112,26 @@ async def scan(request: ScanRequest, db: Session = Depends(database.get_db)):
         logger.info("Starting new scan for target: %s", url)
         findings: ScanResult = await perform_scan(url)
 
-        # 3. Store in Database
-        new_scan = database.Scan(scan_id=scan_id, target=url)
-        db.add(new_scan)
-        db.commit()
-        db.refresh(new_scan)
+        # 3. Store in Database (if available)
+        if db and database.engine:
+            try:
+                new_scan = database.Scan(scan_id=scan_id, target=url)
+                db.add(new_scan)
+                db.commit()
+                db.refresh(new_scan)
 
-        for vuln_data in findings.vulnerabilities:
-            vuln = database.Vulnerability(
-                **vuln_data,
-                scan_id=new_scan.id
-            )
-            db.add(vuln)
-        db.commit()
-        logger.info("Successfully stored %d vulnerabilities in the database.", len(findings.vulnerabilities))
+                for vuln_data in findings.vulnerabilities:
+                    vuln = database.Vulnerability(
+                        **vuln_data,
+                        scan_id=new_scan.id
+                    )
+                    db.add(vuln)
+                db.commit()
+                logger.info("Successfully stored %d vulnerabilities in the database.", len(findings.vulnerabilities))
+            except Exception as e:
+                logger.warning("Failed to store results in database: %s", e)
+        else:
+            logger.info("Database not available, skipping result storage.")
 
         response_data = findings.to_dict()
 

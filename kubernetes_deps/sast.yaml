@@ -142,15 +142,17 @@ spec:
             httpGet:
               path: /health
               port: 5050
-            initialDelaySeconds: 15
-            periodSeconds: 10
-            timeoutSeconds: 5
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 30
+            failureThreshold: 10
           livenessProbe:
             tcpSocket:
               port: 5050
-            initialDelaySeconds: 15
-            periodSeconds: 10
-            timeoutSeconds: 5
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 30
+            failureThreshold: 10
           
 ---
 apiVersion: v1

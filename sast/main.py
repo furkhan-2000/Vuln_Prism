@@ -119,20 +119,26 @@ async def scan_code(
         logger.info("Starting new scan for target: %s", target)
         summary, issues = scan_engine.run_full_scan(code_dir, temp_id)
 
-        # 3. Store Results in Database
-        new_scan = database.Scan(scan_id=temp_id, target=target)
-        db.add(new_scan)
-        db.commit()
-        db.refresh(new_scan)
+        # 3. Store Results in Database (if available)
+        if db and database.engine:
+            try:
+                new_scan = database.Scan(scan_id=temp_id, target=target)
+                db.add(new_scan)
+                db.commit()
+                db.refresh(new_scan)
 
-        for issue_data in issues:
-            vuln = database.Vulnerability(
-                **issue_data, # Unpack the dictionary
-                scan_id=new_scan.id
-            )
-            db.add(vuln)
-        db.commit()
-        logger.info("Successfully stored %d vulnerabilities in the database.", len(issues))
+                for issue_data in issues:
+                    vuln = database.Vulnerability(
+                        **issue_data, # Unpack the dictionary
+                        scan_id=new_scan.id
+                    )
+                    db.add(vuln)
+                db.commit()
+                logger.info("Successfully stored %d vulnerabilities in the database.", len(issues))
+            except Exception as e:
+                logger.warning("Failed to store results in database: %s", e)
+        else:
+            logger.info("Database not available, skipping result storage.")
 
         # Prepare response
         response_data = {"scan_id": temp_id, "target": target, "summary": summary, "issues": issues}

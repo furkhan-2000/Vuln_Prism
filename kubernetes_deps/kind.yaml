@@ -1,10 +1,21 @@
 apiVersion: kind.x-k8s.io/v1alpha4
 kind: Cluster
+networking:
+  # Allow pods to access external services
+  disableDefaultCNI: false
+  podSubnet: "10.244.0.0/16"
+  serviceSubnet: "10.96.0.0/12"
 nodes:
   - role: control-plane
     extraPortMappings:
     - containerPort: 32507
       hostPort: 32507
       protocol: TCP
+    kubeadmConfigPatches:
+    - |
+      kind: ClusterConfiguration
+      networking:
+        podSubnet: "10.244.0.0/16"
+        serviceSubnet: "10.96.0.0/12"
   - role: worker
   - role: worker
