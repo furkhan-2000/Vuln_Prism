@@ -6,11 +6,10 @@ import logging
 import shutil
 import time
 from pathlib import Path
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import random
 
-import pdf_report
 from lxml import etree
 
 # Configure logging
@@ -256,7 +255,19 @@ def parse_dependency_check(path: str) -> List[Dict[str, Any]]:
         logger.error("Error parsing Dependency-Check XML: %s", e, exc_info=True)
     return issues
 
-def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
+def run_full_scan(source_dir: str, temp_id: str) -> Tuple[Dict[str, int], List[Dict[str, Any]]]:
+    """
+    Runs all configured SAST and SCA tools and returns the structured results.
+
+    Args:
+        source_dir: The directory containing the source code to scan.
+        temp_id: A unique identifier for this scan run.
+
+    Returns:
+        A tuple containing:
+        - A summary dictionary of vulnerability counts by severity.
+        - A list of all found vulnerabilities (issues).
+    """
     base_output = os.path.join("/tmp", f"scan_results_{temp_id}")
     os.makedirs(base_output, exist_ok=True)
 
@@ -338,8 +349,5 @@ def run_full_scan_and_report(source_dir: str, temp_id: str) -> Optional[str]:
         sev = issue.get("severity", "Info")
         summary[sev] += 1
 
-    # Build PDF
-    report_file = os.path.join(base_output, f"VulnPrism_Report_{temp_id}.pdf")
-    pdf_report.build_pdf_with_enhancements(summary, all_issues, report_file)
-    return report_file
-
+    # Return the structured data
+    return summary, all_issues

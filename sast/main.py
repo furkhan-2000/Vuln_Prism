@@ -3,24 +3,30 @@ import shutil
 import uuid
 import logging
 import subprocess
+import json
 from zipfile import ZipFile
 from tarfile import open as TarOpen
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, Form, HTTPException, Request
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
+from fastapi import FastAPI, UploadFile, Form, HTTPException, Request, Depends
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+import redis
 
 import scan_engine
+import database
 
-# Logging
+# --- Basic Setup ---
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 )
 logger = logging.getLogger("app.main")
+
+# Initialize Database
+database.init_db()
 
 app = FastAPI(title="VulnPrism SAST API")
 app.add_middleware(
@@ -29,10 +35,21 @@ app.add_middleware(
 )
 templates = Jinja2Templates(directory="templates")
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    logger.warning("Validation error: %s", exc)
-    return JSONResponse({"detail": "Invalid payload"}, status_code=422)
+# --- Redis Cache Connection ---
+# Reads connection details from environment variables
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+CACHE_EXPIRATION_SECONDS = 3600  # 1 hour
+
+try:
+    redis_cache = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
+    redis_cache.ping() # Check connection
+    logger.info("Successfully connected to Redis cache.")
+except redis.exceptions.ConnectionError as e:
+    logger.error("Failed to connect to Redis: %s. Caching will be disabled.", e)
+    redis_cache = None
+
+# --- API Endpoints ---
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -40,92 +57,97 @@ async def index(request: Request):
 
 @app.get("/health")
 async def health_check():
-    return {"status": "ok"}
+    # Add DB and Redis health checks
+    try:
+        db_ok = database.engine and database.engine.connect() is not None
+    except:
+        db_ok = False
 
-@app.post("/scan")
+    redis_ok = redis_cache.ping() if redis_cache else False
+
+    return {"status": "ok", "database": "ok" if db_ok else "disabled", "cache": "ok" if redis_ok else "disabled"}
+
+@app.post("/scan", response_model=dict)
 async def scan_code(
-    request: Request,
     repo_url: str = Form(None),
     code_text: str = Form(None),
-    file: UploadFile = None
+    file: UploadFile = None,
+    db: Session = Depends(database.get_db)
 ):
     temp_id = str(uuid.uuid4())
-    base_dir = os.path.join("/tmp", temp_id) # Use os.path.join for robustness
+    base_dir = os.path.join("/tmp", temp_id)
     code_dir = os.path.join(base_dir, "source")
-    report_path = None # Initialize report_path
+
+    # Determine the primary target for caching and logging
+    target = repo_url or (file.filename if file else "pasted_code")
+    if not target:
+        raise HTTPException(400, "No input provided.")
+
+    # 1. Check Cache
+    if redis_cache:
+        cached_result = redis_cache.get(target)
+        if cached_result:
+            logger.info("Returning cached result for target: %s", target)
+            return json.loads(cached_result)
 
     try:
-        os.makedirs(code_dir, exist_ok=True) # Create code_dir first
+        os.makedirs(code_dir, exist_ok=True)
 
-        # Git repo
+        # --- Input Handling ---
         if repo_url:
-            logger.info("[%s] Cloning repo %s", temp_id, repo_url)
-            # Ensure git clone is run from the parent directory of code_dir or specify target
+            logger.info("Cloning repo: %s", repo_url)
             result = subprocess.run(
                 ["git", "clone", "--depth", "1", repo_url, code_dir],
-                capture_output=True,
-                text=True,
-                timeout=300
+                capture_output=True, text=True, timeout=300
             )
             if result.returncode != 0:
-                logger.error("[%s] Clone failed: %s", temp_id, result.stderr)
-                raise HTTPException(400, f"Clone failed: {result.stderr}")
-
-        # Pasted code
+                raise HTTPException(400, f"Git clone failed: {result.stderr}")
         elif code_text:
-            logger.info("[%s] Writing pasted code", temp_id)
-            snippet_path = os.path.join(code_dir, "snippet.txt")
-            with open(snippet_path, "w") as f:
+            with open(os.path.join(code_dir, "snippet.txt"), "w") as f:
                 f.write(code_text)
-
-        # Uploaded file
         elif file:
-            logger.info("[%s] Handling file upload %s", temp_id, file.filename)
             safe_filename = Path(file.filename).name
-            upload_path = os.path.join(base_dir, safe_filename) # Upload to base_dir initially
-
+            upload_path = os.path.join(base_dir, safe_filename)
             with open(upload_path, "wb") as f:
                 shutil.copyfileobj(file.file, f)
+            # Handle archives
+            if safe_filename.endswith(".zip"): ZipFile(upload_path, "r").extractall(code_dir)
+            elif safe_filename.endswith(('.tar.gz', '.tgz', '.tar')): TarOpen(upload_path, "r:*").extractall(code_dir)
+            else: shutil.move(upload_path, os.path.join(code_dir, safe_filename))
 
-            # Archive handling
-            if safe_filename.endswith(".zip"):
-                with ZipFile(upload_path, "r") as z:
-                    z.extractall(code_dir)
-            elif safe_filename.endswith((".tar.gz", ".tgz", ".tar")):
-                with TarOpen(upload_path, "r:*") as t:
-                    t.extractall(code_dir)
-            else:
-                # If it's a single file, move it directly into code_dir
-                shutil.move(upload_path, os.path.join(code_dir, safe_filename))
-        else:
-            raise HTTPException(400, "No input provided")
+        # 2. Run Scan (if not cached)
+        logger.info("Starting new scan for target: %s", target)
+        summary, issues = scan_engine.run_full_scan(code_dir, temp_id)
 
-        # Run scan
-        logger.info("[%s] Starting scan...", temp_id)
-        report_path = scan_engine.run_full_scan_and_report(code_dir, temp_id)
-        if not report_path or not os.path.exists(report_path):
-            raise HTTPException(500, "Report generation failed or report path is invalid")
+        # 3. Store Results in Database
+        new_scan = database.Scan(scan_id=temp_id, target=target)
+        db.add(new_scan)
+        db.commit()
+        db.refresh(new_scan)
 
-        logger.info("[%s] Scan complete", temp_id)
-        return FileResponse(
-            report_path,
-            filename=f"VulnPrism_Report_{temp_id}.pdf",
-            media_type="application/pdf"
-        )
+        for issue_data in issues:
+            vuln = database.Vulnerability(
+                **issue_data, # Unpack the dictionary
+                scan_id=new_scan.id
+            )
+            db.add(vuln)
+        db.commit()
+        logger.info("Successfully stored %d vulnerabilities in the database.", len(issues))
 
-    except subprocess.TimeoutExpired:
-        logger.error("[%s] Operation timed out", temp_id)
-        raise HTTPException(408, "Operation timed out")
-    except HTTPException:
-        raise
+        # Prepare response
+        response_data = {"scan_id": temp_id, "target": target, "summary": summary, "issues": issues}
+
+        # 4. Update Cache
+        if redis_cache:
+            redis_cache.set(target, json.dumps(response_data), ex=CACHE_EXPIRATION_SECONDS)
+            logger.info("Result for target '%s' cached.", target)
+
+        return response_data
+
     except Exception as e:
-        logger.error("[%s] Scan failed: %s", temp_id, e, exc_info=True)
-        raise HTTPException(500, f"Internal server error: {str(e)}")
+        logger.error("Scan failed for target %s: %s", target, e, exc_info=True)
+        raise HTTPException(500, f"Internal server error: {e}")
     finally:
         # Clean up temporary directory
         if os.path.exists(base_dir):
-            logger.info("[%s] Cleaning up temporary directory %s", temp_id, base_dir)
-            try:
-                shutil.rmtree(base_dir)
-            except OSError as e:
-                logger.error("[%s] Error cleaning up directory %s: %s", temp_id, base_dir, e)
+            shutil.rmtree(base_dir)

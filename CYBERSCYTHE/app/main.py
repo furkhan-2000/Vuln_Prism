@@ -1,22 +1,23 @@
-from fastapi import FastAPI, Query, BackgroundTasks, HTTPException
+from fastapi import FastAPI, Query, BackgroundTasks, HTTPException, Depends
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse, FileResponse, RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 import uuid
 import os
 import json
 import httpx
 from app.aggressive_scanner.scanner import perform_scan, ScanResult
-from app.report import create_pdf_report
 from loguru import logger
 import sys
+from sqlalchemy.orm import Session
+import redis
+
+import database
 
 # Load environment variables
-load_dotenv(".env")
-load_dotenv()  # Also check local .env if exists
+load_dotenv()
 
 # Enhanced Configure logging
 logger.remove()
@@ -34,24 +35,9 @@ logger.add(
     level="DEBUG",
     encoding="utf-8"
 )
-logger.add(
-    "/tmp/cyberscythe_debug.log",
-    level="DEBUG",
-    format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {name}:{function}:{line} - {message}",
-    encoding="utf-8"
-)
 
-logger.info("🚀 CyberScythe Service Starting Up...")
-logger.info("📁 Working Directory: {}", os.getcwd())
-logger.info("🐍 Python Version: {}", sys.version)
-logger.info("📦 Checking Dependencies...")
-
-# Check if playwright is available
-try:
-    import playwright
-    logger.info("✅ Playwright is available")
-except ImportError as e:
-    logger.error("❌ Playwright not available: {}", e)
+# Initialize Database
+database.init_db()
 
 app = FastAPI(
     title="CyberScythe",
@@ -68,73 +54,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-REPORTS_DIR = "static/reports"
-os.makedirs(REPORTS_DIR, exist_ok=True)
+# --- Redis Cache Connection ---
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+CACHE_EXPIRATION_SECONDS = 3600  # 1 hour
+
+try:
+    redis_cache = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
+    redis_cache.ping() # Check connection
+    logger.info("Successfully connected to Redis cache.")
+except redis.exceptions.ConnectionError as e:
+    logger.error("Failed to connect to Redis: %s. Caching will be disabled.", e)
+    redis_cache = None
 
 # Mount static directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
-def update_scan_status(scan_id: str, status: str, message: str = None, report_path: str = None):
-    status_file = os.path.join(REPORTS_DIR, f"status_{scan_id}.json")
-    with open(status_file, "w") as f:
-        status_data = {"status": status}
-        if message:
-            status_data["message"] = message
-        if report_path:
-            status_data["report_path"] = report_path
-        json.dump(status_data, f)
-
-async def run_scan_and_generate_report(scan_id: str, url: str):
-    """
-    The core function that runs in the background.
-    """
-    pdf_report_path = os.path.join(REPORTS_DIR, f"report_{scan_id}.pdf")
-
-    logger.info("🎯 BACKGROUND SCAN STARTED")
-    logger.info("  - Scan ID: {}", scan_id)
-    logger.info("  - Target URL: {}", url)
-    logger.info("  - Report Path: {}", pdf_report_path)
-
-    try:
-        logger.info("🔄 Updating status to 'scanning'...")
-        update_scan_status(scan_id, "scanning", message=f"Starting scan for {url}")
-        logger.info("✅ Status updated")
-
-        logger.info("🔍 Calling perform_scan function...")
-        findings: ScanResult = await perform_scan(url)
-        logger.info("✅ Scan completed successfully")
-        logger.info("  - Findings type: {}", type(findings))
-        logger.info("  - Findings data: {}", findings.to_dict() if hasattr(findings, 'to_dict') else str(findings))
-
-        setattr(findings, "url", url)
-        logger.info("✅ URL attribute set on findings")
-
-        logger.info("📊 Updating status to 'generating_report'...")
-        update_scan_status(scan_id, "generating_report", message="Scan complete, generating PDF report.")
-        logger.info("✅ Status updated")
-
-        logger.info("📄 Creating PDF report...")
-        create_pdf_report(scan_id, url, findings.to_dict(), pdf_report_path)
-
-        # Verify report was created
-        if os.path.exists(pdf_report_path):
-            report_size = os.path.getsize(pdf_report_path)
-            logger.info("✅ PDF report created successfully")
-            logger.info("  - File size: {} bytes", report_size)
-        else:
-            logger.error("❌ PDF report file not found after creation")
-            raise Exception("PDF report creation failed - file not found")
-
-        logger.info("🎉 Updating status to 'complete'...")
-        update_scan_status(scan_id, "complete", report_path=f"/report/{scan_id}")
-        logger.info("✅ Scan and report complete for {} with scan_id {}", url, scan_id)
-
-    except Exception as e:
-        logger.error("💥 Critical error during scan for {} (scan_id: {})", url, scan_id)
-        logger.error("  - Error type: {}", type(e).__name__)
-        logger.error("  - Error message: {}", str(e))
-        logger.exception("  - Full traceback:")
-        update_scan_status(scan_id, "error", message=str(e))
 
 @app.get("/", include_in_schema=False)
 def root():
@@ -143,80 +77,60 @@ def root():
 
 @app.get("/health")
 def health_check():
-    logger.debug("💓 Health check requested")
-    return {"status": "healthy"}
-
-
+    db_ok = database.engine.connect() is not None
+    redis_ok = redis_cache.ping() if redis_cache else False
+    if db_ok and redis_ok:
+        return {"status": "ok", "database": "ok", "cache": "ok"}
+    else:
+        raise HTTPException(503, {"status": "unhealthy", "database": "ok" if db_ok else "error", "cache": "ok" if redis_ok else "error"})
 
 class ScanRequest(BaseModel):
     url: str
 
 @app.post("/scan")
-async def scan(background_tasks: BackgroundTasks, request: ScanRequest):
+async def scan(request: ScanRequest, db: Session = Depends(database.get_db)):
     scan_id = str(uuid.uuid4())
+    url = request.url
 
-    logger.info("🔍 SCAN REQUEST RECEIVED")
-    logger.info("  - Scan ID: {}", scan_id)
-    logger.info("  - Target URL: {}", request.url)
-    logger.info("  - Request Type: {}", type(request))
+    if not url or not url.strip() or not url.startswith(('http://', 'https://')):
+        raise HTTPException(400, "A valid URL is required.")
 
-    try:
-        # Validate URL
-        if not request.url or not request.url.strip():
-            logger.error("❌ Empty URL provided")
-            raise HTTPException(400, "URL is required")
-
-        # Basic URL validation
-        if not request.url.startswith(('http://', 'https://')):
-            logger.error("❌ Invalid URL format: {}", request.url)
-            raise HTTPException(400, "URL must start with http:// or https://")
-
-        logger.info("✅ URL validation passed")
-
-        # Immediately create a status file to indicate the process has started
-        logger.info("📝 Creating status file...")
-        update_scan_status(scan_id, "queued", message="Scan has been queued.")
-        logger.info("✅ Status file created")
-
-        # Add the long-running task to the background
-        logger.info("🚀 Adding background task...")
-        background_tasks.add_task(run_scan_and_generate_report, scan_id, request.url)
-        logger.info("✅ Background task added")
-
-        # Return immediately with the scan_id
-        response = {"message": "Scan initiated.", "scan_id": scan_id}
-        logger.info("📤 Returning response: {}", response)
-        return response
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error("💥 Unexpected error in scan endpoint: {}", e, exc_info=True)
-        raise HTTPException(500, f"Internal server error: {str(e)}")
-
-@app.get("/status/{scan_id}")
-def get_status(scan_id: str):
-    logger.debug("📊 Status check requested for scan ID: {}", scan_id)
-    status_file = os.path.join(REPORTS_DIR, f"status_{scan_id}.json")
-    logger.debug("  - Status file path: {}", status_file)
-
-    if not os.path.exists(status_file):
-        logger.warning("❌ Status file not found: {}", status_file)
-        return JSONResponse(status_code=404, content={"error": "Scan ID not found."})
+    # 1. Check Cache
+    if redis_cache:
+        cached_result = redis_cache.get(url)
+        if cached_result:
+            logger.info("Returning cached result for target: %s", url)
+            return json.loads(cached_result)
 
     try:
-        with open(status_file, "r") as f:
-            status_data = json.load(f)
-        logger.debug("✅ Status data loaded: {}", status_data)
-        return status_data
+        # 2. Run Scan
+        logger.info("Starting new scan for target: %s", url)
+        findings: ScanResult = await perform_scan(url)
+
+        # 3. Store in Database
+        new_scan = database.Scan(scan_id=scan_id, target=url)
+        db.add(new_scan)
+        db.commit()
+        db.refresh(new_scan)
+
+        for vuln_data in findings.vulnerabilities:
+            vuln = database.Vulnerability(
+                **vuln_data,
+                scan_id=new_scan.id
+            )
+            db.add(vuln)
+        db.commit()
+        logger.info("Successfully stored %d vulnerabilities in the database.", len(findings.vulnerabilities))
+
+        response_data = findings.to_dict()
+
+        # 4. Update Cache
+        if redis_cache:
+            redis_cache.set(url, json.dumps(response_data), ex=CACHE_EXPIRATION_SECONDS)
+            logger.info("Result for target '%s' cached.", url)
+
+        return response_data
+
     except Exception as e:
-        logger.error("❌ Error reading status file: {}", e)
-        return JSONResponse(status_code=500, content={"error": "Error reading status"})
-
-@app.get("/report/{scan_id}")
-def download_report(scan_id: str):
-    filepath = os.path.join(REPORTS_DIR, f"report_{scan_id}.pdf")
-    if not os.path.exists(filepath):
-        return JSONResponse(status_code=404, content={"error": "Report not found or not yet generated."})
-    return FileResponse(filepath, media_type='application/pdf', filename=f"CyberScythe_Report_{scan_id}.pdf")
-
+        logger.error("Scan failed for target %s: %s", url, e, exc_info=True)
+        raise HTTPException(500, f"Internal server error: {e}")

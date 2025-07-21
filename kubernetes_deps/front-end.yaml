@@ -50,33 +50,7 @@ roleRef:
   kind: Role
   name: vuln-role
   apiGroup: rbac.authorization.k8s.io
----
-apiVersion: v1 
-kind: PersistentVolume 
-metadata: 
-  name: vuln-pv 
-spec: 
-  persistentVolumeReclaimPolicy: Retain 
-  capacity: 
-    storage: 500Mi 
-  accessModes: 
-    - ReadWriteMany 
-  hostPath: 
-    path: /tmp/vuln-data 
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: vuln-pvc
-  namespace: mustang
-spec: 
-  storageClassName: "" 
-  volumeName: vuln-pv 
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: "500Mi"
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -128,8 +102,10 @@ spec:
           ports:
             - containerPort: 3000
           envFrom:
+            - configMapRef:
+                name: app-config
             - secretRef:
-                name: openrouter-secret
+                name: app-secrets
           resources:
             requests:
               cpu: "250m"
@@ -148,13 +124,7 @@ spec:
               port: 3000
             initialDelaySeconds: 8
             periodSeconds: 10
-          volumeMounts:
-            - name: store-room 
-              mountPath: /pvcstore
-      volumes:
-        - name: store-room 
-          persistentVolumeClaim:
-            claimName: vuln-pvc
+          
 ---
 apiVersion: v1
 kind: Service
