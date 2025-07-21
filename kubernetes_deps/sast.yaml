@@ -7,7 +7,7 @@ data:
   DB_HOST: "database-1.c0pogq0w8mxc.us-east-1.rds.amazonaws.com"
   DB_USER: "admin"
   DB_PORT: "3306"
-  DB_NAME: "database-1"
+  DB_NAME: "mysql"
   #REDIS_HOST: "your-valkey-cluster.cache.amazonaws.com"
  # REDIS_PORT: ""
 ---
