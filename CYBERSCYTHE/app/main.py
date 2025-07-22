@@ -75,6 +75,11 @@ def root():
     logger.info("🌐 Root endpoint accessed - redirecting to static/index.html")
     return RedirectResponse("/static/index.html")
 
+@app.get("/cyber", include_in_schema=False)
+def cyber_redirect():
+    logger.info("🌐 /cyber endpoint accessed - redirecting to /cyber/static/index.html")
+    return RedirectResponse("/cyber/static/index.html")
+
 @app.get("/health")
 def health_check():
     try:

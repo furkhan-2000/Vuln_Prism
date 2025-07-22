@@ -4,35 +4,57 @@ metadata:
   name: vuln-ingress
   namespace: mustang
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      if ($request_uri ~ "^/cyber/?$") {
+        return 302 /cyber/static/index.html;
+      }
+      if ($request_uri ~ "^/cyber/static/(.*)") {
+        rewrite ^/cyber/static/(.*)$ /static/$1 break;
+      }
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /vuln
-            pathType: Prefix
+          - path: /vuln(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: vuln-svc
                 port:
                   number: 3000
-          - path: /sast
-            pathType: Prefix
+          - path: /sast(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: sast-svc
                 port:
                   number: 5050
-          - path: /cyber
-            pathType: Prefix
+          - path: /cyber/static/(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: cyber-svc
                 port:
                   number: 5051
-          - path: /cyber-static
+          - path: /cyber/scan
             pathType: Exact
+            backend:
+              service:
+                name: cyber-svc
+                port:
+                  number: 5051
+          - path: /cyber/health
+            pathType: Exact
+            backend:
+              service:
+                name: cyber-svc
+                port:
+                  number: 5051
+          - path: /cyber(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: cyber-svc
