@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Query, BackgroundTasks, HTTPException, Depends
+from fastapi import FastAPI, Query, BackgroundTasks, HTTPException, Depends, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -70,15 +70,15 @@ except redis.exceptions.ConnectionError as e:
 # Mount static directory
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/", include_in_schema=False)
-def root():
-    logger.info("🌐 Root endpoint accessed - redirecting to static/index.html")
-    return RedirectResponse("/static/index.html")
-
-@app.get("/cyber", include_in_schema=False)
-def cyber_redirect():
-    logger.info("🌐 /cyber endpoint accessed - redirecting to /cyber/static/index.html")
-    return RedirectResponse("/cyber/static/index.html")
+@app.get("/", response_class=HTMLResponse, include_in_schema=False)
+async def root():
+    """Serve the main CyberScythe interface directly (SAST-style approach)"""
+    logger.info("🌐 Root endpoint accessed - serving index.html directly")
+    try:
+        return FileResponse("static/index.html")
+    except Exception as e:
+        logger.error(f"Error serving index.html: {e}")
+        return RedirectResponse("/static/index.html")
 
 @app.get("/health")
 def health_check():
