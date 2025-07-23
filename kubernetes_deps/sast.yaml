@@ -119,7 +119,7 @@ spec:
         fsGroup: 1001
       containers:
         - name: sast-con
-          image: furkhan2000/shark:sast-v2
+          image: furkhan2000/shark:sast
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
