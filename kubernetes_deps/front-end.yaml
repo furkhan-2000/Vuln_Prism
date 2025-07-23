@@ -94,7 +94,7 @@ spec:
         runAsNonRoot: true
       containers:
         - name: vuln-con
-          image: furkhan2000/shark:frontend
+          image: furkhan2000/shark:front-end
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
