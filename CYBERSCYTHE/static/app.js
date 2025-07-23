@@ -90,14 +90,40 @@ async function startScan() {
         console.log("  - Status:", res.status);
         console.log("  - Status Text:", res.statusText);
 
-        const data = await res.json();
-        console.log("  - Response Data:", data);
-
         if (!res.ok) {
-            throw new Error(data.detail || `Scan failed with status: ${res.status}`);
+            const errorData = await res.json();
+            throw new Error(errorData.detail || `Scan failed with status: ${res.status}`);
         }
-        
-        displayResults(data);
+
+        // Check if response is PDF or JSON
+        const contentType = res.headers.get('content-type');
+        console.log("  - Content Type:", contentType);
+
+        if (contentType && contentType.includes('application/pdf')) {
+            // Handle PDF download
+            console.log("✅ Response is PDF - processing download");
+            output.innerHTML = `<div class="success">Scan complete! Downloading report...</div>`;
+
+            const blob = await res.blob();
+            console.log("📄 PDF blob received, size:", blob.size, "bytes");
+
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = 'VulnPrism_CyberScythe_Report.pdf';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(downloadUrl);
+            document.body.removeChild(a);
+
+            output.innerHTML = `<div class="success">✅ Scan completed successfully! PDF report downloaded.<br><br>Check your downloads folder for the detailed vulnerability report.</div>`;
+        } else {
+            // Handle JSON fallback
+            console.log("📋 Response is JSON - processing data");
+            const data = await res.json();
+            console.log("  - Response Data:", data);
+            displayResults(data);
+        }
 
     } catch (err) {
         console.error("💥 Error in startScan():", err);

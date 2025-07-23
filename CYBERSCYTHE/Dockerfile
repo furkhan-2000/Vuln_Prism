@@ -87,9 +87,9 @@ ENV PATH="/install/bin:$PATH"
 # Expose the port the application listens on
 EXPOSE 5051
 
-# Define a health check for the container
+# Define a health check for the container (stateless mode)
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD python -c "import httpx; httpx.get('http://0.0.0.0:5051/health')" || exit 1
+  CMD python -c "import httpx; response = httpx.get('http://0.0.0.0:5051/health'); exit(0 if response.status_code == 200 and response.json().get('status') == 'ok' else 1)" || exit 1
 
 # Command to run the application
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5051"]

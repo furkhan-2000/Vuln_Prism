@@ -1,4 +1,9 @@
 
+# DEPRECATED: This file is not used in stateless mode
+# Kept for future RDS integration if needed
+# To enable database functionality, uncomment the imports and code below
+
+"""
 import os
 from sqlalchemy import create_engine, Column, Integer, String, Text, ForeignKey, DateTime
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
@@ -11,6 +16,7 @@ import uuid
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+"""
 
 # --- Database Connection Setup ---
 # Reads connection details from environment variables

@@ -8,15 +8,12 @@ from zipfile import ZipFile
 from tarfile import open as TarOpen
 from pathlib import Path
 
-from fastapi import FastAPI, UploadFile, Form, HTTPException, Request, Depends
+from fastapi import FastAPI, UploadFile, Form, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-import redis
 
 import scan_engine
-import database
 
 # --- Basic Setup ---
 logging.basicConfig(
@@ -25,9 +22,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger("app.main")
 
-# Initialize Database
-database.init_db()
-
 app = FastAPI(title="VulnPrism SAST API")
 app.add_middleware(
     CORSMiddleware,
@@ -35,19 +29,8 @@ app.add_middleware(
 )
 templates = Jinja2Templates(directory="templates")
 
-# --- Redis Cache Connection ---
-# Reads connection details from environment variables
-REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-CACHE_EXPIRATION_SECONDS = 3600  # 1 hour
-
-try:
-    redis_cache = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, db=0, decode_responses=True)
-    redis_cache.ping() # Check connection
-    logger.info("Successfully connected to Redis cache.")
-except redis.exceptions.ConnectionError as e:
-    logger.error("Failed to connect to Redis: %s. Caching will be disabled.", e)
-    redis_cache = None
+# Stateless operation - no database or cache dependencies
+logger.info("🚀 SAST service running in stateless mode - no database or cache dependencies")
 
 # --- API Endpoints ---
 
@@ -57,22 +40,14 @@ async def index(request: Request):
 
 @app.get("/health")
 async def health_check():
-    # Add DB and Redis health checks
-    try:
-        db_ok = database.engine and database.engine.connect() is not None
-    except:
-        db_ok = False
-
-    redis_ok = redis_cache.ping() if redis_cache else False
-
-    return {"status": "ok", "database": "ok" if db_ok else "disabled", "cache": "ok" if redis_ok else "disabled"}
+    """Stateless health check - only checks service availability"""
+    return {"status": "ok", "mode": "stateless", "service": "sast"}
 
 @app.post("/scan")
 async def scan_code(
     repo_url: str = Form(None),
     code_text: str = Form(None),
-    file: UploadFile = None,
-    db: Session = Depends(database.get_db)
+    file: UploadFile = None
 ):
     temp_id = str(uuid.uuid4())
     base_dir = os.path.join("/home/jenkins", temp_id)
@@ -129,26 +104,8 @@ async def scan_code(
             summary = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0, "Info": 0}
             issues = [{"rule": "scan-error", "desc": f"Scan failed: {str(scan_error)}", "impact": "N/A", "fix": "Check logs for details", "severity": "High"}]
 
-        # 3. Store Results in Database (if available)
-        if db and database.engine:
-            try:
-                new_scan = database.Scan(scan_id=temp_id, target=target)
-                db.add(new_scan)
-                db.commit()
-                db.refresh(new_scan)
-
-                for issue_data in issues:
-                    vuln = database.Vulnerability(
-                        **issue_data, # Unpack the dictionary
-                        scan_id=new_scan.id
-                    )
-                    db.add(vuln)
-                db.commit()
-                logger.info("Successfully stored %d vulnerabilities in the database.", len(issues))
-            except Exception as e:
-                logger.warning("Failed to store results in database: %s", e)
-        else:
-            logger.info("Database not available, skipping result storage.")
+        # Stateless operation - no database storage needed
+        logger.info("📊 Scan completed - proceeding to PDF generation")
 
         # 4. Generate PDF Report
         pdf_start_time = time.time()
