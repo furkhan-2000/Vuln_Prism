@@ -3,31 +3,78 @@ console.log("🚀 CyberScythe Frontend JavaScript Loaded");
 document.getElementById("scan-button").addEventListener("click", startScan);
 console.log("✅ Event listener attached to scan button");
 
+function displayResults(data) {
+    const output = document.getElementById("output");
+
+    if (data.detail) {
+        output.innerHTML = `<div class="error">Error: ${data.detail}</div>`;
+        return;
+    }
+
+    if (data.error_count > 0) {
+        output.innerHTML = `<div class="error">Scan completed with ${data.error_count} errors. Please check the service logs for details.</div>`;
+        return;
+    }
+
+    if (data.vuln_count === 0) {
+        output.innerHTML = `<div class="success">Scan complete. No vulnerabilities found for ${data.url}. Scanned ${data.scanned_urls} URLs.</div>`;
+        return;
+    }
+
+    let html = `
+        <div class="success">
+            Found ${data.vuln_count} vulnerabilities at ${data.url}. Scanned ${data.scanned_urls} URLs.
+        </div>
+        <div class="mt-4 overflow-x-auto rounded-lg border border-gray-700">
+            <table class="min-w-full bg-gray-900/50 text-white">
+                <thead class="bg-gray-800/80">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Type</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">URL</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Parameter/Location</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Severity</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold uppercase tracking-wider">Description</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    ${data.vulnerabilities.map(vuln => `
+                        <tr class="hover:bg-gray-800/50 transition-colors duration-200">
+                            <td class="py-3 px-4 font-mono text-sm text-red-400">${vuln.type}</td>
+                            <td class="py-3 px-4 text-sm break-all">${vuln.url}</td>
+                            <td class="py-3 px-4 text-sm">${vuln.param}</td>
+                            <td class="py-3 px-4 text-sm text-yellow-400">${vuln.severity || 'N/A'}</td>
+                            <td class="py-3 px-4 text-sm">${vuln.description || 'No description available.'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+    output.innerHTML = html;
+}
+
+
 async function startScan() {
     console.log("🔍 startScan() function called");
 
-    const url = document.getElementById("url").value;
+    const urlInput = document.getElementById("url");
+    const url = urlInput.value;
     const output = document.getElementById("output");
 
     console.log("📊 Input values:");
     console.log("  - URL:", url);
-    console.log("  - Output element:", output);
 
-    if (!url) {
-        console.log("❌ No URL provided");
-        output.innerHTML = `<div class="error">Please enter a URL to scan.</div>`;
+    if (!url || !url.startsWith('http')) {
+        console.log("❌ Invalid URL provided");
+        output.innerHTML = `<div class="error">Please enter a valid URL (e.g., http://example.com) to scan.</div>`;
         return;
     }
 
     console.log("✅ URL validation passed");
-    output.innerHTML = `<div class="scanning">Queuing scan... <div class="spinner"></div></div>`;
+    output.innerHTML = `<div class="scanning">Scan in progress for ${url}... <div class="spinner"></div></div>`;
 
     try {
         console.log("📤 Sending POST request to /scan");
-        console.log("  - URL:", url);
-        console.log("  - Method: POST");
-        console.log("  - Headers: Content-Type: application/json");
-
         const requestBody = JSON.stringify({ url });
         console.log("  - Body:", requestBody);
 
@@ -42,81 +89,18 @@ async function startScan() {
         console.log("📥 Response received:");
         console.log("  - Status:", res.status);
         console.log("  - Status Text:", res.statusText);
-        console.log("  - Headers:", Object.fromEntries(res.headers.entries()));
 
         const data = await res.json();
         console.log("  - Response Data:", data);
 
-        if (data.scan_id) {
-            const scan_id = data.scan_id;
-            console.log("✅ Scan initiated successfully with ID:", scan_id);
-            output.innerHTML = `<div class="scanning">Scan in progress (ID: ${scan_id})... <div class="spinner"></div></div>`;
-            pollStatus(scan_id);
-        } else {
-            console.log("❌ No scan_id in response");
-            output.innerHTML = `<div class="error">Error starting scan: ${data.error || 'Unknown error'}</div>`;
+        if (!res.ok) {
+            throw new Error(data.detail || `Scan failed with status: ${res.status}`);
         }
+        
+        displayResults(data);
+
     } catch (err) {
         console.error("💥 Error in startScan():", err);
-        output.innerHTML = `<div class="error">Failed to start scan: ${err.message}</div>`;
+        output.innerHTML = `<div class="error">Failed to execute scan: ${err.message}</div>`;
     }
-}
-
-async function pollStatus(scan_id) {
-    console.log("📊 Starting status polling for scan ID:", scan_id);
-    const output = document.getElementById("output");
-    let pollCount = 0;
-
-    const interval = setInterval(async () => {
-        pollCount++;
-        console.log(`📡 Status poll #${pollCount} for scan ID: ${scan_id}`);
-
-        try {
-            const res = await fetch(`./status/${scan_id}`);
-            console.log("📥 Status response:");
-            console.log("  - Status:", res.status);
-            console.log("  - Status Text:", res.statusText);
-
-            if (!res.ok) {
-                console.error("❌ Status request failed");
-                clearInterval(interval);
-                output.innerHTML = `<div class="error">Error fetching status for scan ${scan_id}.</div>`;
-                return;
-            }
-
-            const data = await res.json();
-            console.log("  - Status Data:", data);
-
-            // Update UI with the latest status message
-            if (data.message) {
-                console.log("📝 Updating UI with message:", data.message);
-                output.innerHTML = `<div class="scanning">${data.message} <div class="spinner"></div></div>`;
-            }
-
-            if (data.status === 'complete') {
-                console.log("🎉 Scan completed successfully!");
-                clearInterval(interval);
-                output.innerHTML = `
-                    <div class="success">
-                        <p>Scan complete!</p>
-                        <a href="${data.report_path}" target="_blank" class="report-link">
-                            Download Report
-                        </a>
-                    </div>
-                `;
-            } else if (data.status === 'error') {
-                console.error("❌ Scan failed with error:", data.message);
-                clearInterval(interval);
-                output.innerHTML = `<div class="error">Scan failed: ${data.message || 'An unknown error occurred.'}</div>`;
-            } else {
-                console.log("⏳ Scan still in progress, status:", data.status);
-            }
-        } catch (err) {
-            console.error("💥 Error in pollStatus():", err);
-            clearInterval(interval);
-            output.innerHTML = `<div class="error">Error polling for status: ${err.message}</div>`;
-        }
-    }, 3000); // Poll every 3 seconds
-
-    console.log("✅ Status polling interval started (every 3 seconds)");
 }

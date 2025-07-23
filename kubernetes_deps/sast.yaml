@@ -117,6 +117,9 @@ spec:
         runAsUser: 1001
         runAsGroup: 1001
         fsGroup: 1001
+      volumes:
+        - name: temp-storage
+          emptyDir: {}
       containers:
         - name: sast-con
           image: furkhan2000/shark:sast
@@ -124,6 +127,9 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
+          volumeMounts:
+            - name: temp-storage
+              mountPath: /home/jenkins
           ports:
             - containerPort: 5050
           envFrom:
