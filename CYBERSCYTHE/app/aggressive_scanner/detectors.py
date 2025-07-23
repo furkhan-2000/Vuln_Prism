@@ -323,7 +323,7 @@ def check_insecure_forms(tree, base_url, vulnerabilities, url):
 
         csrf_token_found = False
         for input_tag in form.css('input[type="hidden"]'):
-            name = input_tag.get('name', '').lower()
+            name = input_tag.attributes.get('name', '').lower()
             if 'csrf' in name or 'token' in name:
                 csrf_token_found = True
                 break

@@ -112,7 +112,13 @@ async def scan_code(
 
         # 2. Run Scan
         logger.info("Starting new scan for target: %s", target)
-        summary, issues = scan_engine.run_full_scan(code_dir, temp_id)
+        try:
+            summary, issues = scan_engine.run_full_scan(code_dir, temp_id)
+        except Exception as scan_error:
+            logger.error("Scan failed: %s", scan_error)
+            # Create a minimal report even if scan fails
+            summary = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0, "Info": 0}
+            issues = [{"rule": "scan-error", "desc": f"Scan failed: {str(scan_error)}", "impact": "N/A", "fix": "Check logs for details", "severity": "High"}]
 
         # 3. Store Results in Database (if available)
         if db and database.engine:
@@ -136,9 +142,13 @@ async def scan_code(
             logger.info("Database not available, skipping result storage.")
 
         # 4. Generate PDF Report
-        pdf_buffer = scan_engine.generate_pdf_report(target, summary, issues)
-        
-        return Response(content=pdf_buffer.getvalue(), media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=VulnPrism_SAST_Report_{temp_id[:8]}.pdf"})
+        try:
+            pdf_buffer = scan_engine.generate_pdf_report(target, summary, issues)
+            return Response(content=pdf_buffer.getvalue(), media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=VulnPrism_SAST_Report_{temp_id[:8]}.pdf"})
+        except Exception as pdf_error:
+            logger.error("PDF generation failed: %s", pdf_error)
+            # Return JSON response as fallback
+            return {"target": target, "summary": summary, "issues": issues, "error": "PDF generation failed, returning JSON"}
 
     except Exception as e:
         logger.error("Scan failed for target %s: %s", target, e, exc_info=True)
