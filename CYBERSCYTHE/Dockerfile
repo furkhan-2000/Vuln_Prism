@@ -13,26 +13,33 @@ COPY requirements.txt .
 
 # Install system dependencies and Python packages into a virtual environment.
 # This layer also installs Playwright's browser binaries.
+# Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        gcc python3-dev \
+        gcc python3-dev pkg-config \
+        libcairo2-dev libgirepository1.0-dev \
         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1 \
         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 \
         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation \
         libgtk-3-0 wget ca-certificates && \
-    # Create a virtual environment at /install
-    python -m venv /install && \
-    # Install pip and project dependencies into the virtual environment
-    /install/bin/pip install --upgrade pip && \
-    /install/bin/pip install --no-cache-dir -r requirements.txt && \
-    # Install Playwright browser binaries (Chromium) with dependencies
-    /install/bin/playwright install chromium --with-deps && \
-    # Clean up build artifacts and apt cache to reduce layer size
-    find /install -name "*.pyc" -delete && \
-    find /install -name "__pycache__" -type d -exec rm -rf {} + && \
-    apt-get purge -y --auto-remove gcc python3-dev && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip
+    rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python -m venv /install
+
+# Install Python dependencies
+RUN /install/bin/pip install --upgrade pip
+RUN /install/bin/pip install --no-cache-dir -r requirements.txt
+
+# Install Playwright browser binaries
+RUN /install/bin/playwright install chromium --with-deps
+
+# Clean up build artifacts
+RUN find /install -name "*.pyc" -delete && \
+    find /install -name "__pycache__" -type d -exec rm -rf {} + && \
+    apt-get purge -y --auto-remove gcc python3-dev pkg-config libcairo2-dev libgirepository1.0-dev && \
+    rm -rf /tmp/* /var/tmp/* /root/.cache/pip
 
 # ----------------- Runtime stage -----------------
 # Use a minimal slim Python image for the final runtime environment

@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  # Build services one by one to avoid memory issues
+  
+  # Frontend service (lightest, build first)
+  frontend:
+    build:
+      context: ./chatbot-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-your-api-key}
+    networks:
+      - vulnprism-network
+    restart: unless-stopped
+
+  # SAST service (medium complexity)
+  sast:
+    build:
+      context: ./sast
+      dockerfile: Dockerfile
+    ports:
+      - "5050:5050"
+    networks:
+      - vulnprism-network
+    restart: unless-stopped
+    depends_on:
+      - frontend
+
+  # CYBERSCYTHE service (heaviest, build last)
+  cyberscythe:
+    build:
+      context: ./CYBERSCYTHE
+      dockerfile: Dockerfile
+    ports:
+      - "5051:5051"
+    networks:
+      - vulnprism-network
+    restart: unless-stopped
+    depends_on:
+      - sast
+
+networks:
+  vulnprism-network:
+    driver: bridge

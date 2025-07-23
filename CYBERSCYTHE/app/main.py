@@ -13,11 +13,7 @@ from loguru import logger
 import sys
 import time
 from io import BytesIO
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib import colors
-from reportlab.lib.units import inch
-from reportlab.lib.pagesizes import letter
+from fpdf import FPDF
 
 # Load environment variables
 load_dotenv()
@@ -58,25 +54,29 @@ app.add_middleware(
 logger.info("🚀 CyberScythe running in stateless mode - no database or cache dependencies")
 
 def generate_cyberscythe_pdf_report(target_url: str, scan_result: ScanResult) -> BytesIO:
-    """Generate PDF report for CyberScythe scan results using same layout as SAST"""
+    """Generate PDF report for CyberScythe scan results using FPDF2"""
     buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter)
-    styles = getSampleStyleSheet()
-    story = []
+
+    # Create PDF
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font('Arial', 'B', 16)
 
     # Title
-    story.append(Paragraph("VulnPrism CyberScythe DAST Report", styles['Title']))
-    story.append(Spacer(1, 0.2*inch))
+    pdf.cell(0, 10, 'VulnPrism CyberScythe DAST Report', 0, 1, 'C')
+    pdf.ln(10)
 
     # Target URL
-    story.append(Paragraph(f"<b>Target URL:</b> {target_url}", styles['Normal']))
-    story.append(Spacer(1, 0.2*inch))
+    pdf.set_font('Arial', 'B', 12)
+    pdf.cell(0, 10, f'Target URL: {target_url}', 0, 1)
+    pdf.ln(5)
 
     # Scan Summary
-    story.append(Paragraph(f"<b>URLs Scanned:</b> {scan_result.scanned_urls}", styles['Normal']))
-    story.append(Paragraph(f"<b>Vulnerabilities Found:</b> {scan_result.vuln_count}", styles['Normal']))
-    story.append(Paragraph(f"<b>Errors Encountered:</b> {scan_result.error_count}", styles['Normal']))
-    story.append(Spacer(1, 0.3*inch))
+    pdf.set_font('Arial', '', 10)
+    pdf.cell(0, 8, f'URLs Scanned: {scan_result.scanned_urls}', 0, 1)
+    pdf.cell(0, 8, f'Vulnerabilities Found: {scan_result.vuln_count}', 0, 1)
+    pdf.cell(0, 8, f'Errors Encountered: {scan_result.error_count}', 0, 1)
+    pdf.ln(10)
 
     # Severity Summary
     severity_counts = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0, "Info": 0}
@@ -85,26 +85,20 @@ def generate_cyberscythe_pdf_report(target_url: str, scan_result: ScanResult) ->
         if severity in severity_counts:
             severity_counts[severity] += 1
 
-    summary_data = [["Severity", "Count"]]
-    for sev, count in severity_counts.items():
-        summary_data.append([sev, str(count)])
+    pdf.set_font('Arial', 'B', 12)
+    pdf.cell(0, 10, 'Severity Summary:', 0, 1)
+    pdf.set_font('Arial', '', 10)
 
-    summary_table = Table(summary_data)
-    summary_table.setStyle(TableStyle([
-        ('BACKGROUND', (0,0), (-1,0), colors.grey),
-        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
-        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
-        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0,0), (-1,0), 12),
-        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
-        ('GRID', (0,0), (-1,-1), 1, colors.black)
-    ]))
-    story.append(summary_table)
-    story.append(Spacer(1, 0.3*inch))
+    for severity, count in severity_counts.items():
+        if count > 0:
+            pdf.cell(0, 8, f'{severity}: {count}', 0, 1)
+    pdf.ln(10)
 
-    # Vulnerabilities Table
+    # Vulnerabilities Details
     if scan_result.vulnerabilities:
-        vuln_data = [["Severity", "Type", "URL", "Parameter", "Payload"]]
+        pdf.set_font('Arial', 'B', 12)
+        pdf.cell(0, 10, 'Vulnerability Details:', 0, 1)
+        pdf.set_font('Arial', '', 9)
 
         # Sort by severity (Critical first)
         severity_order = {"Critical": 4, "High": 3, "Medium": 2, "Low": 1, "Info": 0}
@@ -112,33 +106,38 @@ def generate_cyberscythe_pdf_report(target_url: str, scan_result: ScanResult) ->
                             key=lambda x: severity_order.get(x.get('severity', 'Info'), 0),
                             reverse=True)
 
-        for vuln in sorted_vulns:
-            vuln_data.append([
-                vuln.get('severity', 'N/A'),
-                Paragraph(vuln.get('type', 'N/A'), styles['Normal']),
-                Paragraph(vuln.get('url', 'N/A'), styles['Normal']),
-                vuln.get('param', 'N/A'),
-                Paragraph(vuln.get('payload', 'N/A')[:100] + "..." if len(vuln.get('payload', '')) > 100 else vuln.get('payload', 'N/A'), styles['Normal'])
-            ])
+        for i, vuln in enumerate(sorted_vulns, 1):
+            if pdf.get_y() > 250:  # Add new page if needed
+                pdf.add_page()
+                pdf.set_font('Arial', '', 9)
 
-        vuln_table = Table(vuln_data, colWidths=[0.8*inch, 1.2*inch, 2.5*inch, 1*inch, 2*inch])
-        vuln_table.setStyle(TableStyle([
-            ('BACKGROUND', (0,0), (-1,0), colors.darkred),
-            ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
-            ('ALIGN', (0,0), (-1,-1), 'LEFT'),
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-            ('BOTTOMPADDING', (0,0), (-1,0), 10),
-            ('TOPPADDING', (0,0), (-1,0), 10),
-            ('BACKGROUND', (0,1), (-1,-1), colors.lightgrey),
-            ('GRID', (0,0), (-1,-1), 1, colors.black),
-            ('WORDWRAP', (0,0), (-1,-1), 'CJK')
-        ]))
-        story.append(vuln_table)
+            pdf.set_font('Arial', 'B', 10)
+            pdf.cell(0, 8, f'{i}. {vuln.get("type", "Unknown")} ({vuln.get("severity", "Info")})', 0, 1)
+            pdf.set_font('Arial', '', 9)
+
+            # URL (truncate if too long)
+            url = vuln.get('url', 'N/A')
+            if len(url) > 80:
+                url = url[:77] + "..."
+            pdf.cell(0, 6, f'   URL: {url}', 0, 1)
+
+            # Parameter
+            param = vuln.get('param', 'N/A')
+            pdf.cell(0, 6, f'   Parameter: {param}', 0, 1)
+
+            # Payload (truncate if too long)
+            payload = vuln.get('payload', 'N/A')
+            if len(payload) > 100:
+                payload = payload[:97] + "..."
+            pdf.cell(0, 6, f'   Payload: {payload}', 0, 1)
+            pdf.ln(3)
     else:
-        story.append(Paragraph("✅ No vulnerabilities found during the scan.", styles['Normal']))
+        pdf.set_font('Arial', 'B', 12)
+        pdf.cell(0, 10, 'No vulnerabilities found during the scan.', 0, 1)
 
-    doc.build(story)
+    # Save to buffer
+    pdf_output = pdf.output(dest='S').encode('latin-1')
+    buffer.write(pdf_output)
     buffer.seek(0)
     return buffer
 

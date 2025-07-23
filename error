@@ -1,0 +1,1108 @@
+ec2-user@ip-172-31-25-160 Vuln_Prism]$ docker compose up -d
+[+] Building 0.0s (0/0)
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:50e6f29f412a9e1b5813327773b9667234d9c7ba071c282291e696e99dc9db00",
+
+      "name": "[internal] load local bake definitions",
+
+      "started": "2025-07-23T22:37:02.810732094Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "reading from stdin",
+
+      "vertex": "sha256:50e6f29f412a9e1b5813327773b9667234d9c7ba071c282291e696e99dc9db00",
+
+      "current": 0,
+
+      "timestamp": "0001-01-01T00:00:00Z",
+
+      "started": "2025-07-23T22:37:02.810735748Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "reading from stdin",
+
+      "vertex": "sha256:50e6f29f412a9e1b5813327773b9667234d9c7ba071c282291e696e99dc9db00",
+
+      "current": 1001,
+
+      "timestamp": "0001-01-01T00:00:00Z",
+
+      "started": "2025-07-23T22:37:02.810735748Z",
+
+      "completed": "2025-07-23T22:37:02.811410582Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "reading from stdin",
+
+      "vertex": "sha256:50e6f29f412a9e1b5813327773b9667234d9c7ba071c282291e696e99dc9db00",
+
+      "current": 1001,
+
+      "timestamp": "0001-01-01T00:00:00Z",
+
+      "started": "2025-07-23T22:37:02.810735748Z",
+
+      "completed": "2025-07-23T22:37:02.811410582Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:50e6f29f412a9e1b5813327773b9667234d9c7ba071c282291e696e99dc9db00",
+
+      "name": "[internal] load local bake definitions",
+
+      "started": "2025-07-23T22:37:02.810732094Z",
+
+      "completed": "2025-07-23T22:37:02.811546518Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
+
+      "name": "[cyberscythe internal] load build definition from Dockerfile"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
+
+      "name": "[chatbot-frontend internal] load build definition from Dockerfile"
+
+    },
+
+    {
+
+      "digest": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
+
+      "name": "[chatbot-frontend internal] load build definition from Dockerfile",
+
+      "started": "2025-07-23T22:37:02.917983777Z",
+
+      "completed": "2025-07-23T22:37:02.918037033Z"
+
+    },
+
+    {
+
+      "digest": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
+
+      "name": "[chatbot-frontend internal] load build definition from Dockerfile",
+
+      "started": "2025-07-23T22:37:02.918149681Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
+
+      "name": "[cyberscythe internal] load build definition from Dockerfile",
+
+      "started": "2025-07-23T22:37:02.918199027Z",
+
+      "completed": "2025-07-23T22:37:02.918237271Z"
+
+    },
+
+    {
+
+      "digest": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
+
+      "name": "[cyberscythe internal] load build definition from Dockerfile",
+
+      "started": "2025-07-23T22:37:02.918339916Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
+
+      "name": "[sast internal] load build definition from Dockerfile"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
+
+      "name": "[sast internal] load build definition from Dockerfile",
+
+      "started": "2025-07-23T22:37:02.918136795Z",
+
+      "completed": "2025-07-23T22:37:02.918186241Z"
+
+    },
+
+    {
+
+      "digest": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
+
+      "name": "[sast internal] load build definition from Dockerfile",
+
+      "started": "2025-07-23T22:37:02.91827464Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring dockerfile:",
+
+      "vertex": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
+
+      "name": "transferring",
+
+      "current": 0,
+
+      "timestamp": "2025-07-23T22:37:02.942585485Z",
+
+      "started": "2025-07-23T22:37:02.942583595Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring dockerfile:",
+
+      "vertex": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
+
+      "name": "transferring",
+
+      "current": 89,
+
+      "timestamp": "2025-07-23T22:37:02.945200582Z",
+
+      "started": "2025-07-23T22:37:02.942583595Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring dockerfile:",
+
+      "vertex": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
+
+      "name": "transferring",
+
+      "current": 473,
+
+      "timestamp": "2025-07-23T22:37:02.94769849Z",
+
+      "started": "2025-07-23T22:37:02.942583595Z",
+
+      "completed": "2025-07-23T22:37:02.94769713Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring dockerfile:",
+
+      "vertex": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
+
+      "name": "transferring",
+
+      "current": 0,
+
+      "timestamp": "2025-07-23T22:37:02.938882236Z",
+
+      "started": "2025-07-23T22:37:02.938880542Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring dockerfile:",
+
+      "vertex": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
+
+      "name": "transferring",
+
+      "current": 89,
+
+      "timestamp": "2025-07-23T22:37:02.940020596Z",
+
+      "started": "2025-07-23T22:37:02.938880542Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring dockerfile:",
+
+      "vertex": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
+
+      "name": "transferring",
+
+      "current": 4357,
+
+      "timestamp": "2025-07-23T22:37:02.941421442Z",
+
+      "started": "2025-07-23T22:37:02.938880542Z",
+
+      "completed": "2025-07-23T22:37:02.941419982Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring dockerfile:",
+
+      "vertex": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
+
+      "name": "transferring",
+
+      "current": 0,
+
+      "timestamp": "2025-07-23T22:37:02.950071895Z",
+
+      "started": "2025-07-23T22:37:02.950070307Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring dockerfile:",
+
+      "vertex": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
+
+      "name": "transferring",
+
+      "current": 89,
+
+      "timestamp": "2025-07-23T22:37:02.95150453Z",
+
+      "started": "2025-07-23T22:37:02.950070307Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring dockerfile:",
+
+      "vertex": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
+
+      "name": "transferring",
+
+      "current": 3047,
+
+      "timestamp": "2025-07-23T22:37:02.952886723Z",
+
+      "started": "2025-07-23T22:37:02.950070307Z",
+
+      "completed": "2025-07-23T22:37:02.95288528Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
+
+      "name": "[chatbot-frontend internal] load build definition from Dockerfile",
+
+      "started": "2025-07-23T22:37:02.918149681Z",
+
+      "completed": "2025-07-23T22:37:02.972166574Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
+
+      "name": "[cyberscythe internal] load build definition from Dockerfile",
+
+      "started": "2025-07-23T22:37:02.918339916Z",
+
+      "completed": "2025-07-23T22:37:02.979669183Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
+
+      "name": "[chatbot-frontend internal] load metadata for docker.io/library/python:3.11-slim",
+
+      "started": "2025-07-23T22:37:02.991877141Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
+
+      "name": "[sast internal] load build definition from Dockerfile",
+
+      "started": "2025-07-23T22:37:02.91827464Z",
+
+      "completed": "2025-07-23T22:37:02.982695767Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
+
+      "name": "[cyberscythe internal] load metadata for docker.io/library/python:3.11-slim",
+
+      "started": "2025-07-23T22:37:02.992136697Z"
+
+    },
+
+    {
+
+      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
+
+      "name": "[cyberscythe internal] load metadata for docker.io/library/python:3.11-slim",
+
+      "started": "2025-07-23T22:37:02.992214578Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:0d9c7f59686088b4df5dc011e3fabd455eedacdf0f072befd67f098b5b36da22",
+
+      "name": "[sast internal] load metadata for docker.io/library/python:3.11.9-slim",
+
+      "started": "2025-07-23T22:37:03.030915067Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:0d9c7f59686088b4df5dc011e3fabd455eedacdf0f072befd67f098b5b36da22",
+
+      "name": "[sast internal] load metadata for docker.io/library/python:3.11.9-slim",
+
+      "started": "2025-07-23T22:37:03.031023554Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
+
+      "name": "[cyberscythe internal] load metadata for docker.io/library/python:3.11-slim",
+
+      "started": "2025-07-23T22:37:02.992214578Z",
+
+      "completed": "2025-07-23T22:37:03.513507352Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:d02c2ae4ee0b10d2c7406bed27af6669c20172b1ae5c929fde5fe1b02dfee042",
+
+      "name": "[cyberscythe internal] load .dockerignore"
+
+    },
+
+    {
+
+      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
+
+      "name": "[cyberscythe internal] load metadata for docker.io/library/python:3.11-slim",
+
+      "started": "2025-07-23T22:37:02.992136697Z",
+
+      "completed": "2025-07-23T22:37:03.513878445Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
+
+      "name": "[chatbot-frontend internal] load .dockerignore"
+
+    },
+
+    {
+
+      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
+
+      "name": "[chatbot-frontend internal] load metadata for docker.io/library/python:3.11-slim",
+
+      "started": "2025-07-23T22:37:02.991877141Z",
+
+      "completed": "2025-07-23T22:37:03.527826164Z"
+
+    },
+
+    {
+
+      "digest": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
+
+      "name": "[chatbot-frontend internal] load .dockerignore",
+
+      "started": "2025-07-23T22:37:03.528546572Z",
+
+      "completed": "2025-07-23T22:37:03.528576963Z"
+
+    },
+
+    {
+
+      "digest": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
+
+      "name": "[chatbot-frontend internal] load .dockerignore",
+
+      "started": "2025-07-23T22:37:03.528709674Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:d02c2ae4ee0b10d2c7406bed27af6669c20172b1ae5c929fde5fe1b02dfee042",
+
+      "name": "[cyberscythe internal] load .dockerignore",
+
+      "started": "2025-07-23T22:37:03.517026987Z",
+
+      "completed": "2025-07-23T22:37:03.517109157Z"
+
+    },
+
+    {
+
+      "digest": "sha256:d02c2ae4ee0b10d2c7406bed27af6669c20172b1ae5c929fde5fe1b02dfee042",
+
+      "name": "[cyberscythe internal] load .dockerignore",
+
+      "started": "2025-07-23T22:37:03.517235893Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring context:",
+
+      "vertex": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
+
+      "name": "transferring",
+
+      "current": 0,
+
+      "timestamp": "2025-07-23T22:37:03.541612264Z",
+
+      "started": "2025-07-23T22:37:03.541610423Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring context:",
+
+      "vertex": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
+
+      "name": "transferring",
+
+      "current": 0,
+
+      "timestamp": "2025-07-23T22:37:03.54264179Z",
+
+      "started": "2025-07-23T22:37:03.541610423Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "statuses": [
+
+    {
+
+      "id": "transferring context:",
+
+      "vertex": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
+
+      "name": "transferring",
+
+      "current": 2,
+
+      "timestamp": "2025-07-23T22:37:03.543202708Z",
+
+      "started": "2025-07-23T22:37:03.541610423Z",
+
+      "completed": "2025-07-23T22:37:03.543201303Z"
+
+    }
+
+  ]
+
+}
+
+    {
+
+      "digest": "sha256:c2022e09d3df120d561baa7c2eaf919e64fce0c560385f7949ab815e4897dd4c",
+
+      "inputs": [
+
+        "sha256:ca3cbe5f3f0d8e435739e8fd9ec3da0fafb06acce6c1f2b92aae3e3cac8cbedd"
+
+      ],
+
+      "name": "[cyberscythe builder 4/4] RUN apt-get update \u0026\u0026     apt-get install -y --no-install-recommends         gcc python3-dev         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation         libgtk-3-0 wget ca-certificates \u0026\u0026     python -m venv /install \u0026\u0026     /install/bin/pip install --upgrade pip \u0026\u0026     /install/bin/pip install --no-cache-dir -r requirements.txt \u0026\u0026     /install/bin/playwright install chromium --with-deps \u0026\u0026     find /install -name \"*.pyc\" -delete \u0026\u0026     find /install -name \"__pycache__\" -type d -exec rm -rf {} + \u0026\u0026     apt-get purge -y --auto-remove gcc python3-dev \u0026\u0026     apt-get clean \u0026\u0026     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip"
+
+    },
+
+    {
+
+      "digest": "s
+    
+    
+
+      "timestamp": "2025-07-23T22:39:36.354958103Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "logs": [
+
+    {
+
+      "vertex": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
+
+      "stream": 1,
+
+      "data": "ICAgIEZvdW5kIGV4aXN0aW5nIGluc3RhbGxhdGlvbjogcGlwIDI0LjAK",
+
+      "timestamp": "2025-07-23T22:39:36.358403836Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "logs": [
+
+    {
+
+      "vertex": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
+
+      "stream": 1,
+
+      "data": "ICAgIFVuaW5zdGFsbGluZyBwaXAtMjQuMDoK",
+
+      "timestamp": "2025-07-23T22:39:36.472021753Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "logs": [
+
+    {
+
+      "vertex": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
+
+      "stream": 1,
+
+      "data": "ICAgICAgU3VjY2Vzc2Z1bGx5IHVuaW5zdGFsbGVkIHBpcC0yNC4wCg==",
+
+      "timestamp": "2025-07-23T22:39:37.086554216Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "logs": [
+
+    {
+
+      "vertex": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
+
+      "stream": 1,
+
+      "data": "U3VjY2Vzc2Z1bGx5IGluc3RhbGxlZCBwaXAtMjUuMS4xCg==",
+
+      "timestamp": "2025-07-23T22:39:39.413412102Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "logs": [
+
+    {
+
+      "vertex": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
+
+      "stream": 2,
+
+      "data": "V0FSTklORzogUnVubmluZyBwaXAgYXMgdGhlICdyb290JyB1c2VyIGNhbiByZXN1bHQgaW4gYnJva2VuIHBlcm1pc3Npb25zIGFuZCBjb25mbGljdGluZyBiZWhhdmlvdXIgd2l0aCB0aGUgc3lzdGVtIHBhY2thZ2UgbWFuYWdlci4gSXQgaXMgcmVjb21tZW5kZWQgdG8gdXNlIGEgdmlydHVhbCBlbnZpcm9ubWVudCBpbnN0ZWFkOiBodHRwczovL3BpcC5weXBhLmlvL3dhcm5pbmdzL3ZlbnYK",
+
+      "timestamp": "2025-07-23T22:39:39.415274728Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "logs": [
+
+    {
+
+      "vertex": "sha256:c2022e09d3df120d561baa7c2eaf919e64fce0c560385f7949ab815e4897dd4c",
+
+      "stream": 1,
+
+      "data": "ICBQcmVwYXJpbmcgbWV0YWRhdGEgKHB5cHJvamVjdC50b21sKTogZmluaXNoZWQgd2l0aCBzdGF0dXMgJ2Vycm9yJwo=",
+
+      "timestamp": "2025-07-23T22:39:39.544044136Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "logs": [
+
+    {
+
+      "vertex": "sha256:c2022e09d3df120d561baa7c2eaf919e64fce0c560385f7949ab815e4897dd4c",
+
+      "stream": 2,
+
+      "data": "ICBlcnJvcjogc3VicHJvY2Vzcy1leGl0ZWQtd2l0aC1lcnJvcgogIAogIMOXIFByZXBhcmluZyBtZXRhZGF0YSAocHlwcm9qZWN0LnRvbWwpIGRpZCBub3QgcnVuIHN1Y2Nlc3NmdWxseS4KICDilIIgZXhpdCBjb2RlOiAxCiAg4pWw4pSAPiBbNTAgbGluZXMgb2Ygb3V0cHV0XQogICAgICArIG1lc29uIHNldHVwIC90bXAvcGlwLWluc3RhbGwtdGFjOTh1cXYvcHljYWlyb19kZmM0NjY4OTliMWI0MmY5OTBiMDQzNzViMmE0ZTk1OSAvdG1wL3BpcC1pbnN0YWxsLXRhYzk4dXF2L3B5Y2Fpcm9fZGZjNDY2ODk5YjFiNDJmOTkwYjA0Mzc1YjJhNGU5NTkvLm1lc29ucHktM3BtbThuaWQgLURidWlsZHR5cGU9cmVsZWFzZSAtRGJfbmRlYnVnPWlmLXJlbGVhc2UgLURiX3ZzY3J0PW1kIC1Ed2hlZWw9dHJ1ZSAtRHRlc3RzPWZhbHNlIC0tbmF0aXZlLWZpbGU9L3RtcC9waXAtaW5zdGFsbC10YWM5OHVxdi9weWNhaXJvX2RmYzQ2Njg5OWIxYjQyZjk5MGIwNDM3NWIyYTRlOTU5Ly5tZXNvbnB5LTNwbW04bmlkL21lc29uLXB5dGhvbi1uYXRpdmUtZmlsZS5pbmkKICAgICAgVGhlIE1lc29uIGJ1aWxkIHN5c3RlbQogICAgICBWZXJzaW9uOiAxLjguMgogICAgICBTb3VyY2UgZGlyOiAvdG1wL3BpcC1pbnN0YWxsLXRhYzk4dXF2L3B5Y2Fpcm9fZGZjNDY2ODk5YjFiNDJmOTkwYjA0Mzc1YjJhNGU5NTkKICAgICAgQnVpbGQgZGlyOiAvdG1wL3BpcC1pbnN0YWxsLXRhYzk4dXF2L3B5Y2Fpcm9fZGZjNDY2ODk5YjFiNDJmOTkwYjA0Mzc1YjJhNGU5NTkvLm1lc29ucHktM3BtbThuaWQKICAgICAgQnVpbGQgdHlwZTogbmF0aXZlIGJ1aWxkCiAgICAgIFByb2plY3QgbmFtZTogcHljYWlybwogICAgICBQcm9qZWN0IHZlcnNpb246IDEuMjguMAogICAgICBDIGNvbXBpbGVyIGZvciB0aGUgaG9zdCBtYWNoaW5lOiBjYyAoZ2NjIDEyLjIuMCAiY2MgKERlYmlhbiAxMi4yLjAtMTQrZGViMTJ1MSkgMTIuMi4wIikKICAgICAgQyBsaW5rZXIgZm9yIHRoZSBob3N0IG1hY2hpbmU6IGNjIGxkLmJmZCAyLjQwCiAgICAgIEhvc3QgbWFjaGluZSBjcHUgZmFtaWx5OiB4ODZfNjQKICAgICAgSG9zdCBtYWNoaW5lIGNwdTogeDg2XzY0CiAgICAgIFByb2dyYW0gcHl0aG9uMyBmb3VuZDogWUVTICgvaW5zdGFsbC9iaW4vcHl0aG9uKQogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdhbGw6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdhcnJheS1ib3VuZHM6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdjYXN0LWFsaWduOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XY29udmVyc2lvbjogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV2V4dHJhOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XZm9ybWF0PTI6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdmb3JtYXQtbm9ubGl0ZXJhbDogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV2Zvcm1hdC1zZWN1cml0eTogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV2ltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XaW5pdC1zZWxmOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XaW5saW5lOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XbWlzc2luZy1mb3JtYXQtYXR0cmlidXRlOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XbWlzc2luZy1ub3JldHVybjogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV25lc3RlZC1leHRlcm5zOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1Xb2xkLXN0eWxlLWRlZmluaXRpb246IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdwYWNrZWQ6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdwb2ludGVyLWFyaXRoOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XcmV0dXJuLXR5cGU6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdzaGFkb3c6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdzaWduLWNvbXBhcmU6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdzdHJpY3QtYWxpYXNpbmc6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVd1bmRlZjogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV3VudXNlZC1idXQtc2V0LXZhcmlhYmxlOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1Xc3dpdGNoLWRlZmF1bHQ6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVduby1taXNzaW5nLWZpZWxkLWluaXRpYWxpemVyczogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV25vLXVudXNlZC1wYXJhbWV0ZXI6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLWZuby1zdHJpY3QtYWxpYXNpbmc6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLWZ2aXNpYmlsaXR5PWhpZGRlbjogWUVTCiAgICAgIERpZCBub3QgZmluZCBwa2ctY29uZmlnIGJ5IG5hbWUgJ3BrZy1jb25maWcnCiAgICAgIEZvdW5kIHBrZy1jb25maWc6IE5PCiAgICAgIERpZCBub3QgZmluZCBDTWFrZSAnY21ha2UnCiAgICAgIEZvdW5kIENNYWtlOiBOTwogICAgICBSdW4tdGltZSBkZXBlbmRlbmN5IGNhaXJvIGZvdW5kOiBOTwogICAgICAKICAgICAgLi4vY2Fpcm8vbWVzb24uYnVpbGQ6MzE6MTI6IEVSUk9SOiBEZXBlbmRlbmN5IGxvb2t1cCBmb3IgY2Fpcm8gd2l0aCBtZXRob2QgJ3BrZ2NvbmZpZycgZmFpbGVkOiBQa2ctY29uZmlnIGZvciBtYWNoaW5lIGhvc3QgbWFjaGluZSBub3QgZm91bmQuIEdpdmluZyB1cC4KICAgICAgCiAgICAgIEEgZnVsbCBsb2cgY2FuIGJlIGZvdW5kIGF0IC90bXAvcGlwLWluc3RhbGwtdGFjOTh1cXYvcHljYWlyb19kZmM0NjY4OTliMWI0MmY5OTBiMDQzNzViMmE0ZTk1OS8ubWVzb25weS0zcG1tOG5pZC9tZXNvbi1sb2dzL21lc29uLWxvZy50eHQKICAgICAgW2VuZCBvZiBvdXRwdXRdCiAgCiAgbm90ZTogVGhpcyBlcnJvciBvcmlnaW5hdGVzIGZyb20gYSBzdWJwcm9jZXNzLCBhbmQgaXMgbGlrZWx5IG5vdCBhIHByb2JsZW0gd2l0aCBwaXAuCg==",
+
+      "timestamp": "2025-07-23T22:39:39.559180449Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "logs": [
+
+    {
+
+      "vertex": "sha256:c2022e09d3df120d561baa7c2eaf919e64fce0c560385f7949ab815e4897dd4c",
+
+      "stream": 2,
+
+      "data": "ZXJyb3I6IG1ldGFkYXRhLWdlbmVyYXRpb24tZmFpbGVkCgrDlyBFbmNvdW50ZXJlZCBlcnJvciB3aGlsZSBnZW5lcmF0aW5nIHBhY2thZ2UgbWV0YWRhdGEuCuKVsOKUgD4gU2VlIGFib3ZlIGZvciBvdXRwdXQuCgpub3RlOiBUaGlzIGlzIGFuIGlzc3VlIHdpdGggdGhlIHBhY2thZ2UgbWVudGlvbmVkIGFib3ZlLCBub3QgcGlwLgpoaW50OiBTZWUgYWJvdmUgZm9yIGRldGFpbHMuCg==",
+
+      "timestamp": "2025-07-23T22:39:39.746991625Z"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:c2022e09d3df120d561baa7c2eaf919e64fce0c560385f7949ab815e4897dd4c",
+
+      "inputs": [
+
+        "sha256:ca3cbe5f3f0d8e435739e8fd9ec3da0fafb06acce6c1f2b92aae3e3cac8cbedd"
+
+      ],
+
+      "name": "[cyberscythe builder 4/4] RUN apt-get update \u0026\u0026     apt-get install -y --no-install-recommends         gcc python3-dev         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation         libgtk-3-0 wget ca-certificates \u0026\u0026     python -m venv /install \u0026\u0026     /install/bin/pip install --upgrade pip \u0026\u0026     /install/bin/pip install --no-cache-dir -r requirements.txt \u0026\u0026     /install/bin/playwright install chromium --with-deps \u0026\u0026     find /install -name \"*.pyc\" -delete \u0026\u0026     find /install -name \"__pycache__\" -type d -exec rm -rf {} + \u0026\u0026     apt-get purge -y --auto-remove gcc python3-dev \u0026\u0026     apt-get clean \u0026\u0026     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip",
+
+      "started": "2025-07-23T22:37:12.036571735Z",
+
+      "completed": "2025-07-23T22:39:40.875077544Z",
+
+      "error": "process \"/bin/sh -c apt-get update \u0026\u0026     apt-get install -y --no-install-recommends         gcc python3-dev         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation         libgtk-3-0 wget ca-certificates \u0026\u0026     python -m venv /install \u0026\u0026     /install/bin/pip install --upgrade pip \u0026\u0026     /install/bin/pip install --no-cache-dir -r requirements.txt \u0026\u0026     /install/bin/playwright install chromium --with-deps \u0026\u0026     find /install -name \\\"*.pyc\\\" -delete \u0026\u0026     find /install -name \\\"__pycache__\\\" -type d -exec rm -rf {} + \u0026\u0026     apt-get purge -y --auto-remove gcc python3-dev \u0026\u0026     apt-get clean \u0026\u0026     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip\" did not complete successfully: exit code: 1"
+
+    }
+
+  ]
+
+}
+
+{
+
+  "vertexes": [
+
+    {
+
+      "digest": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
+
+      "inputs": [
+
+        "sha256:bae72a82ce7251321aa86b76f1c2fdfbe979d02debde4e9be0e5c18fdc041d14"
+
+      ],
+
+      "name": "[sast builder 5/6] RUN pip install --no-cache-dir --upgrade pip \u0026\u0026     pip install --no-cache-dir -r requirements.txt",
+
+      "started": "2025-07-23T22:39:30.244311871Z",
+
+      "completed": "2025-07-23T22:39:42.057862581Z",
+
+      "error": "process \"/bin/sh -c pip install --no-cache-dir --upgrade pip \u0026\u0026     pip install --no-cache-dir -r requirements.txt\" did not complete successfully: exit code: 137: context canceled: context canceled"
+
+    }
+
+  ]
+
+}
+
+Dockerfile:16
+
+--------------------
+
+  15 |     # This layer also installs Playwright's browser binaries.
+
+  16 | >>> RUN apt-get update && \
+
+  17 | >>>     apt-get install -y --no-install-recommends \
+
+  18 | >>>         gcc python3-dev \
+
+  19 | >>>         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1 \
+
+  20 | >>>         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 \
+
+  21 | >>>         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation \
+
+  22 | >>>         libgtk-3-0 wget ca-certificates && \
+
+  23 | >>>     # Create a virtual environment at /install
+
+  24 | >>>     python -m venv /install && \
+
+  25 | >>>     # Install pip and project dependencies into the virtual environment
+
+  26 | >>>     /install/bin/pip install --upgrade pip && \
+
+  27 | >>>     /install/bin/pip install --no-cache-dir -r requirements.txt && \
+
+  28 | >>>     # Install Playwright browser binaries (Chromium) with dependencies
+
+  29 | >>>     /install/bin/playwright install chromium --with-deps && \
+
+  30 | >>>     # Clean up build artifacts and apt cache to reduce layer size
+
+  31 | >>>     find /install -name "*.pyc" -delete && \
+
+  32 | >>>     find /install -name "__pycache__" -type d -exec rm -rf {} + && \
+
+  33 | >>>     apt-get purge -y --auto-remove gcc python3-dev && \
+
+  34 | >>>     apt-get clean && \
+
+  35 | >>>     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip
+
+  36 |
+
+--------------------
+
+failed to solve: process "/bin/sh -c apt-get update &&     apt-get install -y --no-install-recommends         gcc python3-dev         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation         libgtk-3-0 wget ca-certificates &&     python -m venv /install &&     /install/bin/pip install --upgrade pip &&     /install/bin/pip install --no-cache-dir -r requirements.txt &&     /install/bin/playwright install chromium --with-deps &&     find /install -name \"*.pyc\" -delete &&     find /install -name \"__pycache__\" -type d -exec rm -rf {} + &&     apt-get purge -y --auto-remove gcc python3-dev &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip" did not complete successfully: exit code: 1
+
+[ec2-user@ip-172-31-25-160 Vuln_Prism]$
+
+
+
+
+
