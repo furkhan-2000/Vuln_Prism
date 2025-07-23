@@ -528,7 +528,7 @@
         }, 500);
 
         console.log("📤 Sending POST request to /scan");
-        const response = await fetch('/scan', {
+        const response = await fetch('./scan', {
           method: 'POST',
           body: formData
         });

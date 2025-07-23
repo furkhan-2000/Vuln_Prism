@@ -31,7 +31,7 @@ async function startScan() {
         const requestBody = JSON.stringify({ url });
         console.log("  - Body:", requestBody);
 
-        const res = await fetch(`/scan`, {
+        const res = await fetch(`./scan`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -72,7 +72,7 @@ async function pollStatus(scan_id) {
         console.log(`📡 Status poll #${pollCount} for scan ID: ${scan_id}`);
 
         try {
-            const res = await fetch(`/status/${scan_id}`);
+            const res = await fetch(`./status/${scan_id}`);
             console.log("📥 Status response:");
             console.log("  - Status:", res.status);
             console.log("  - Status Text:", res.statusText);
