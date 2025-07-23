@@ -149,7 +149,7 @@ spec:
   - Ingress 
   - Egress 
   ingress: 
-    - from:    # allow traffic from all pods in the same namespace as the pod(s) selected for this NetworkPolicy.
+    - from:    
       - ipBlock: 
           cidr: 0.0.0.0/0  
       ports: 

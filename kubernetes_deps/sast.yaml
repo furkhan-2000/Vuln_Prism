@@ -8,8 +8,8 @@ data:
   DB_USER: "admin"
   DB_PORT: "3306"
   DB_NAME: "mysql"
-  #REDIS_HOST: "your-valkey-cluster.cache.amazonaws.com"
- # REDIS_PORT: ""
+  # REDIS_HOST: "your-valkey-cluster.cache.amazonaws.com"
+  # REDIS_PORT: ""
 ---
 apiVersion: v1
 kind: Secret
@@ -55,11 +55,11 @@ kind: PersistentVolume
 metadata:
   name: sast-pv
 spec:
-  persistentVolumeReclaimPolicy: Retain
   capacity:
     storage: 700Mi
   accessModes:
     - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
   hostPath:
     path: /tmp/sast
 ---
@@ -69,13 +69,13 @@ metadata:
   name: sast-pvc
   namespace: mustang
 spec:
-  storageClassName: ""
   volumeName: sast-pv
+  storageClassName: ""
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: "500Mi"
+      storage: 500Mi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -117,9 +117,6 @@ spec:
         runAsUser: 1001
         runAsGroup: 1001
         fsGroup: 1001
-      volumes:
-        - name: temp-storage
-          emptyDir: {}
       containers:
         - name: sast-con
           image: furkhan2000/shark:sast
@@ -127,11 +124,11 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
+          ports:
+            - containerPort: 5050
           volumeMounts:
             - name: temp-storage
               mountPath: /home/jenkins
-          ports:
-            - containerPort: 5050
           envFrom:
             - configMapRef:
                 name: sast-config-rds
@@ -159,7 +156,9 @@ spec:
             periodSeconds: 30
             timeoutSeconds: 30
             failureThreshold: 10
-          
+      volumes:
+        - name: temp-storage
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
