@@ -1,44 +1,59 @@
-ntrolplane:~/Vuln_Prism/kubernetes_deps$ k -n mustang get pods 
+controlplane:~/Vuln_Prism/kubernetes_deps$ k -n mustang get pods    
 NAME                        READY   STATUS    RESTARTS   AGE
-cyber-dep-c94b87f5d-8nwpt   1/1     Running   0          5m51s
-sast-dep-6c6c857c7b-hgkcg   1/1     Running   0          5m50s
-vuln-dep-78658698d5-hf8p5   1/1     Running   0          5m51s
-controlplane:~/Vuln_Prism/kubernetes_deps$ k -n mustang logs cyber-dep-c94b87f5d-8nwpt && k -n mustang logs sast-dep-6c6c857c7b-hgkcg
+cyber-dep-c94b87f5d-zp77w   1/1     Running   0          3m28s
+sast-dep-6c6c857c7b-2skch   1/1     Running   0          3m26s
+vuln-dep-78658698d5-wxct8   1/1     Running   0          3m27s
+controlplane:~/Vuln_Prism/kubernetes_deps$ k -n mustang get svc  
+NAME        TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)          AGE
+cyber-svc   NodePort   10.103.154.231   <none>        5051:32238/TCP   3m36s
+sast-svc    NodePort   10.106.175.20    <none>        5050:30717/TCP   3m34s
+vuln-svc    NodePort   10.99.179.18     <none>        3000:32271/TCP   3m35s
+controlplane:~/Vuln_Prism/kubernetes_deps$ k -n mustang port-forward svc/cyber-svc --address=0.0.0.0 32238:5051 & 
+[1] 46741
+controlplane:~/Vuln_Prism/kubernetes_deps$ Forwarding from 0.0.0.0:32238 -> 5051
+controlplane:~/Vuln_Prism/kubernetes_deps$ k -n mustang logs cyber-dep-c94b87f5d-zp77w -f
 Could not initialize database tables: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on 'database-1.c0pogq0w8mxc.us-east-1.rds.amazonaws.com' ([Errno -2] Name or service not known)")
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
-2025-07-23 06:33:03.557 | ERROR    | app.main:<module>:67 - Failed to connect to Redis: %s. Caching will be disabled.
+2025-07-23 07:10:59.761 | ERROR    | app.main:<module>:67 - Failed to connect to Redis: %s. Caching will be disabled.
 INFO:     Started server process [1]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5051 (Press CTRL+C to quit)
-INFO:     172.30.2.2:34930 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:40168 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:53640 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:38890 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:60344 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:36184 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:39024 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:38400 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:36526 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:42462 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:35798 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:56008 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:50054 - "GET /health HTTP/1.1" 200 OK
-2025-07-23 06:35:23.478 | INFO     | app.main:root:76 - 🌐 Root endpoint accessed - serving index.html directly
-INFO:     192.168.0.0:59533 - "GET / HTTP/1.1" 200 OK
-INFO:     192.168.0.0:9090 - "GET /static/app.js HTTP/1.1" 200 OK
-INFO:     192.168.0.0:43598 - "GET /favicon.ico HTTP/1.1" 404 Not Found
-INFO:     172.30.2.2:51670 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:33984 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:51964 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:53784 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:38860 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:43162 - "GET /health HTTP/1.1" 200 OK
-2025-07-23 06:36:27.950 | INFO     | app.main:scan:117 - Starting new scan for target: %s
-INFO:     172.30.2.2:33802 - "GET /health HTTP/1.1" 200 OK
-2025-07-23 06:36:29.830 | INFO     | app.aggressive_scanner.browser_scanner:aggressive_run:113 - Navigating to https://pixabay.com/ for initial analysis.
-2025-07-23 06:36:31.998 | INFO     | app.aggressive_scanner.browser_scanner:aggressive_run:122 - Performing static analysis on https://pixabay.com/
-2025-07-23 06:36:37.101 | ERROR    | app.aggressive_scanner.browser_scanner:aggressive_run:187 - An unexpected error occurred during the browser scan for https://pixabay.com/: 'selectolax.parser.Node' object has no attribute 'get'
+INFO:     172.30.2.2:48248 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:49004 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:47104 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:58804 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:44864 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:32968 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:54296 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:52916 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:32772 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:50382 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:34682 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:56926 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:60756 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:36336 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:48226 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:54416 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:55738 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:35532 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:48642 - "GET /health HTTP/1.1" 200 OK
+2025-07-23 07:14:17.161 | INFO     | app.main:root:76 - 🌐 Root endpoint accessed - serving index.html directly
+INFO:     192.168.0.0:36304 - "GET / HTTP/1.1" 200 OK
+INFO:     192.168.0.0:3779 - "GET /static/app.js HTTP/1.1" 200 OK
+INFO:     192.168.0.0:51286 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     172.30.2.2:50082 - "GET /health HTTP/1.1" 200 OK
+2025-07-23 07:14:31.630 | INFO     | app.main:scan:117 - Starting new scan for target: %s
+2025-07-23 07:14:33.537 | INFO     | app.aggressive_scanner.browser_scanner:aggressive_run:113 - Navigating to https://pixabay.com/ for initial analysis.
+INFO:     172.30.2.2:47250 - "GET /health HTTP/1.1" 200 OK
+2025-07-23 07:14:35.831 | INFO     | app.aggressive_scanner.browser_scanner:aggressive_run:122 - Performing static analysis on https://pixabay.com/
+INFO:     172.30.2.2:40086 - "GET /health HTTP/1.1" 200 OK
+2025-07-23 07:14:45.663 | INFO     | app.aggressive_scanner.browser_scanner:aggressive_run:134 - Starting dynamic form injection for https://pixabay.com/
+2025-07-23 07:14:46.071 | INFO     | app.aggressive_scanner.browser_scanner:aggressive_run:140 - Testing input field: search
+INFO:     172.30.2.2:46908 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:46678 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:37874 - "GET /health HTTP/1.1" 200 OK
+2025-07-23 07:15:15.664 | ERROR    | app.aggressive_scanner.browser_scanner:aggressive_run:193 - An unexpected error occurred during the browser scan for https://pixabay.com/: 'signature'
 Traceback (most recent call last):
 
   File "/install/bin/uvicorn", line 8, in <module>
@@ -50,62 +65,62 @@ Traceback (most recent call last):
     return self.main(*args, **kwargs)
            │    │     │       └ {}
            │    │     └ ()
-           │    └ <function Command.main at 0x71e664da9da0>
+           │    └ <function Command.main at 0x7240ccec9da0>
            └ <Command main>
   File "/install/lib/python3.11/site-packages/click/core.py", line 1363, in main
     rv = self.invoke(ctx)
-         │    │      └ <click.core.Context object at 0x71e6658b8510>
-         │    └ <function Command.invoke at 0x71e664daa520>
+         │    │      └ <click.core.Context object at 0x7240cd990050>
+         │    └ <function Command.invoke at 0x7240cceca520>
          └ <Command main>
   File "/install/lib/python3.11/site-packages/click/core.py", line 1226, in invoke
     return ctx.invoke(self.callback, **ctx.params)
            │   │      │    │           │   └ {'host': '0.0.0.0', 'port': 5051, 'app': 'app.main:app', 'uds': None, 'fd': None, 'reload': False, 'reload_dirs': (), 'reload...
-           │   │      │    │           └ <click.core.Context object at 0x71e6658b8510>
-           │   │      │    └ <function main at 0x71e664cf77e0>
+           │   │      │    │           └ <click.core.Context object at 0x7240cd990050>
+           │   │      │    └ <function main at 0x7240cce0f7e0>
            │   │      └ <Command main>
-           │   └ <function Context.invoke at 0x71e664daade0>
-           └ <click.core.Context object at 0x71e6658b8510>
+           │   └ <function Context.invoke at 0x7240ccecade0>
+           └ <click.core.Context object at 0x7240cd990050>
   File "/install/lib/python3.11/site-packages/click/core.py", line 794, in invoke
     return callback(*args, **kwargs)
            │         │       └ {'host': '0.0.0.0', 'port': 5051, 'app': 'app.main:app', 'uds': None, 'fd': None, 'reload': False, 'reload_dirs': (), 'reload...
            │         └ ()
-           └ <function main at 0x71e664cf77e0>
+           └ <function main at 0x7240cce0f7e0>
   File "/install/lib/python3.11/site-packages/uvicorn/main.py", line 418, in main
     run(
-    └ <function run at 0x71e664c660c0>
+    └ <function run at 0x7240ccd860c0>
   File "/install/lib/python3.11/site-packages/uvicorn/main.py", line 587, in run
     server.run()
-    │      └ <function Server.run at 0x71e664c38900>
-    └ <uvicorn.server.Server object at 0x71e664decd50>
+    │      └ <function Server.run at 0x7240ccd58900>
+    └ <uvicorn.server.Server object at 0x7240ccee8d90>
   File "/install/lib/python3.11/site-packages/uvicorn/server.py", line 62, in run
     return asyncio.run(self.serve(sockets=sockets))
            │       │   │    │             └ None
-           │       │   │    └ <function Server.serve at 0x71e664c389a0>
-           │       │   └ <uvicorn.server.Server object at 0x71e664decd50>
-           │       └ <function run at 0x71e66573c040>
+           │       │   │    └ <function Server.serve at 0x7240ccd589a0>
+           │       │   └ <uvicorn.server.Server object at 0x7240ccee8d90>
+           │       └ <function run at 0x7240cd818040>
            └ <module 'asyncio' from '/usr/local/lib/python3.11/asyncio/__init__.py'>
   File "/usr/local/lib/python3.11/asyncio/runners.py", line 190, in run
     return runner.run(main)
-           │      │   └ <coroutine object Server.serve at 0x71e664ca2ac0>
-           │      └ <function Runner.run at 0x71e664f23ec0>
-           └ <asyncio.runners.Runner object at 0x71e664d03710>
+           │      │   └ <coroutine object Server.serve at 0x7240ccdc2ac0>
+           │      └ <function Runner.run at 0x7240cd043ec0>
+           └ <asyncio.runners.Runner object at 0x7240cce1b490>
   File "/usr/local/lib/python3.11/asyncio/runners.py", line 118, in run
     return self._loop.run_until_complete(task)
            │    │     │                  └ <Task pending name='Task-1' coro=<Server.serve() running at /install/lib/python3.11/site-packages/uvicorn/server.py:82> wait_...
-           │    │     └ <function BaseEventLoop.run_until_complete at 0x71e664f21b20>
+           │    │     └ <function BaseEventLoop.run_until_complete at 0x7240cd041b20>
            │    └ <_UnixSelectorEventLoop running=True closed=False debug=False>
-           └ <asyncio.runners.Runner object at 0x71e664d03710>
+           └ <asyncio.runners.Runner object at 0x7240cce1b490>
   File "/usr/local/lib/python3.11/asyncio/base_events.py", line 641, in run_until_complete
     self.run_forever()
-    │    └ <function BaseEventLoop.run_forever at 0x71e664f21a80>
+    │    └ <function BaseEventLoop.run_forever at 0x7240cd041a80>
     └ <_UnixSelectorEventLoop running=True closed=False debug=False>
   File "/usr/local/lib/python3.11/asyncio/base_events.py", line 608, in run_forever
     self._run_once()
-    │    └ <function BaseEventLoop._run_once at 0x71e664f23880>
+    │    └ <function BaseEventLoop._run_once at 0x7240cd043880>
     └ <_UnixSelectorEventLoop running=True closed=False debug=False>
   File "/usr/local/lib/python3.11/asyncio/base_events.py", line 1936, in _run_once
     handle._run()
-    │      └ <function Handle._run at 0x71e6656b5b20>
+    │      └ <function Handle._run at 0x7240cd795b20>
     └ <Handle Task.task_wakeup(<Future finished result=None>)>
   File "/usr/local/lib/python3.11/asyncio/events.py", line 84, in _run
     self._context.run(self._callback, *self._args)
@@ -117,242 +132,227 @@ Traceback (most recent call last):
     └ <Handle Task.task_wakeup(<Future finished result=None>)>
   File "/install/lib/python3.11/site-packages/uvicorn/protocols/http/h11_impl.py", line 404, in run_asgi
     result = await app(  # type: ignore[func-returns-value]
-                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x71e664d01510>
+                   └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7240cce19390>
   File "/install/lib/python3.11/site-packages/uvicorn/middleware/proxy_headers.py", line 84, in __call__
     return await self.app(scope, receive, send)
-                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
-                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+                 │    │   │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
+                 │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
                  │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-                 │    └ <fastapi.applications.FastAPI object at 0x71e66361ec90>
-                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x71e664d01510>
+                 │    └ <fastapi.applications.FastAPI object at 0x7240ca8d5790>
+                 └ <uvicorn.middleware.proxy_headers.ProxyHeadersMiddleware object at 0x7240cce19390>
   File "/install/lib/python3.11/site-packages/fastapi/applications.py", line 1054, in __call__
     await super().__call__(scope, receive, send)
-                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
-                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+                           │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
+                           │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
                            └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
   File "/install/lib/python3.11/site-packages/starlette/applications.py", line 123, in __call__
     await self.middleware_stack(scope, receive, send)
-          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
-          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │    │                │      │        └ <bound method RequestResponseCycle.send of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x71e66282e050>
-          └ <fastapi.applications.FastAPI object at 0x71e66361ec90>
+          │    └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7240ca8d5f10>
+          └ <fastapi.applications.FastAPI object at 0x7240ca8d5790>
   File "/install/lib/python3.11/site-packages/starlette/middleware/errors.py", line 164, in __call__
     await self.app(scope, receive, _send)
-          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x71e6627f9c60>
-          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │    │   │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7240ca8f59e0>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x71e66282df90>
-          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x71e66282e050>
+          │    └ <starlette.middleware.cors.CORSMiddleware object at 0x7240ca8e6ed0>
+          └ <starlette.middleware.errors.ServerErrorMiddleware object at 0x7240ca8d5f10>
   File "/install/lib/python3.11/site-packages/starlette/middleware/cors.py", line 91, in __call__
     await self.simple_response(scope, receive, send, request_headers=headers)
-          │    │               │      │        │                     └ Headers({'host': '3f35502e0a3c-10-244-3-139-31400.papa.r.killercoda.com', 'x-forwarded-host': '3f35502e0a3c-10-244-3-139-3140...
-          │    │               │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x71e6627f9c60>
-          │    │               │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │    │               │      │        │                     └ Headers({'host': 'e7fdc105a825-10-244-5-19-32238.papa.r.killercoda.com', 'x-forwarded-host': 'e7fdc105a825-10-244-5-19-32238....
+          │    │               │      │        └ <function ServerErrorMiddleware.__call__.<locals>._send at 0x7240ca8f59e0>
+          │    │               │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │    │               └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          │    └ <function CORSMiddleware.simple_response at 0x71e663e0c040>
-          └ <starlette.middleware.cors.CORSMiddleware object at 0x71e66282df90>
+          │    └ <function CORSMiddleware.simple_response at 0x7240cbcfc040>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7240ca8e6ed0>
   File "/install/lib/python3.11/site-packages/starlette/middleware/cors.py", line 146, in simple_response
     await self.app(scope, receive, send)
-          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x71e66282df90>>, ...
-          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │    │   │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7240ca8e6ed0>>, ...
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x71e66282e010>
-          └ <starlette.middleware.cors.CORSMiddleware object at 0x71e66282df90>
+          │    └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7240ca8e70d0>
+          └ <starlette.middleware.cors.CORSMiddleware object at 0x7240ca8e6ed0>
   File "/install/lib/python3.11/site-packages/starlette/middleware/exceptions.py", line 62, in __call__
     await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
-          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x71e66282df90>>, ...
-          │                            │    │    │     │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │                            │    │    │     │      │        └ functools.partial(<bound method CORSMiddleware.send of <starlette.middleware.cors.CORSMiddleware object at 0x7240ca8e6ed0>>, ...
+          │                            │    │    │     │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │                            │    │    │     └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          │                            │    │    └ <starlette.requests.Request object at 0x71e662832610>
-          │                            │    └ <fastapi.routing.APIRouter object at 0x71e6629dac90>
-          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x71e66282e010>
-          └ <function wrap_app_handling_exceptions at 0x71e663d47420>
+          │                            │    │    └ <starlette.requests.Request object at 0x7240ca9963d0>
+          │                            │    └ <fastapi.routing.APIRouter object at 0x7240ca8e75d0>
+          │                            └ <starlette.middleware.exceptions.ExceptionMiddleware object at 0x7240ca8e70d0>
+          └ <function wrap_app_handling_exceptions at 0x7240cbe23420>
   File "/install/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     await app(scope, receive, sender)
-          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71e6627f9f80>
-          │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7240ca8f5bc0>
+          │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          └ <fastapi.routing.APIRouter object at 0x71e6629dac90>
+          └ <fastapi.routing.APIRouter object at 0x7240ca8e75d0>
   File "/install/lib/python3.11/site-packages/starlette/routing.py", line 762, in __call__
     await self.middleware_stack(scope, receive, send)
-          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71e6627f9f80>
-          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │    │                │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7240ca8f5bc0>
+          │    │                │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │    │                └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x71e6629dac90>>
-          └ <fastapi.routing.APIRouter object at 0x71e6629dac90>
+          │    └ <bound method Router.app of <fastapi.routing.APIRouter object at 0x7240ca8e75d0>>
+          └ <fastapi.routing.APIRouter object at 0x7240ca8e75d0>
   File "/install/lib/python3.11/site-packages/starlette/routing.py", line 782, in app
     await route.handle(scope, receive, send)
-          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71e6627f9f80>
-          │     │      │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │     │      │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7240ca8f5bc0>
+          │     │      │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │     │      └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          │     └ <function Route.handle at 0x71e663db8b80>
+          │     └ <function Route.handle at 0x7240cbea0b80>
           └ APIRoute(path='/scan', name='scan', methods=['POST'])
   File "/install/lib/python3.11/site-packages/starlette/routing.py", line 297, in handle
     await self.app(scope, receive, send)
-          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71e6627f9f80>
-          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │    │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7240ca8f5bc0>
+          │    │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │    │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          │    └ <function request_response.<locals>.app at 0x71e6627fa200>
+          │    └ <function request_response.<locals>.app at 0x7240ca8f6200>
           └ APIRoute(path='/scan', name='scan', methods=['POST'])
   File "/install/lib/python3.11/site-packages/starlette/routing.py", line 77, in app
     await wrap_app_handling_exceptions(app, request)(scope, receive, send)
-          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71e6627f9f80>
-          │                            │    │        │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │                            │    │        │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7240ca8f5bc0>
+          │                            │    │        │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │                            │    │        └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          │                            │    └ <starlette.requests.Request object at 0x71e662833590>
-          │                            └ <function request_response.<locals>.app.<locals>.app at 0x71e6627f9ee0>
-          └ <function wrap_app_handling_exceptions at 0x71e663d47420>
+          │                            │    └ <starlette.requests.Request object at 0x7240ca996ad0>
+          │                            └ <function request_response.<locals>.app.<locals>.app at 0x7240ca8f5f80>
+          └ <function wrap_app_handling_exceptions at 0x7240cbe23420>
   File "/install/lib/python3.11/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
     await app(scope, receive, sender)
-          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x71e6628a6200>
-          │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x71e662832990>>
+          │   │      │        └ <function wrap_app_handling_exceptions.<locals>.wrapped_app.<locals>.sender at 0x7240ca97a520>
+          │   │      └ <bound method RequestResponseCycle.receive of <uvicorn.protocols.http.h11_impl.RequestResponseCycle object at 0x7240ca997510>>
           │   └ {'type': 'http', 'asgi': {'version': '3.0', 'spec_version': '2.3'}, 'http_version': '1.1', 'server': ('192.168.1.4', 5051), '...
-          └ <function request_response.<locals>.app.<locals>.app at 0x71e6627f9ee0>
+          └ <function request_response.<locals>.app.<locals>.app at 0x7240ca8f5f80>
   File "/install/lib/python3.11/site-packages/starlette/routing.py", line 72, in app
     response = await func(request)
-                     │    └ <starlette.requests.Request object at 0x71e662833590>
-                     └ <function get_request_handler.<locals>.app at 0x71e6627fa0c0>
+                     │    └ <starlette.requests.Request object at 0x7240ca996ad0>
+                     └ <function get_request_handler.<locals>.app at 0x7240ca8f60c0>
   File "/install/lib/python3.11/site-packages/fastapi/routing.py", line 294, in app
     raw_response = await run_endpoint_function(
-                         └ <function run_endpoint_function at 0x71e663d47240>
+                         └ <function run_endpoint_function at 0x7240cbe23240>
   File "/install/lib/python3.11/site-packages/fastapi/routing.py", line 191, in run_endpoint_function
     return await dependant.call(**values)
-                 │         │      └ {'db': <sqlalchemy.orm.session.Session object at 0x71e66282c950>, 'request': ScanRequest(url='https://pixabay.com/')}
-                 │         └ <function scan at 0x71e6627f9a80>
-                 └ <fastapi.dependencies.models.Dependant object at 0x71e662830650>
+                 │         │      └ {'db': <sqlalchemy.orm.session.Session object at 0x7240ca92fe10>, 'request': ScanRequest(url='https://pixabay.com/')}
+                 │         └ <function scan at 0x7240ca8f5a80>
+                 └ <fastapi.dependencies.models.Dependant object at 0x7240ca92cb50>
 
   File "/app/app/main.py", line 118, in scan
     findings: ScanResult = await perform_scan(url)
                                  │            └ 'https://pixabay.com/'
-                                 └ <function perform_scan at 0x71e663bd51c0>
+                                 └ <function perform_scan at 0x7240cbc051c0>
 
   File "/app/app/aggressive_scanner/scanner.py", line 58, in perform_scan
     await aggressive_run(url, scan_result)
-          │              │    └ <app.aggressive_scanner.scanner.ScanResult object at 0x71e662baae90>
+          │              │    └ <app.aggressive_scanner.scanner.ScanResult object at 0x7240ca996390>
           │              └ 'https://pixabay.com/'
-          └ <function aggressive_run at 0x71e661bae7a0>
+          └ <function aggressive_run at 0x7240ca6d27a0>
 
-> File "/app/app/aggressive_scanner/browser_scanner.py", line 128, in aggressive_run
-    check_insecure_forms(tree, url, scan_result.vulnerabilities, url)
-    │                    │     │    │           │                └ 'https://pixabay.com/'
-    │                    │     │    │           └ [{'url': 'https://pixabay.com/', 'type': 'Missing Security Headers', 'severity': 'Medium', 'description': 'The following secu...
-    │                    │     │    └ <app.aggressive_scanner.scanner.ScanResult object at 0x71e662baae90>
-    │                    │     └ 'https://pixabay.com/'
-    │                    └ <HTMLParser chars=408574>
-    └ <function check_insecure_forms at 0x71e661bad8a0>
+> File "/app/app/aggressive_scanner/browser_scanner.py", line 160, in aggressive_run
+    scan_result.add_vulnerability(url, vuln_type, f"{name} (pre-submit)", payload)
+    │           │                 │    │                                  └ '%u0022%u003e%u003c%u0073%u0063%u0072%u0069%u0070%u0074%u003e%u0061%u006c%u0065%u0072%u0074%u0028%u0077%u0069%u006e%u0064%u00...
+    │           │                 │    └ 'XSS'
+    │           │                 └ 'https://pixabay.com/'
+    │           └ <function ScanResult.add_vulnerability at 0x7240cb6c8720>
+    └ <app.aggressive_scanner.scanner.ScanResult object at 0x7240ca996390>
 
-  File "/app/app/aggressive_scanner/detectors.py", line 311, in check_insecure_forms
-    action = form.get('action', '')
-             └ <Node form>
+  File "/app/app/aggressive_scanner/scanner.py", line 15, in add_vulnerability
+    if not any(v['signature'] == vuln_signature for v in self.vulnerabilities):
+                                 │                       │    └ [{'url': 'https://pixabay.com/', 'type': 'Missing Security Headers', 'severity': 'Medium', 'description': 'The following secu...
+                                 │                       └ <app.aggressive_scanner.scanner.ScanResult object at 0x7240ca996390>
+                                 └ ('https://pixabay.com/', 'XSS', 'search (pre-submit)')
 
-AttributeError: 'selectolax.parser.Node' object has no attribute 'get'
-2025-07-23 06:36:37.297 | INFO     | app.aggressive_scanner.scanner:report:39 - 
-=== SCAN REPORT ===
-2025-07-23 06:36:37.298 | INFO     | app.aggressive_scanner.scanner:report:40 - Scanned URLs: 1
-2025-07-23 06:36:37.298 | INFO     | app.aggressive_scanner.scanner:report:41 - Vulnerabilities found: 0
-2025-07-23 06:36:37.298 | INFO     | app.aggressive_scanner.scanner:report:42 - Errors encountered: 1
-2025-07-23 06:36:37.298 | INFO     | app.aggressive_scanner.scanner:report:44 - [Missing Security Headers] https://pixabay.com/ Parameter: N/A Payload: N/A
-2025-07-23 06:36:37.306 | WARNING  | app.main:scan:137 - Failed to store results in database: %s
-INFO:     192.168.0.0:17509 - "POST /scan HTTP/1.1" 200 OK
-INFO:     172.30.2.2:45786 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:54340 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:54876 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:36156 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:48538 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:56466 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:54806 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:37780 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:57084 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:41942 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:36376 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:36660 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:32852 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:47106 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:42950 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:54406 - "GET /health HTTP/1.1" 200 OK
-2025-07-23 06:33:35,507 [INFO] database: Successfully connected to the database.
-2025-07-23 06:33:35,525 [ERROR] database: Could not initialize database tables: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on 'database-1.c0pogq0w8mxc.us-east-1.rds.amazonaws.com' ([Errno -2] Name or service not known)")
+  File "/app/app/aggressive_scanner/scanner.py", line 15, in <genexpr>
+    if not any(v['signature'] == vuln_signature for v in self.vulnerabilities):
+               │                 │                  └ {'url': 'https://pixabay.com/', 'type': 'Missing Security Headers', 'severity': 'Medium', 'description': 'The following secur...
+               │                 └ ('https://pixabay.com/', 'XSS', 'search (pre-submit)')
+               └ {'url': 'https://pixabay.com/', 'type': 'Missing Security Headers', 'severity': 'Medium', 'description': 'The following secur...
+
+KeyError: 'signature'
+2025-07-23 07:15:15.851 | ERROR    | app.main:scan:151 - Scan failed for target %s: %s
+INFO:     192.168.0.0:42475 - "POST /scan HTTP/1.1" 500 Internal Server Error
+INFO:     172.30.2.2:39394 - "GET /health HTTP/1.1" 200 OK
+----------------------------------------------------------------------------------------------
+sast: controlplane:~/Vuln_Prism/kubernetes_deps$ k -n mustang logs sast-dep-6c6c857c7b-2skch -f 
+2025-07-23 07:12:15,807 [INFO] database: Successfully connected to the database.
+2025-07-23 07:12:15,819 [ERROR] database: Could not initialize database tables: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on 'database-1.c0pogq0w8mxc.us-east-1.rds.amazonaws.com' ([Errno -2] Name or service not known)")
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
-2025-07-23 06:33:35,526 [ERROR] app.main: Failed to connect to Redis: Error 111 connecting to localhost:6379. Connection refused.. Caching will be disabled.
+2025-07-23 07:12:15,820 [ERROR] app.main: Failed to connect to Redis: Error 111 connecting to localhost:6379. Connection refused.. Caching will be disabled.
 INFO:     Started server process [7]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://0.0.0.0:5050 (Press CTRL+C to quit)
-INFO:     172.30.2.2:53512 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:51748 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:50393 - "GET / HTTP/1.1" 200 OK
-INFO:     172.30.2.2:43580 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:13547 - "GET /favicon.ico HTTP/1.1" 404 Not Found
-2025-07-23 06:35:45,404 [INFO] app.main: Cloning repo: https://github.com/furkhan-2000/Hospital-Proj.git
-2025-07-23 06:35:48,315 [INFO] app.main: Starting new scan for target: https://github.com/furkhan-2000/Hospital-Proj.git
-2025-07-23 06:35:48,316 [INFO] app.scan_engine: Source analysis: {'file_count': 47, 'total_size': 117066, 'extensions': {'.yaml', '.pack', '.txt', '.md', '.idx', '.sample', '.html', '.py'}, 'has_code': True}
-2025-07-23 06:35:48,316 [INFO] app.scan_engine: No valid requirements.txt; skipping pip-audit.
-2025-07-23 06:35:48,316 [INFO] app.scan_engine: Running semgrep (attempt 1/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/semgrep.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
-2025-07-23 06:35:48,317 [INFO] app.scan_engine: Running bandit (attempt 1/6): bandit -r /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source -f json -o /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/bandit.json
-2025-07-23 06:35:48,318 [INFO] app.scan_engine: Running trivy (attempt 1/6): trivy fs --format json --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/trivy.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source
-2025-07-23 06:35:50,125 [INFO] app.scan_engine: trivy exit code 1
-2025-07-23 06:35:50,125 [WARNING] app.scan_engine: trivy produced no valid output on attempt 1
-2025-07-23 06:35:51,110 [INFO] app.scan_engine: bandit exit code 1
-2025-07-23 06:35:51,110 [INFO] app.scan_engine: Running gitleaks (attempt 1/6): gitleaks detect --source /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source --report-path /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/gitleaks.json --report-format json
-2025-07-23 06:35:51,310 [INFO] app.scan_engine: gitleaks exit code 0
-2025-07-23 06:35:51,310 [INFO] app.scan_engine: Running dependency-check (attempt 1/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source -f XML -o /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/depcheck --prettyPrint
-2025-07-23 06:35:51,915 [INFO] app.scan_engine: Running trivy (attempt 2/6): trivy fs --format json --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/trivy.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source
-2025-07-23 06:35:53,917 [INFO] app.scan_engine: trivy exit code 1
-2025-07-23 06:35:53,917 [WARNING] app.scan_engine: trivy produced no valid output on attempt 2
-2025-07-23 06:35:55,337 [INFO] app.scan_engine: semgrep exit code 2
-2025-07-23 06:35:55,337 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 1
-2025-07-23 06:35:55,419 [INFO] app.scan_engine: dependency-check exit code 13
-2025-07-23 06:35:55,419 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 1
-2025-07-23 06:35:56,147 [INFO] app.scan_engine: Running trivy (attempt 3/6): trivy fs --format json --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/trivy.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source
-2025-07-23 06:35:56,534 [INFO] app.scan_engine: Running dependency-check (attempt 2/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source -f XML -o /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/depcheck --prettyPrint
-2025-07-23 06:35:56,625 [INFO] app.scan_engine: Running semgrep (attempt 2/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/semgrep.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
-2025-07-23 06:35:57,506 [INFO] app.scan_engine: trivy exit code 1
-2025-07-23 06:35:57,506 [WARNING] app.scan_engine: trivy produced no valid output on attempt 3
-2025-07-23 06:35:59,967 [INFO] app.scan_engine: dependency-check exit code 13
-2025-07-23 06:35:59,967 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 2
-2025-07-23 06:36:01,317 [INFO] app.scan_engine: semgrep exit code 2
-2025-07-23 06:36:01,317 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 2
-2025-07-23 06:36:02,321 [INFO] app.scan_engine: Running trivy (attempt 4/6): trivy fs --format json --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/trivy.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source
-2025-07-23 06:36:02,703 [INFO] app.scan_engine: Running dependency-check (attempt 3/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source -f XML -o /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/depcheck --prettyPrint
-2025-07-23 06:36:03,463 [INFO] app.scan_engine: Running semgrep (attempt 3/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/semgrep.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
-2025-07-23 06:36:03,718 [INFO] app.scan_engine: trivy exit code 1
-2025-07-23 06:36:03,718 [WARNING] app.scan_engine: trivy produced no valid output on attempt 4
-2025-07-23 06:36:06,011 [INFO] app.scan_engine: dependency-check exit code 13
-2025-07-23 06:36:06,012 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 3
-2025-07-23 06:36:07,708 [INFO] app.scan_engine: semgrep exit code 2
-2025-07-23 06:36:07,708 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 3
-2025-07-23 06:36:10,786 [INFO] app.scan_engine: Running dependency-check (attempt 4/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source -f XML -o /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/depcheck --prettyPrint
-2025-07-23 06:36:12,577 [INFO] app.scan_engine: Running trivy (attempt 5/6): trivy fs --format json --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/trivy.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source
-2025-07-23 06:36:12,665 [INFO] app.scan_engine: Running semgrep (attempt 4/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/semgrep.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
-2025-07-23 06:36:13,475 [INFO] app.scan_engine: dependency-check exit code 13
-2025-07-23 06:36:13,475 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 4
-2025-07-23 06:36:14,470 [INFO] app.scan_engine: trivy exit code 1
-2025-07-23 06:36:14,470 [WARNING] app.scan_engine: trivy produced no valid output on attempt 5
-2025-07-23 06:36:15,634 [INFO] app.scan_engine: semgrep exit code 2
-2025-07-23 06:36:15,634 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 4
-2025-07-23 06:36:22,001 [INFO] app.scan_engine: Running dependency-check (attempt 5/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source -f XML -o /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/depcheck --prettyPrint
-2025-07-23 06:36:24,349 [INFO] app.scan_engine: dependency-check exit code 13
-2025-07-23 06:36:24,350 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 5
-2025-07-23 06:36:24,477 [INFO] app.scan_engine: Running semgrep (attempt 5/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/semgrep.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
-2025-07-23 06:36:26,824 [INFO] app.scan_engine: semgrep exit code 2
-2025-07-23 06:36:26,824 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 5
-2025-07-23 06:36:31,146 [INFO] app.scan_engine: Running trivy (attempt 6/6): trivy fs --format json --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/trivy.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source
-2025-07-23 06:36:32,759 [INFO] app.scan_engine: trivy exit code 1
-2025-07-23 06:36:32,759 [WARNING] app.scan_engine: trivy produced no valid output on attempt 6
-2025-07-23 06:36:41,073 [INFO] app.scan_engine: Running dependency-check (attempt 6/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source -f XML -o /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/depcheck --prettyPrint
-2025-07-23 06:36:43,207 [INFO] app.scan_engine: Running semgrep (attempt 6/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_901eab27-2db4-400d-b3f2-ed67bedf724f/semgrep.json /home/jenkins/901eab27-2db4-400d-b3f2-ed67bedf724f/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
-2025-07-23 06:36:44,067 [INFO] app.scan_engine: dependency-check exit code 13
-2025-07-23 06:36:44,067 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 6
-2025-07-23 06:36:46,368 [INFO] app.scan_engine: semgrep exit code 2
-2025-07-23 06:36:46,368 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 6
-2025-07-23 06:37:04,906 [ERROR] app.scan_engine: trivy failed after 6 attempts
-2025-07-23 06:37:04,906 [WARNING] app.scan_engine: trivy: skipped (no output or error)
-2025-07-23 06:37:16,197 [ERROR] app.scan_engine: dependency-check failed after 6 attempts
-2025-07-23 06:37:16,197 [WARNING] app.scan_engine: dependency-check: skipped (no output or error)
-2025-07-23 06:37:18,564 [ERROR] app.scan_engine: semgrep failed after 6 attempts
-2025-07-23 06:37:18,564 [WARNING] app.scan_engine: semgrep: skipped (no output or error)
-2025-07-23 06:37:18,571 [WARNING] app.main: Failed to store results in database: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on 'database-1.c0pogq0w8mxc.us-east-1.rds.amazonaws.com' ([Errno -2] Name or service not known)")
+INFO:     172.30.2.2:37406 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:40604 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:52910 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:34306 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:43188 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:39404 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:36104 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:50532 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:56738 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:33354 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:44433 - "GET / HTTP/1.1" 200 OK
+INFO:     172.30.2.2:11542 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     172.30.2.2:57594 - "GET /health HTTP/1.1" 200 OK
+2025-07-23 07:18:42,095 [INFO] app.main: Cloning repo: https://github.com/furkhan-2000/Hospital-Proj.git
+2025-07-23 07:18:45,109 [INFO] app.main: Starting new scan for target: https://github.com/furkhan-2000/Hospital-Proj.git
+2025-07-23 07:18:45,111 [INFO] app.scan_engine: Source analysis: {'file_count': 47, 'total_size': 117066, 'extensions': {'.sample', '.idx', '.txt', '.md', '.py', '.yaml', '.html', '.pack'}, 'has_code': True}
+2025-07-23 07:18:45,112 [INFO] app.scan_engine: No valid requirements.txt; skipping pip-audit.
+2025-07-23 07:18:45,114 [INFO] app.scan_engine: Running semgrep (attempt 1/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/semgrep.json /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
+2025-07-23 07:18:45,115 [INFO] app.scan_engine: Running bandit (attempt 1/6): bandit -r /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source -f json -o /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/bandit.json
+2025-07-23 07:18:45,117 [INFO] app.scan_engine: Running trivy (attempt 1/6): trivy fs --format json --output /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/trivy.json /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source
+2025-07-23 07:18:48,447 [INFO] app.scan_engine: trivy exit code 1
+2025-07-23 07:18:48,451 [INFO] app.scan_engine: Running gitleaks (attempt 1/6): gitleaks detect --source /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source --report-path /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/gitleaks.json --report-format json
+2025-07-23 07:18:48,452 [ERROR] app.scan_engine: Error parsing Trivy output: [Errno 2] No such file or directory: '/home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/trivy.json'
+Traceback (most recent call last):
+  File "/sast/scan_engine.py", line 247, in parse_trivy
+    data = json.load(open(path, encoding="utf-8"))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/trivy.json'
+2025-07-23 07:18:48,847 [INFO] app.scan_engine: gitleaks exit code 0
+2025-07-23 07:18:48,848 [INFO] app.scan_engine: Running dependency-check (attempt 1/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source -f XML -o /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/depcheck --prettyPrint
+2025-07-23 07:18:48,938 [INFO] app.scan_engine: bandit exit code 1
+2025-07-23 07:18:53,588 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 07:18:53,588 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 1
+2025-07-23 07:18:53,606 [INFO] app.scan_engine: semgrep exit code 2
+2025-07-23 07:18:53,606 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 1
+2025-07-23 07:18:54,753 [INFO] app.scan_engine: Running semgrep (attempt 2/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/semgrep.json /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
+2025-07-23 07:18:55,136 [INFO] app.scan_engine: Running dependency-check (attempt 2/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source -f XML -o /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/depcheck --prettyPrint
+2025-07-23 07:18:59,747 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 07:18:59,747 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 2
+2025-07-23 07:19:00,848 [INFO] app.scan_engine: semgrep exit code 2
+2025-07-23 07:19:00,849 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 2
+2025-07-23 07:19:01,844 [INFO] app.scan_engine: Running dependency-check (attempt 3/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source -f XML -o /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/depcheck --prettyPrint
+2025-07-23 07:19:03,036 [INFO] app.scan_engine: Running semgrep (attempt 3/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/semgrep.json /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
+2025-07-23 07:19:06,251 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 07:19:06,252 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 3
+2025-07-23 07:19:08,690 [INFO] app.scan_engine: semgrep exit code 2
+2025-07-23 07:19:08,690 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 3
+2025-07-23 07:19:11,219 [INFO] app.scan_engine: Running dependency-check (attempt 4/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source -f XML -o /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/depcheck --prettyPrint
+2025-07-23 07:19:12,961 [INFO] app.scan_engine: Running semgrep (attempt 4/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/semgrep.json /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
+2025-07-23 07:19:15,347 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 07:19:15,349 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 4
+2025-07-23 07:19:17,290 [INFO] app.scan_engine: semgrep exit code 2
+2025-07-23 07:19:17,291 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 4
+2025-07-23 07:19:24,109 [INFO] app.scan_engine: Running dependency-check (attempt 5/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source -f XML -o /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/depcheck --prettyPrint
+2025-07-23 07:19:25,688 [INFO] app.scan_engine: Running semgrep (attempt 5/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/semgrep.json /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
+2025-07-23 07:19:27,286 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 07:19:27,287 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 5
+2025-07-23 07:19:29,354 [INFO] app.scan_engine: semgrep exit code 2
+2025-07-23 07:19:29,355 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 5
+2025-07-23 07:19:43,530 [INFO] app.scan_engine: Running dependency-check (attempt 6/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source -f XML -o /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/depcheck --prettyPrint
+2025-07-23 07:19:45,372 [INFO] app.scan_engine: Running semgrep (attempt 6/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/semgrep.json /home/jenkins/c4e71ac2-3dbb-49ee-b835-c7ce9570e5d4/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
+2025-07-23 07:19:45,840 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 07:19:45,842 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 6
+2025-07-23 07:19:48,157 [INFO] app.scan_engine: semgrep exit code 2
+2025-07-23 07:19:48,158 [WARNING] app.scan_engine: semgrep produced no valid output on attempt 6
+2025-07-23 07:20:18,114 [ERROR] app.scan_engine: dependency-check failed after 6 attempts
+2025-07-23 07:20:18,115 [WARNING] app.scan_engine: dependency-check: skipped (no output or error)
+2025-07-23 07:20:20,414 [ERROR] app.scan_engine: semgrep failed after 6 attempts
+2025-07-23 07:20:20,414 [WARNING] app.scan_engine: semgrep: skipped (no output or error)
+2025-07-23 07:20:20,605 [WARNING] app.main: Failed to store results in database: (pymysql.err.OperationalError) (2003, "Can't connect to MySQL server on 'database-1.c0pogq0w8mxc.us-east-1.rds.amazonaws.com' ([Errno -2] Name or service not known)")
 (Background on this error at: https://sqlalche.me/e/20/e3q8)
-INFO:     172.30.2.2:55848 - "GET /health HTTP/1.1" 200 OK
-INFO:     172.30.2.2:53026 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:12676 - "POST /scan HTTP/1.1" 200 OK
+INFO:     172.30.2.2:45492 - "GET /health HTTP/1.1" 200 OK
+INFO:     172.30.2.2:41808 - "GET /health HTTP/1.1" 200 OK

@@ -12,16 +12,21 @@ class ScanResult:
     def add_vulnerability(self, url: str, vuln_type: str, param: str, payload: str):
         # Avoid adding duplicate vulnerabilities
         vuln_signature = (url, vuln_type, param)
-        if not any(v['signature'] == vuln_signature for v in self.vulnerabilities):
+        if not any(v.get('signature') == vuln_signature for v in self.vulnerabilities):
             self.vulnerabilities.append({
                 'url': url,
                 'type': vuln_type,
                 'param': param,
                 'payload': payload,
+                'signature': vuln_signature,
                 'signature': vuln_signature # Internal signature for deduplication
             })
             self.vuln_count += 1
             logger.critical(f"VULNERABILITY: {vuln_type} at {url} in param '{param}'")
+
+    def add_error(self, error_message: str = ""):
+        """Add an error to the scan results"""
+        self.error_count += 1
 
     def to_dict(self):
         # Exclude the internal signature from the final report
