@@ -2,7 +2,7 @@ import asyncio
 import random
 import re
 import math
-from playwright.async_api import async_playwright, Error as PlaywrightError
+from playwright.async_api import async_playwright, Error as PlaywrightError, TimeoutError as PlaywrightTimeoutError
 from loguru import logger
 from selectolax.parser import HTMLParser
 
@@ -111,7 +111,7 @@ async def aggressive_run(url: str, scan_result: ScanResult):
 
         try:
             logger.info(f"Navigating to {url} for initial analysis.")
-            initial_response = await page.goto(url, timeout=60000, wait_until='domcontentloaded')
+            initial_response = await page.goto(url, timeout=90000, wait_until='domcontentloaded')
             
             scan_result.scanned_urls += 1
             html_content = await page.content()
@@ -161,7 +161,7 @@ async def aggressive_run(url: str, scan_result: ScanResult):
 
                         # Try to submit the form to check for server-side vulnerabilities
                         await element.press('Enter')
-                        await page.wait_for_timeout(2000) # Wait for navigation/response
+                        await page.wait_for_timeout(3000) # Wait for navigation/response
 
                         response_text = await page.content()
                         if detect_func(response_text, payload if vuln_type == "XSS" else None):
@@ -174,18 +174,24 @@ async def aggressive_run(url: str, scan_result: ScanResult):
                         if page.url != url:
                             await page.goto(url, wait_until='domcontentloaded')
 
+                except PlaywrightTimeoutError:
+                    logger.warning(f"Timeout interacting with input element: {name}. The page may have been slow to respond.")
+                    scan_result.add_error(f"Timeout on input: {name}")
                 except PlaywrightError as e:
                     logger.warning(f"Error interacting with an input element: {e}")
-                    scan_result.error_count += 1
+                    scan_result.add_error(f"Playwright error on input '{name}': {str(e)[:100]}")
 
             logger.info(f"Browser scan complete for {url}")
 
+        except PlaywrightTimeoutError:
+            logger.error(f"Navigation timeout for {url}. The site may be slow, offline, or actively blocking the scan.")
+            scan_result.add_error("Navigation Timeout: The target site failed to load in time.")
         except PlaywrightError as e:
             logger.error(f"A Playwright error occurred during the browser scan for {url}: {e}")
-            scan_result.error_count += 1
+            scan_result.add_error(f"A browser error occurred: {str(e)[:150]}")
         except Exception as e:
             logger.exception(f"An unexpected error occurred during the browser scan for {url}: {e}")
-            scan_result.error_count += 1
+            scan_result.add_error(f"An unexpected error occurred: {str(e)[:150]}")
         finally:
             await context.close()
             await browser.close()

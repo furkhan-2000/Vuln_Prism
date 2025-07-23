@@ -308,8 +308,8 @@ def check_basic_xss(base_url, html_content, vulnerabilities, url):
 def check_insecure_forms(tree, base_url, vulnerabilities, url):
     forms = tree.css('form')
     for form in forms:
-        action = form.get('action', '')
-        method = form.get('method', 'GET').upper()
+        action = form.attributes.get('action', '')
+        method = form.attributes.get('method', 'GET').upper()
 
         if base_url.startswith("https://") and action.startswith("http://"):
             vulnerabilities.append({

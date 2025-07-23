@@ -9,8 +9,14 @@ from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import random
+from io import BytesIO
 
 from lxml import etree
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
 
 # Configure logging
 logger = logging.getLogger("app.scan_engine")
@@ -59,6 +65,69 @@ AUTO_FIX_SUGGESTIONS = {
     "hardcoded-credential": "Use secrets manager."
 }
 
+def generate_pdf_report(target: str, summary: Dict[str, int], issues: List[Dict[str, Any]]) -> BytesIO:
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    styles = getSampleStyleSheet()
+    story = []
+
+    # Title
+    story.append(Paragraph("VulnPrism SAST/SCA Report", styles['Title']))
+    story.append(Spacer(1, 0.2*inch))
+
+    # Target
+    story.append(Paragraph(f"<b>Target:</b> {target}", styles['Normal']))
+    story.append(Spacer(1, 0.2*inch))
+
+    # Summary Table
+    summary_data = [["Severity", "Count"]]
+    for sev, count in summary.items():
+        summary_data.append([sev, str(count)])
+    
+    summary_table = Table(summary_data)
+    summary_table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.grey),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+        ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0,0), (-1,0), 12),
+        ('BACKGROUND', (0,1), (-1,-1), colors.beige),
+        ('GRID', (0,0), (-1,-1), 1, colors.black)
+    ]))
+    story.append(summary_table)
+    story.append(Spacer(1, 0.3*inch))
+
+    # Issues Table
+    if issues:
+        issues_data = [["Severity", "Rule", "File", "Line", "Description"]]
+        for issue in sorted(issues, key=lambda x: RISK_SCORE_MAP.get(x.get('severity', 'Info'), 0), reverse=True):
+            issues_data.append([
+                issue.get('severity', 'N/A'),
+                Paragraph(issue.get('rule', 'N/A'), styles['Normal']),
+                Paragraph(issue.get('file', 'N/A'), styles['Normal']),
+                issue.get('line', 'N/A'),
+                Paragraph(issue.get('desc', 'N/A'), styles['Normal'])
+            ])
+
+        issues_table = Table(issues_data, colWidths=[0.8*inch, 1.5*inch, 2*inch, 0.5*inch, 2.7*inch])
+        issues_table.setStyle(TableStyle([
+            ('BACKGROUND', (0,0), (-1,0), colors.darkred),
+            ('TEXTCOLOR', (0,0), (-1,0), colors.whitesmoke),
+            ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
+            ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0,0), (-1,0), 10),
+            ('TOPPADDING', (0,0), (-1,0), 10),
+            ('BACKGROUND', (0,1), (-1,-1), colors.lightgrey),
+            ('GRID', (0,0), (-1,-1), 1, colors.black),
+            ('WORDWRAP', (0,0), (-1,-1), 'CJK')
+        ]))
+        story.append(issues_table)
+
+    doc.build(story)
+    buffer.seek(0)
+    return buffer
+
 def validate_source_directory(source_path: str) -> Dict[str, Any]:
     if not os.path.isdir(source_path):
         raise Exception(f"Invalid source directory: {source_path}")
@@ -105,7 +174,9 @@ def run_tool_with_retry(name: str, cmd: List[str], output_path: str,
             logger.debug("%s stderr: %s", name, result.stderr[:500])
 
             # Semgrep: exit code 7 = no findings (we treat as success)
-            if name.lower() == "semgrep" and result.returncode == 7:
+            # Bandit/Trivy: exit code 1 = findings (we treat as success)
+            if (name.lower() == "semgrep" and result.returncode == 7) or \
+               (name.lower() in ["bandit", "trivy"] and result.returncode == 1):
                 return True
 
             # Write output: for JSON-based tools use stdout, for XML use stderr if empty

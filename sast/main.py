@@ -9,7 +9,7 @@ from tarfile import open as TarOpen
 from pathlib import Path
 
 from fastapi import FastAPI, UploadFile, Form, HTTPException, Request, Depends
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -67,7 +67,7 @@ async def health_check():
 
     return {"status": "ok", "database": "ok" if db_ok else "disabled", "cache": "ok" if redis_ok else "disabled"}
 
-@app.post("/scan", response_model=dict)
+@app.post("/scan")
 async def scan_code(
     repo_url: str = Form(None),
     code_text: str = Form(None),
@@ -83,12 +83,7 @@ async def scan_code(
     if not target:
         raise HTTPException(400, "No input provided.")
 
-    # 1. Check Cache
-    if redis_cache:
-        cached_result = redis_cache.get(target)
-        if cached_result:
-            logger.info("Returning cached result for target: %s", target)
-            return json.loads(cached_result)
+    # Caching is more complex with PDF responses, so we disable it for now.
 
     try:
         os.makedirs(code_dir, exist_ok=True)
@@ -115,7 +110,7 @@ async def scan_code(
             elif safe_filename.endswith(('.tar.gz', '.tgz', '.tar')): TarOpen(upload_path, "r:*").extractall(code_dir)
             else: shutil.move(upload_path, os.path.join(code_dir, safe_filename))
 
-        # 2. Run Scan (if not cached)
+        # 2. Run Scan
         logger.info("Starting new scan for target: %s", target)
         summary, issues = scan_engine.run_full_scan(code_dir, temp_id)
 
@@ -140,15 +135,10 @@ async def scan_code(
         else:
             logger.info("Database not available, skipping result storage.")
 
-        # Prepare response
-        response_data = {"scan_id": temp_id, "target": target, "summary": summary, "issues": issues}
-
-        # 4. Update Cache
-        if redis_cache:
-            redis_cache.set(target, json.dumps(response_data), ex=CACHE_EXPIRATION_SECONDS)
-            logger.info("Result for target '%s' cached.", target)
-
-        return response_data
+        # 4. Generate PDF Report
+        pdf_buffer = scan_engine.generate_pdf_report(target, summary, issues)
+        
+        return Response(content=pdf_buffer.getvalue(), media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=VulnPrism_SAST_Report_{temp_id[:8]}.pdf"})
 
     except Exception as e:
         logger.error("Scan failed for target %s: %s", target, e, exc_info=True)
