@@ -268,7 +268,7 @@ def run_full_scan(source_dir: str, temp_id: str) -> Tuple[Dict[str, int], List[D
         - A summary dictionary of vulnerability counts by severity.
         - A list of all found vulnerabilities (issues).
     """
-    base_output = os.path.join("/tmp", f"scan_results_{temp_id}")
+    base_output = os.path.join("/home/jenkins", f"scan_results_{temp_id}")
     os.makedirs(base_output, exist_ok=True)
 
     dir_info = validate_source_directory(source_dir)

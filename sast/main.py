@@ -75,7 +75,7 @@ async def scan_code(
     db: Session = Depends(database.get_db)
 ):
     temp_id = str(uuid.uuid4())
-    base_dir = os.path.join("/tmp", temp_id)
+    base_dir = os.path.join("/home/jenkins", temp_id)
     code_dir = os.path.join(base_dir, "source")
 
     # Determine the primary target for caching and logging
