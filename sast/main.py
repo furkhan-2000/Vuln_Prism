@@ -111,11 +111,20 @@ async def scan_code(
             else: shutil.move(upload_path, os.path.join(code_dir, safe_filename))
 
         # 2. Run Scan
-        logger.info("Starting new scan for target: %s", target)
+        import time
+        import traceback
+
+        scan_start_time = time.time()
+        logger.info(f"🚀 Starting comprehensive SAST scan for target: {target} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
+
         try:
             summary, issues = scan_engine.run_full_scan(code_dir, temp_id)
+            scan_duration = time.time() - scan_start_time
+            logger.info(f"✅ SAST scan completed in {scan_duration:.2f} seconds - Found {len(issues)} issues")
         except Exception as scan_error:
-            logger.error("Scan failed: %s", scan_error)
+            scan_duration = time.time() - scan_start_time
+            logger.error(f"❌ SAST scan failed after {scan_duration:.2f} seconds: {str(scan_error)}")
+            logger.error(f"📍 SAST scan error traceback: {traceback.format_exc()}")
             # Create a minimal report even if scan fails
             summary = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0, "Info": 0}
             issues = [{"rule": "scan-error", "desc": f"Scan failed: {str(scan_error)}", "impact": "N/A", "fix": "Check logs for details", "severity": "High"}]
@@ -142,13 +151,21 @@ async def scan_code(
             logger.info("Database not available, skipping result storage.")
 
         # 4. Generate PDF Report
+        pdf_start_time = time.time()
+        logger.info(f"📄 Starting PDF report generation for {len(issues)} issues")
+
         try:
             pdf_buffer = scan_engine.generate_pdf_report(target, summary, issues)
+            pdf_duration = time.time() - pdf_start_time
+            logger.info(f"✅ PDF report generated successfully in {pdf_duration:.2f} seconds")
             return Response(content=pdf_buffer.getvalue(), media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=VulnPrism_SAST_Report_{temp_id[:8]}.pdf"})
         except Exception as pdf_error:
-            logger.error("PDF generation failed: %s", pdf_error)
+            pdf_duration = time.time() - pdf_start_time
+            logger.error(f"❌ PDF generation failed after {pdf_duration:.2f} seconds: {str(pdf_error)}")
+            logger.error(f"📍 PDF error traceback: {traceback.format_exc()}")
             # Return JSON response as fallback
-            return {"target": target, "summary": summary, "issues": issues, "error": "PDF generation failed, returning JSON"}
+            logger.info("📋 Returning JSON fallback response")
+            return {"target": target, "summary": summary, "issues": issues, "error": "PDF generation failed, returning JSON", "scan_duration": f"{time.time() - scan_start_time:.2f}s"}
 
     except Exception as e:
         logger.error("Scan failed for target %s: %s", target, e, exc_info=True)
