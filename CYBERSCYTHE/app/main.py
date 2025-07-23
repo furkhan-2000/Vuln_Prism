@@ -12,6 +12,7 @@ from app.aggressive_scanner.scanner import perform_scan, ScanResult
 from loguru import logger
 import sys
 import time
+import traceback
 from io import BytesIO
 from fpdf import FPDF
 
@@ -60,19 +61,19 @@ def generate_cyberscythe_pdf_report(target_url: str, scan_result: ScanResult) ->
     # Create PDF
     pdf = FPDF()
     pdf.add_page()
-    pdf.set_font('Arial', 'B', 16)
+    pdf.set_font('Helvetica', 'B', 16)
 
     # Title
     pdf.cell(0, 10, 'VulnPrism CyberScythe DAST Report', 0, 1, 'C')
     pdf.ln(10)
 
     # Target URL
-    pdf.set_font('Arial', 'B', 12)
+    pdf.set_font('Helvetica', 'B', 12)
     pdf.cell(0, 10, f'Target URL: {target_url}', 0, 1)
     pdf.ln(5)
 
     # Scan Summary
-    pdf.set_font('Arial', '', 10)
+    pdf.set_font('Helvetica', '', 10)
     pdf.cell(0, 8, f'URLs Scanned: {scan_result.scanned_urls}', 0, 1)
     pdf.cell(0, 8, f'Vulnerabilities Found: {scan_result.vuln_count}', 0, 1)
     pdf.cell(0, 8, f'Errors Encountered: {scan_result.error_count}', 0, 1)
@@ -85,9 +86,9 @@ def generate_cyberscythe_pdf_report(target_url: str, scan_result: ScanResult) ->
         if severity in severity_counts:
             severity_counts[severity] += 1
 
-    pdf.set_font('Arial', 'B', 12)
+    pdf.set_font('Helvetica', 'B', 12)
     pdf.cell(0, 10, 'Severity Summary:', 0, 1)
-    pdf.set_font('Arial', '', 10)
+    pdf.set_font('Helvetica', '', 10)
 
     for severity, count in severity_counts.items():
         if count > 0:
@@ -96,9 +97,9 @@ def generate_cyberscythe_pdf_report(target_url: str, scan_result: ScanResult) ->
 
     # Vulnerabilities Details
     if scan_result.vulnerabilities:
-        pdf.set_font('Arial', 'B', 12)
+        pdf.set_font('Helvetica', 'B', 12)
         pdf.cell(0, 10, 'Vulnerability Details:', 0, 1)
-        pdf.set_font('Arial', '', 9)
+        pdf.set_font('Helvetica', '', 9)
 
         # Sort by severity (Critical first)
         severity_order = {"Critical": 4, "High": 3, "Medium": 2, "Low": 1, "Info": 0}
@@ -109,11 +110,11 @@ def generate_cyberscythe_pdf_report(target_url: str, scan_result: ScanResult) ->
         for i, vuln in enumerate(sorted_vulns, 1):
             if pdf.get_y() > 250:  # Add new page if needed
                 pdf.add_page()
-                pdf.set_font('Arial', '', 9)
+                pdf.set_font('Helvetica', '', 9)
 
-            pdf.set_font('Arial', 'B', 10)
+            pdf.set_font('Helvetica', 'B', 10)
             pdf.cell(0, 8, f'{i}. {vuln.get("type", "Unknown")} ({vuln.get("severity", "Info")})', 0, 1)
-            pdf.set_font('Arial', '', 9)
+            pdf.set_font('Helvetica', '', 9)
 
             # URL (truncate if too long)
             url = vuln.get('url', 'N/A')
@@ -132,12 +133,16 @@ def generate_cyberscythe_pdf_report(target_url: str, scan_result: ScanResult) ->
             pdf.cell(0, 6, f'   Payload: {payload}', 0, 1)
             pdf.ln(3)
     else:
-        pdf.set_font('Arial', 'B', 12)
+        pdf.set_font('Helvetica', 'B', 12)
         pdf.cell(0, 10, 'No vulnerabilities found during the scan.', 0, 1)
 
     # Save to buffer
-    pdf_output = pdf.output(dest='S').encode('latin-1')
-    buffer.write(pdf_output)
+    pdf_output = pdf.output()
+    # Handle both bytes and bytearray
+    if isinstance(pdf_output, (bytes, bytearray)):
+        buffer.write(bytes(pdf_output))
+    else:
+        buffer.write(pdf_output.encode('latin-1'))
     buffer.seek(0)
     return buffer
 
@@ -197,7 +202,7 @@ async def scan(request: ScanRequest):
         except Exception as pdf_error:
             pdf_duration = time.time() - pdf_start_time
             logger.error(f"❌ PDF generation failed after {pdf_duration:.2f} seconds: {str(pdf_error)}")
-            logger.error(f"📍 PDF error traceback: {str(pdf_error)}")
+            logger.error(f"📍 PDF error traceback: {traceback.format_exc()}")
 
             # Return JSON response as fallback
             logger.info("📋 Returning JSON fallback response")

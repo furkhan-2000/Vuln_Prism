@@ -1,1108 +1,186 @@
-ec2-user@ip-172-31-25-160 Vuln_Prism]$ docker compose up -d
-[+] Building 0.0s (0/0)
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:50e6f29f412a9e1b5813327773b9667234d9c7ba071c282291e696e99dc9db00",
-
-      "name": "[internal] load local bake definitions",
-
-      "started": "2025-07-23T22:37:02.810732094Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "reading from stdin",
-
-      "vertex": "sha256:50e6f29f412a9e1b5813327773b9667234d9c7ba071c282291e696e99dc9db00",
-
-      "current": 0,
-
-      "timestamp": "0001-01-01T00:00:00Z",
-
-      "started": "2025-07-23T22:37:02.810735748Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "reading from stdin",
-
-      "vertex": "sha256:50e6f29f412a9e1b5813327773b9667234d9c7ba071c282291e696e99dc9db00",
-
-      "current": 1001,
-
-      "timestamp": "0001-01-01T00:00:00Z",
-
-      "started": "2025-07-23T22:37:02.810735748Z",
-
-      "completed": "2025-07-23T22:37:02.811410582Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "reading from stdin",
-
-      "vertex": "sha256:50e6f29f412a9e1b5813327773b9667234d9c7ba071c282291e696e99dc9db00",
-
-      "current": 1001,
-
-      "timestamp": "0001-01-01T00:00:00Z",
-
-      "started": "2025-07-23T22:37:02.810735748Z",
-
-      "completed": "2025-07-23T22:37:02.811410582Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:50e6f29f412a9e1b5813327773b9667234d9c7ba071c282291e696e99dc9db00",
-
-      "name": "[internal] load local bake definitions",
-
-      "started": "2025-07-23T22:37:02.810732094Z",
-
-      "completed": "2025-07-23T22:37:02.811546518Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
-
-      "name": "[cyberscythe internal] load build definition from Dockerfile"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
-
-      "name": "[chatbot-frontend internal] load build definition from Dockerfile"
-
-    },
-
-    {
-
-      "digest": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
-
-      "name": "[chatbot-frontend internal] load build definition from Dockerfile",
-
-      "started": "2025-07-23T22:37:02.917983777Z",
-
-      "completed": "2025-07-23T22:37:02.918037033Z"
-
-    },
-
-    {
-
-      "digest": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
-
-      "name": "[chatbot-frontend internal] load build definition from Dockerfile",
-
-      "started": "2025-07-23T22:37:02.918149681Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
-
-      "name": "[cyberscythe internal] load build definition from Dockerfile",
-
-      "started": "2025-07-23T22:37:02.918199027Z",
-
-      "completed": "2025-07-23T22:37:02.918237271Z"
-
-    },
-
-    {
-
-      "digest": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
-
-      "name": "[cyberscythe internal] load build definition from Dockerfile",
-
-      "started": "2025-07-23T22:37:02.918339916Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
-
-      "name": "[sast internal] load build definition from Dockerfile"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
-
-      "name": "[sast internal] load build definition from Dockerfile",
-
-      "started": "2025-07-23T22:37:02.918136795Z",
-
-      "completed": "2025-07-23T22:37:02.918186241Z"
-
-    },
-
-    {
-
-      "digest": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
-
-      "name": "[sast internal] load build definition from Dockerfile",
-
-      "started": "2025-07-23T22:37:02.91827464Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring dockerfile:",
-
-      "vertex": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
-
-      "name": "transferring",
-
-      "current": 0,
-
-      "timestamp": "2025-07-23T22:37:02.942585485Z",
-
-      "started": "2025-07-23T22:37:02.942583595Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring dockerfile:",
-
-      "vertex": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
-
-      "name": "transferring",
-
-      "current": 89,
-
-      "timestamp": "2025-07-23T22:37:02.945200582Z",
-
-      "started": "2025-07-23T22:37:02.942583595Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring dockerfile:",
-
-      "vertex": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
-
-      "name": "transferring",
-
-      "current": 473,
-
-      "timestamp": "2025-07-23T22:37:02.94769849Z",
-
-      "started": "2025-07-23T22:37:02.942583595Z",
-
-      "completed": "2025-07-23T22:37:02.94769713Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring dockerfile:",
-
-      "vertex": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
-
-      "name": "transferring",
-
-      "current": 0,
-
-      "timestamp": "2025-07-23T22:37:02.938882236Z",
-
-      "started": "2025-07-23T22:37:02.938880542Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring dockerfile:",
-
-      "vertex": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
-
-      "name": "transferring",
-
-      "current": 89,
-
-      "timestamp": "2025-07-23T22:37:02.940020596Z",
-
-      "started": "2025-07-23T22:37:02.938880542Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring dockerfile:",
-
-      "vertex": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
-
-      "name": "transferring",
-
-      "current": 4357,
-
-      "timestamp": "2025-07-23T22:37:02.941421442Z",
-
-      "started": "2025-07-23T22:37:02.938880542Z",
-
-      "completed": "2025-07-23T22:37:02.941419982Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring dockerfile:",
-
-      "vertex": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
-
-      "name": "transferring",
-
-      "current": 0,
-
-      "timestamp": "2025-07-23T22:37:02.950071895Z",
-
-      "started": "2025-07-23T22:37:02.950070307Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring dockerfile:",
-
-      "vertex": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
-
-      "name": "transferring",
-
-      "current": 89,
-
-      "timestamp": "2025-07-23T22:37:02.95150453Z",
-
-      "started": "2025-07-23T22:37:02.950070307Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring dockerfile:",
-
-      "vertex": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
-
-      "name": "transferring",
-
-      "current": 3047,
-
-      "timestamp": "2025-07-23T22:37:02.952886723Z",
-
-      "started": "2025-07-23T22:37:02.950070307Z",
-
-      "completed": "2025-07-23T22:37:02.95288528Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:e495214528cf9c992cbb1ce13705ff7a5f029b30f454f82d33e53b8d106ba7bd",
-
-      "name": "[chatbot-frontend internal] load build definition from Dockerfile",
-
-      "started": "2025-07-23T22:37:02.918149681Z",
-
-      "completed": "2025-07-23T22:37:02.972166574Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:6d313d177e20349df1e579cb68213113a7e10d83e836a1d8309b200bf72ae09d",
-
-      "name": "[cyberscythe internal] load build definition from Dockerfile",
-
-      "started": "2025-07-23T22:37:02.918339916Z",
-
-      "completed": "2025-07-23T22:37:02.979669183Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
-
-      "name": "[chatbot-frontend internal] load metadata for docker.io/library/python:3.11-slim",
-
-      "started": "2025-07-23T22:37:02.991877141Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:c9d2055008a1eea49c55c77f627c3e69a5b2886398b44ecfbc81f5a4ea4dcf8c",
-
-      "name": "[sast internal] load build definition from Dockerfile",
-
-      "started": "2025-07-23T22:37:02.91827464Z",
-
-      "completed": "2025-07-23T22:37:02.982695767Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
-
-      "name": "[cyberscythe internal] load metadata for docker.io/library/python:3.11-slim",
-
-      "started": "2025-07-23T22:37:02.992136697Z"
-
-    },
-
-    {
-
-      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
-
-      "name": "[cyberscythe internal] load metadata for docker.io/library/python:3.11-slim",
-
-      "started": "2025-07-23T22:37:02.992214578Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:0d9c7f59686088b4df5dc011e3fabd455eedacdf0f072befd67f098b5b36da22",
-
-      "name": "[sast internal] load metadata for docker.io/library/python:3.11.9-slim",
-
-      "started": "2025-07-23T22:37:03.030915067Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:0d9c7f59686088b4df5dc011e3fabd455eedacdf0f072befd67f098b5b36da22",
-
-      "name": "[sast internal] load metadata for docker.io/library/python:3.11.9-slim",
-
-      "started": "2025-07-23T22:37:03.031023554Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
-
-      "name": "[cyberscythe internal] load metadata for docker.io/library/python:3.11-slim",
-
-      "started": "2025-07-23T22:37:02.992214578Z",
-
-      "completed": "2025-07-23T22:37:03.513507352Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:d02c2ae4ee0b10d2c7406bed27af6669c20172b1ae5c929fde5fe1b02dfee042",
-
-      "name": "[cyberscythe internal] load .dockerignore"
-
-    },
-
-    {
-
-      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
-
-      "name": "[cyberscythe internal] load metadata for docker.io/library/python:3.11-slim",
-
-      "started": "2025-07-23T22:37:02.992136697Z",
-
-      "completed": "2025-07-23T22:37:03.513878445Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
-
-      "name": "[chatbot-frontend internal] load .dockerignore"
-
-    },
-
-    {
-
-      "digest": "sha256:fec50dacbb21839eefab803f73dbb4d9623839a8f78459ebb826d917bc361c9b",
-
-      "name": "[chatbot-frontend internal] load metadata for docker.io/library/python:3.11-slim",
-
-      "started": "2025-07-23T22:37:02.991877141Z",
-
-      "completed": "2025-07-23T22:37:03.527826164Z"
-
-    },
-
-    {
-
-      "digest": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
-
-      "name": "[chatbot-frontend internal] load .dockerignore",
-
-      "started": "2025-07-23T22:37:03.528546572Z",
-
-      "completed": "2025-07-23T22:37:03.528576963Z"
-
-    },
-
-    {
-
-      "digest": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
-
-      "name": "[chatbot-frontend internal] load .dockerignore",
-
-      "started": "2025-07-23T22:37:03.528709674Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:d02c2ae4ee0b10d2c7406bed27af6669c20172b1ae5c929fde5fe1b02dfee042",
-
-      "name": "[cyberscythe internal] load .dockerignore",
-
-      "started": "2025-07-23T22:37:03.517026987Z",
-
-      "completed": "2025-07-23T22:37:03.517109157Z"
-
-    },
-
-    {
-
-      "digest": "sha256:d02c2ae4ee0b10d2c7406bed27af6669c20172b1ae5c929fde5fe1b02dfee042",
-
-      "name": "[cyberscythe internal] load .dockerignore",
-
-      "started": "2025-07-23T22:37:03.517235893Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring context:",
-
-      "vertex": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
-
-      "name": "transferring",
-
-      "current": 0,
-
-      "timestamp": "2025-07-23T22:37:03.541612264Z",
-
-      "started": "2025-07-23T22:37:03.541610423Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring context:",
-
-      "vertex": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
-
-      "name": "transferring",
-
-      "current": 0,
-
-      "timestamp": "2025-07-23T22:37:03.54264179Z",
-
-      "started": "2025-07-23T22:37:03.541610423Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "statuses": [
-
-    {
-
-      "id": "transferring context:",
-
-      "vertex": "sha256:a5975be467fd993fd62425f138ca19a623a68d6b338d6ad3f72c00f2f0313327",
-
-      "name": "transferring",
-
-      "current": 2,
-
-      "timestamp": "2025-07-23T22:37:03.543202708Z",
-
-      "started": "2025-07-23T22:37:03.541610423Z",
-
-      "completed": "2025-07-23T22:37:03.543201303Z"
-
-    }
-
-  ]
-
-}
-
-    {
-
-      "digest": "sha256:c2022e09d3df120d561baa7c2eaf919e64fce0c560385f7949ab815e4897dd4c",
-
-      "inputs": [
-
-        "sha256:ca3cbe5f3f0d8e435739e8fd9ec3da0fafb06acce6c1f2b92aae3e3cac8cbedd"
-
-      ],
-
-      "name": "[cyberscythe builder 4/4] RUN apt-get update \u0026\u0026     apt-get install -y --no-install-recommends         gcc python3-dev         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation         libgtk-3-0 wget ca-certificates \u0026\u0026     python -m venv /install \u0026\u0026     /install/bin/pip install --upgrade pip \u0026\u0026     /install/bin/pip install --no-cache-dir -r requirements.txt \u0026\u0026     /install/bin/playwright install chromium --with-deps \u0026\u0026     find /install -name \"*.pyc\" -delete \u0026\u0026     find /install -name \"__pycache__\" -type d -exec rm -rf {} + \u0026\u0026     apt-get purge -y --auto-remove gcc python3-dev \u0026\u0026     apt-get clean \u0026\u0026     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip"
-
-    },
-
-    {
-
-      "digest": "s
-    
-    
-
-      "timestamp": "2025-07-23T22:39:36.354958103Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "logs": [
-
-    {
-
-      "vertex": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
-
-      "stream": 1,
-
-      "data": "ICAgIEZvdW5kIGV4aXN0aW5nIGluc3RhbGxhdGlvbjogcGlwIDI0LjAK",
-
-      "timestamp": "2025-07-23T22:39:36.358403836Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "logs": [
-
-    {
-
-      "vertex": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
-
-      "stream": 1,
-
-      "data": "ICAgIFVuaW5zdGFsbGluZyBwaXAtMjQuMDoK",
-
-      "timestamp": "2025-07-23T22:39:36.472021753Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "logs": [
-
-    {
-
-      "vertex": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
-
-      "stream": 1,
-
-      "data": "ICAgICAgU3VjY2Vzc2Z1bGx5IHVuaW5zdGFsbGVkIHBpcC0yNC4wCg==",
-
-      "timestamp": "2025-07-23T22:39:37.086554216Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "logs": [
-
-    {
-
-      "vertex": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
-
-      "stream": 1,
-
-      "data": "U3VjY2Vzc2Z1bGx5IGluc3RhbGxlZCBwaXAtMjUuMS4xCg==",
-
-      "timestamp": "2025-07-23T22:39:39.413412102Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "logs": [
-
-    {
-
-      "vertex": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
-
-      "stream": 2,
-
-      "data": "V0FSTklORzogUnVubmluZyBwaXAgYXMgdGhlICdyb290JyB1c2VyIGNhbiByZXN1bHQgaW4gYnJva2VuIHBlcm1pc3Npb25zIGFuZCBjb25mbGljdGluZyBiZWhhdmlvdXIgd2l0aCB0aGUgc3lzdGVtIHBhY2thZ2UgbWFuYWdlci4gSXQgaXMgcmVjb21tZW5kZWQgdG8gdXNlIGEgdmlydHVhbCBlbnZpcm9ubWVudCBpbnN0ZWFkOiBodHRwczovL3BpcC5weXBhLmlvL3dhcm5pbmdzL3ZlbnYK",
-
-      "timestamp": "2025-07-23T22:39:39.415274728Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "logs": [
-
-    {
-
-      "vertex": "sha256:c2022e09d3df120d561baa7c2eaf919e64fce0c560385f7949ab815e4897dd4c",
-
-      "stream": 1,
-
-      "data": "ICBQcmVwYXJpbmcgbWV0YWRhdGEgKHB5cHJvamVjdC50b21sKTogZmluaXNoZWQgd2l0aCBzdGF0dXMgJ2Vycm9yJwo=",
-
-      "timestamp": "2025-07-23T22:39:39.544044136Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "logs": [
-
-    {
-
-      "vertex": "sha256:c2022e09d3df120d561baa7c2eaf919e64fce0c560385f7949ab815e4897dd4c",
-
-      "stream": 2,
-
-      "data": "ICBlcnJvcjogc3VicHJvY2Vzcy1leGl0ZWQtd2l0aC1lcnJvcgogIAogIMOXIFByZXBhcmluZyBtZXRhZGF0YSAocHlwcm9qZWN0LnRvbWwpIGRpZCBub3QgcnVuIHN1Y2Nlc3NmdWxseS4KICDilIIgZXhpdCBjb2RlOiAxCiAg4pWw4pSAPiBbNTAgbGluZXMgb2Ygb3V0cHV0XQogICAgICArIG1lc29uIHNldHVwIC90bXAvcGlwLWluc3RhbGwtdGFjOTh1cXYvcHljYWlyb19kZmM0NjY4OTliMWI0MmY5OTBiMDQzNzViMmE0ZTk1OSAvdG1wL3BpcC1pbnN0YWxsLXRhYzk4dXF2L3B5Y2Fpcm9fZGZjNDY2ODk5YjFiNDJmOTkwYjA0Mzc1YjJhNGU5NTkvLm1lc29ucHktM3BtbThuaWQgLURidWlsZHR5cGU9cmVsZWFzZSAtRGJfbmRlYnVnPWlmLXJlbGVhc2UgLURiX3ZzY3J0PW1kIC1Ed2hlZWw9dHJ1ZSAtRHRlc3RzPWZhbHNlIC0tbmF0aXZlLWZpbGU9L3RtcC9waXAtaW5zdGFsbC10YWM5OHVxdi9weWNhaXJvX2RmYzQ2Njg5OWIxYjQyZjk5MGIwNDM3NWIyYTRlOTU5Ly5tZXNvbnB5LTNwbW04bmlkL21lc29uLXB5dGhvbi1uYXRpdmUtZmlsZS5pbmkKICAgICAgVGhlIE1lc29uIGJ1aWxkIHN5c3RlbQogICAgICBWZXJzaW9uOiAxLjguMgogICAgICBTb3VyY2UgZGlyOiAvdG1wL3BpcC1pbnN0YWxsLXRhYzk4dXF2L3B5Y2Fpcm9fZGZjNDY2ODk5YjFiNDJmOTkwYjA0Mzc1YjJhNGU5NTkKICAgICAgQnVpbGQgZGlyOiAvdG1wL3BpcC1pbnN0YWxsLXRhYzk4dXF2L3B5Y2Fpcm9fZGZjNDY2ODk5YjFiNDJmOTkwYjA0Mzc1YjJhNGU5NTkvLm1lc29ucHktM3BtbThuaWQKICAgICAgQnVpbGQgdHlwZTogbmF0aXZlIGJ1aWxkCiAgICAgIFByb2plY3QgbmFtZTogcHljYWlybwogICAgICBQcm9qZWN0IHZlcnNpb246IDEuMjguMAogICAgICBDIGNvbXBpbGVyIGZvciB0aGUgaG9zdCBtYWNoaW5lOiBjYyAoZ2NjIDEyLjIuMCAiY2MgKERlYmlhbiAxMi4yLjAtMTQrZGViMTJ1MSkgMTIuMi4wIikKICAgICAgQyBsaW5rZXIgZm9yIHRoZSBob3N0IG1hY2hpbmU6IGNjIGxkLmJmZCAyLjQwCiAgICAgIEhvc3QgbWFjaGluZSBjcHUgZmFtaWx5OiB4ODZfNjQKICAgICAgSG9zdCBtYWNoaW5lIGNwdTogeDg2XzY0CiAgICAgIFByb2dyYW0gcHl0aG9uMyBmb3VuZDogWUVTICgvaW5zdGFsbC9iaW4vcHl0aG9uKQogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdhbGw6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdhcnJheS1ib3VuZHM6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdjYXN0LWFsaWduOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XY29udmVyc2lvbjogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV2V4dHJhOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XZm9ybWF0PTI6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdmb3JtYXQtbm9ubGl0ZXJhbDogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV2Zvcm1hdC1zZWN1cml0eTogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV2ltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XaW5pdC1zZWxmOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XaW5saW5lOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XbWlzc2luZy1mb3JtYXQtYXR0cmlidXRlOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XbWlzc2luZy1ub3JldHVybjogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV25lc3RlZC1leHRlcm5zOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1Xb2xkLXN0eWxlLWRlZmluaXRpb246IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdwYWNrZWQ6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdwb2ludGVyLWFyaXRoOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1XcmV0dXJuLXR5cGU6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdzaGFkb3c6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdzaWduLWNvbXBhcmU6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVdzdHJpY3QtYWxpYXNpbmc6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVd1bmRlZjogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV3VudXNlZC1idXQtc2V0LXZhcmlhYmxlOiBZRVMKICAgICAgQ29tcGlsZXIgZm9yIEMgc3VwcG9ydHMgYXJndW1lbnRzIC1Xc3dpdGNoLWRlZmF1bHQ6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLVduby1taXNzaW5nLWZpZWxkLWluaXRpYWxpemVyczogWUVTCiAgICAgIENvbXBpbGVyIGZvciBDIHN1cHBvcnRzIGFyZ3VtZW50cyAtV25vLXVudXNlZC1wYXJhbWV0ZXI6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLWZuby1zdHJpY3QtYWxpYXNpbmc6IFlFUwogICAgICBDb21waWxlciBmb3IgQyBzdXBwb3J0cyBhcmd1bWVudHMgLWZ2aXNpYmlsaXR5PWhpZGRlbjogWUVTCiAgICAgIERpZCBub3QgZmluZCBwa2ctY29uZmlnIGJ5IG5hbWUgJ3BrZy1jb25maWcnCiAgICAgIEZvdW5kIHBrZy1jb25maWc6IE5PCiAgICAgIERpZCBub3QgZmluZCBDTWFrZSAnY21ha2UnCiAgICAgIEZvdW5kIENNYWtlOiBOTwogICAgICBSdW4tdGltZSBkZXBlbmRlbmN5IGNhaXJvIGZvdW5kOiBOTwogICAgICAKICAgICAgLi4vY2Fpcm8vbWVzb24uYnVpbGQ6MzE6MTI6IEVSUk9SOiBEZXBlbmRlbmN5IGxvb2t1cCBmb3IgY2Fpcm8gd2l0aCBtZXRob2QgJ3BrZ2NvbmZpZycgZmFpbGVkOiBQa2ctY29uZmlnIGZvciBtYWNoaW5lIGhvc3QgbWFjaGluZSBub3QgZm91bmQuIEdpdmluZyB1cC4KICAgICAgCiAgICAgIEEgZnVsbCBsb2cgY2FuIGJlIGZvdW5kIGF0IC90bXAvcGlwLWluc3RhbGwtdGFjOTh1cXYvcHljYWlyb19kZmM0NjY4OTliMWI0MmY5OTBiMDQzNzViMmE0ZTk1OS8ubWVzb25weS0zcG1tOG5pZC9tZXNvbi1sb2dzL21lc29uLWxvZy50eHQKICAgICAgW2VuZCBvZiBvdXRwdXRdCiAgCiAgbm90ZTogVGhpcyBlcnJvciBvcmlnaW5hdGVzIGZyb20gYSBzdWJwcm9jZXNzLCBhbmQgaXMgbGlrZWx5IG5vdCBhIHByb2JsZW0gd2l0aCBwaXAuCg==",
-
-      "timestamp": "2025-07-23T22:39:39.559180449Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "logs": [
-
-    {
-
-      "vertex": "sha256:c2022e09d3df120d561baa7c2eaf919e64fce0c560385f7949ab815e4897dd4c",
-
-      "stream": 2,
-
-      "data": "ZXJyb3I6IG1ldGFkYXRhLWdlbmVyYXRpb24tZmFpbGVkCgrDlyBFbmNvdW50ZXJlZCBlcnJvciB3aGlsZSBnZW5lcmF0aW5nIHBhY2thZ2UgbWV0YWRhdGEuCuKVsOKUgD4gU2VlIGFib3ZlIGZvciBvdXRwdXQuCgpub3RlOiBUaGlzIGlzIGFuIGlzc3VlIHdpdGggdGhlIHBhY2thZ2UgbWVudGlvbmVkIGFib3ZlLCBub3QgcGlwLgpoaW50OiBTZWUgYWJvdmUgZm9yIGRldGFpbHMuCg==",
-
-      "timestamp": "2025-07-23T22:39:39.746991625Z"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:c2022e09d3df120d561baa7c2eaf919e64fce0c560385f7949ab815e4897dd4c",
-
-      "inputs": [
-
-        "sha256:ca3cbe5f3f0d8e435739e8fd9ec3da0fafb06acce6c1f2b92aae3e3cac8cbedd"
-
-      ],
-
-      "name": "[cyberscythe builder 4/4] RUN apt-get update \u0026\u0026     apt-get install -y --no-install-recommends         gcc python3-dev         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation         libgtk-3-0 wget ca-certificates \u0026\u0026     python -m venv /install \u0026\u0026     /install/bin/pip install --upgrade pip \u0026\u0026     /install/bin/pip install --no-cache-dir -r requirements.txt \u0026\u0026     /install/bin/playwright install chromium --with-deps \u0026\u0026     find /install -name \"*.pyc\" -delete \u0026\u0026     find /install -name \"__pycache__\" -type d -exec rm -rf {} + \u0026\u0026     apt-get purge -y --auto-remove gcc python3-dev \u0026\u0026     apt-get clean \u0026\u0026     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip",
-
-      "started": "2025-07-23T22:37:12.036571735Z",
-
-      "completed": "2025-07-23T22:39:40.875077544Z",
-
-      "error": "process \"/bin/sh -c apt-get update \u0026\u0026     apt-get install -y --no-install-recommends         gcc python3-dev         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation         libgtk-3-0 wget ca-certificates \u0026\u0026     python -m venv /install \u0026\u0026     /install/bin/pip install --upgrade pip \u0026\u0026     /install/bin/pip install --no-cache-dir -r requirements.txt \u0026\u0026     /install/bin/playwright install chromium --with-deps \u0026\u0026     find /install -name \\\"*.pyc\\\" -delete \u0026\u0026     find /install -name \\\"__pycache__\\\" -type d -exec rm -rf {} + \u0026\u0026     apt-get purge -y --auto-remove gcc python3-dev \u0026\u0026     apt-get clean \u0026\u0026     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip\" did not complete successfully: exit code: 1"
-
-    }
-
-  ]
-
-}
-
-{
-
-  "vertexes": [
-
-    {
-
-      "digest": "sha256:c13f49842fb84c8debf40fa4fec5a5f26c8036b5e28d9e49b9a0c5531f139ee7",
-
-      "inputs": [
-
-        "sha256:bae72a82ce7251321aa86b76f1c2fdfbe979d02debde4e9be0e5c18fdc041d14"
-
-      ],
-
-      "name": "[sast builder 5/6] RUN pip install --no-cache-dir --upgrade pip \u0026\u0026     pip install --no-cache-dir -r requirements.txt",
-
-      "started": "2025-07-23T22:39:30.244311871Z",
-
-      "completed": "2025-07-23T22:39:42.057862581Z",
-
-      "error": "process \"/bin/sh -c pip install --no-cache-dir --upgrade pip \u0026\u0026     pip install --no-cache-dir -r requirements.txt\" did not complete successfully: exit code: 137: context canceled: context canceled"
-
-    }
-
-  ]
-
-}
-
-Dockerfile:16
-
---------------------
-
-  15 |     # This layer also installs Playwright's browser binaries.
-
-  16 | >>> RUN apt-get update && \
-
-  17 | >>>     apt-get install -y --no-install-recommends \
-
-  18 | >>>         gcc python3-dev \
-
-  19 | >>>         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1 \
-
-  20 | >>>         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 \
-
-  21 | >>>         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation \
-
-  22 | >>>         libgtk-3-0 wget ca-certificates && \
-
-  23 | >>>     # Create a virtual environment at /install
-
-  24 | >>>     python -m venv /install && \
-
-  25 | >>>     # Install pip and project dependencies into the virtual environment
-
-  26 | >>>     /install/bin/pip install --upgrade pip && \
-
-  27 | >>>     /install/bin/pip install --no-cache-dir -r requirements.txt && \
-
-  28 | >>>     # Install Playwright browser binaries (Chromium) with dependencies
-
-  29 | >>>     /install/bin/playwright install chromium --with-deps && \
-
-  30 | >>>     # Clean up build artifacts and apt cache to reduce layer size
-
-  31 | >>>     find /install -name "*.pyc" -delete && \
-
-  32 | >>>     find /install -name "__pycache__" -type d -exec rm -rf {} + && \
-
-  33 | >>>     apt-get purge -y --auto-remove gcc python3-dev && \
-
-  34 | >>>     apt-get clean && \
-
-  35 | >>>     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip
-
-  36 |
-
---------------------
-
-failed to solve: process "/bin/sh -c apt-get update &&     apt-get install -y --no-install-recommends         gcc python3-dev         libnss3 libatk1.0-0 libatk-bridge2.0-0 libx11-xcb1 libxcb1         libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3         libxi6 libpango-1.0-0 libcairo2 libglib2.0-0 libdbus-1-3         libdrm2 libgbm1 libasound2 libpangocairo-1.0-0 libxrandr2         libxss1 libwayland-client0 libwayland-cursor0 libwayland-egl1         libjpeg62-turbo libwebp7 libcups2 libxkbcommon0 fonts-liberation         libgtk-3-0 wget ca-certificates &&     python -m venv /install &&     /install/bin/pip install --upgrade pip &&     /install/bin/pip install --no-cache-dir -r requirements.txt &&     /install/bin/playwright install chromium --with-deps &&     find /install -name \"*.pyc\" -delete &&     find /install -name \"__pycache__\" -type d -exec rm -rf {} + &&     apt-get purge -y --auto-remove gcc python3-dev &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /root/.cache/pip" did not complete successfully: exit code: 1
-
-[ec2-user@ip-172-31-25-160 Vuln_Prism]$
-
-
-
-
-
+now sast gave this :: [ec2-user@ip-172-31-25-160 Vuln_Prism]$ docker compose ps -a
+NAME                            IMAGE                         COMMAND
+vuln_prism-chatbot-frontend-1   vuln_prism-chatbot-frontend   "python backend.py"      000/tcp
+vuln_prism-cyberscythe-1        vuln_prism-cyberscythe        "uvicorn app.main:ap…"   051/tcp
+vuln_prism-sast-1               vuln_prism-sast               "/usr/bin/tini -- uv…"   050/tcp
+[ec2-user@ip-172-31-25-160 Vuln_Prism]$ docker logs vuln_prism-sast-1 -f &
+[1] 68260
+[ec2-user@ip-172-31-25-160 Vuln_Prism]$ 2025-07-23 22:55:05,107 [INFO] app.main: 🚀 SAST service running in stateless mode - no database or cache dependencies
+INFO:     Started server process [7]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5050 (Press CTRL+C to quit)
+INFO:     127.0.0.1:35168 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59466 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50984 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57948 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52346 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50738 - "GET /health HTTP/1.1" 200 OK
+INFO:     103.48.70.167:64697 - "GET / HTTP/1.1" 200 OK
+INFO:     103.48.70.167:64697 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:50542 - "GET /health HTTP/1.1" 200 OK
+2025-07-23 22:58:41,263 [INFO] app.main: Cloning repo: https://github.com/furkhan-2000/Hospital-Proj.git
+2025-07-23 22:58:41,637 [INFO] app.main: 🚀 Starting comprehensive SAST scan for target: https://github.com/furkhan-2000/Hospital-Proj.git at 2025-07-23 22:58:41
+2025-07-23 22:58:41,639 [INFO] app.scan_engine: Source analysis: {'file_count': 47, 'total_size': 117027, 'extensions': {'.idx', '.pack', '.py', '.yaml', '.md', '.html', '.txt', '.sample'}, 'has_code': True}
+2025-07-23 22:58:41,640 [INFO] app.scan_engine: No valid requirements.txt; skipping pip-audit.
+2025-07-23 22:58:41,641 [INFO] app.scan_engine: Running semgrep (attempt 1/6): semgrep --json --metrics=off --timeout 600 --output /home/jenkins/scan_results_aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/semgrep.json /home/jenkins/aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/source --config p/all --config p/security-audit --config p/owasp-top-10 --config p/python-security
+2025-07-23 22:58:41,642 [INFO] app.scan_engine: Running bandit (attempt 1/6): bandit -r /home/jenkins/aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/source -f json -o /home/jenkins/scan_results_aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/bandit.json
+2025-07-23 22:58:41,643 [INFO] app.scan_engine: Running trivy (attempt 1/6): trivy fs --format json --output /home/jenkins/scan_results_aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/trivy.json /home/jenkins/aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/source
+2025-07-23 22:58:44,097 [INFO] app.scan_engine: bandit exit code 1
+2025-07-23 22:58:44,098 [INFO] app.scan_engine: Running gitleaks (attempt 1/6): gitleaks detect --source /home/jenkins/aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/source --report-path /home/jenkins/scan_results_aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/gitleaks.json --report-format json
+2025-07-23 22:58:44,338 [INFO] app.scan_engine: gitleaks exit code 0
+2025-07-23 22:58:44,339 [INFO] app.scan_engine: Running dependency-check (attempt 1/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/source -f XML -o /home/jenkins/scan_results_aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/depcheck --prettyPrint
+2025-07-23 22:58:48,217 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 22:58:48,218 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 1
+2025-07-23 22:58:50,083 [INFO] app.scan_engine: Running dependency-check (attempt 2/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/source -f XML -o /home/jenkins/scan_results_aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/depcheck --prettyPrint
+2025-07-23 22:58:52,753 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 22:58:52,754 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 2
+2025-07-23 22:58:52,966 [INFO] app.scan_engine: semgrep exit code 7
+2025-07-23 22:58:54,866 [INFO] app.scan_engine: Running dependency-check (attempt 3/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/source -f XML -o /home/jenkins/scan_results_aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/depcheck --prettyPrint
+2025-07-23 22:58:57,473 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 22:58:57,473 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 3
+2025-07-23 22:59:00,608 [INFO] app.scan_engine: trivy exit code 0
+2025-07-23 22:59:01,639 [INFO] app.scan_engine: Running dependency-check (attempt 4/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/source -f XML -o /home/jenkins/scan_results_aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/depcheck --prettyPrint
+2025-07-23 22:59:03,535 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 22:59:03,535 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 4
+2025-07-23 22:59:11,640 [INFO] app.scan_engine: Running dependency-check (attempt 5/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/source -f XML -o /home/jenkins/scan_results_aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/depcheck --prettyPrint
+2025-07-23 22:59:13,068 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 22:59:13,069 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 5
+2025-07-23 22:59:29,081 [INFO] app.scan_engine: Running dependency-check (attempt 6/6): /usr/local/bin/dependency-check.sh -s /home/jenkins/aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/source -f XML -o /home/jenkins/scan_results_aaa7c7b1-ae0a-43c0-8919-f32cbe1f1b60/depcheck --prettyPrint
+2025-07-23 22:59:30,583 [INFO] app.scan_engine: dependency-check exit code 13
+2025-07-23 22:59:30,583 [WARNING] app.scan_engine: dependency-check produced no valid output on attempt 6
+2025-07-23 23:00:03,537 [ERROR] app.scan_engine: dependency-check failed after 6 attempts
+2025-07-23 23:00:03,537 [WARNING] app.scan_engine: dependency-check: skipped (no output or error)
+2025-07-23 23:00:03,538 [INFO] app.main: ✅ SAST scan completed in 81.90 seconds - Found 8 issues
+2025-07-23 23:00:03,538 [INFO] app.main: 📊 Scan completed - proceeding to PDF generation
+2025-07-23 23:00:03,538 [INFO] app.main: 📄 Starting PDF report generation for 8 issues
+2025-07-23 23:00:03,559 [INFO] app.main: ✅ PDF report generated successfully in 0.02 seconds
+INFO:     103.48.70.167:64698 - "POST /scan HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56988 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:44338 - "GET /health HTTP/1.1" 200 OK
+and in report pdf it gave this ::: VulnPrism SAST/SCA Report
+ Target: https://github.com/furkhan-2000/Hospital-Proj.git
+ Severity Count
+ Critical 0
+ High 1
+ Medium 7
+ Low 0
+ Info 0
+ Severity Rule File Line Description
+ High CVE-2024-28219 urine-report-check/requireme
+ nts.txt N/A python-pillow: buffer overflow in
+ _imagingcms.c
+ Medium B104
+ /home/jenkins/aaa7c7b1-ae0
+ a-43c0-8919-f32cbe1f1b60/s
+ ource/blood-report-check/app
+ .py
+ 137 Possible binding to all interfaces.
+ Medium B104
+ /home/jenkins/aaa7c7b1-ae0
+ a-43c0-8919-f32cbe1f1b60/s
+ ource/urine-report-check/app.
+ py
+ 609 Possible binding to all interfaces.
+ Medium CVE-2024-6839 urine-report-check/requireme
+ nts.txt N/A corydolphin/flask-cors version 4.0.1
+ contains an improper regex path m ...
+ Medium CVE-2024-6844 urine-report-check/requireme
+ nts.txt N/A A vulnerability in corydolphin/flask-cors
+ version 4.0.1 allows for inc ...
+ Medium CVE-2024-6866 urine-report-check/requireme
+ nts.txt N/A corydolphin/flask-cors version 4.01
+ contains a vulnerability where the ...
+ Medium CVE-2024-49766 urine-report-check/requireme
+ nts.txt N/A werkzeug: python-werkzeug: Werkzeug
+ safe_join not safe on Windows
+ Medium CVE-2024-49767 urine-report-check/requireme
+ nts.txt N/A
+ werkzeug: python-werkzeug: Werkzeug
+ possible resource exhaustion when
+ parsing file data in forms
+
+ in cyber:: 
+ it dosent create any report it only display this 
+ Scan complete. No vulnerabilities found for N/A. Scanned 1 URLs.
+ but i need it also to create a report format and all likehow sast did 
+ and the logs for cyber is here [ec2-user@ip-172-31-25-160 Vuln_Prism]$ ls
+BUILD_GUIDE.md  build.sh                   docker-compose.yml  sast
+CYBERSCYTHE     chatbot-frontend           error               test_services.py
+build.bat       docker-compose-simple.yml  kubernetes_deps
+[ec2-user@ip-172-31-25-160 Vuln_Prism]$ docker compose ps -a
+NAME                            IMAGE                         COMMAND                  SERVICE            CREATED         STATUS                   PORTS
+vuln_prism-chatbot-frontend-1   vuln_prism-chatbot-frontend   "python backend.py"      chatbot-frontend   7 minutes ago   Up 7 minutes             0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+vuln_prism-cyberscythe-1        vuln_prism-cyberscythe        "uvicorn app.main:ap…"   cyberscythe        7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:5051->5051/tcp, [::]:5051->5051/tcp
+vuln_prism-sast-1               vuln_prism-sast               "/usr/bin/tini -- uv…"   sast               7 minutes ago   Up 7 minutes (healthy)   0.0.0.0:5050->5050/tcp, [::]:5050->5050/tcp
+[ec2-user@ip-172-31-25-160 Vuln_Prism]$ docker logs INFO:     127.0.0.1:53442 - "GET /health HTTP/1.1" 200 OK
+vuln_prism-cyberscythe-1 -f &
+[2] 70508
+[ec2-user@ip-172-31-25-160 Vuln_Prism]$ 2025-07-23 22:55:06.786 | INFO     | app.main:<module>:54 - 🚀 CyberScythe running in stateless mode - no database or cache dependencies
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:5051 (Press CTRL+C to quit)
+INFO:     127.0.0.1:41224 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45340 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:40376 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:34834 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59694 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59632 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58820 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57276 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45472 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59288 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38290 - "GET /health HTTP/1.1" 200 OK
+2025-07-23 23:01:01.486 | INFO     | app.main:root:150 - 🌐 Root endpoint accessed - serving index.html directly
+INFO:     103.48.70.167:64803 - "GET / HTTP/1.1" 200 OK
+INFO:     103.48.70.167:64803 - "GET /static/app.js HTTP/1.1" 200 OK
+INFO:     103.48.70.167:64803 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:35890 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:32768 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58198 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56218 - "GET /health HTTP/1.1" 200 OK
+2025-07-23 23:03:04.617 | INFO     | app.main:scan:176 - 🚀 Starting CyberScythe DAST scan for target: https://pixabay.com/ at 2025-07-23 23:03:04
+2025-07-23 23:03:04.934 | INFO     | app.aggressive_scanner.scanner:perform_scan:109 - 🚀 Starting comprehensive scan for: https://pixabay.com/
+2025-07-23 23:03:08.107 | INFO     | app.aggressive_scanner.browser_scanner:aggressive_run:113 - Navigating to https://pixabay.com/ for initial analysis.
+2025-07-23 23:03:08.551 | INFO     | app.aggressive_scanner.browser_scanner:aggressive_run:122 - Performing static analysis on https://pixabay.com/
+2025-07-23 23:03:13.103 | INFO     | app.aggressive_scanner.browser_scanner:aggressive_run:134 - Starting dynamic form injection for https://pixabay.com/
+2025-07-23 23:03:13.229 | INFO     | app.aggressive_scanner.browser_scanner:aggressive_run:184 - Browser scan complete for https://pixabay.com/
+2025-07-23 23:03:13.530 | INFO     | app.aggressive_scanner.scanner:perform_scan:112 - ✅ Scan completed for https://pixabay.com/ - Found 0 vulnerabilities, 0 errors
+2025-07-23 23:03:13.531 | INFO     | app.aggressive_scanner.scanner:report:89 -
+=== SCAN REPORT ===
+2025-07-23 23:03:13.532 | INFO     | app.aggressive_scanner.scanner:report:90 - Scanned URLs: 1
+2025-07-23 23:03:13.533 | INFO     | app.aggressive_scanner.scanner:report:91 - Vulnerabilities found: 0
+2025-07-23 23:03:13.533 | INFO     | app.aggressive_scanner.scanner:report:92 - Errors encountered: 0
+2025-07-23 23:03:13.534 | INFO     | app.aggressive_scanner.scanner:report:94 - [Missing Security Headers] https://pixabay.com/ Parameter: N/A Payload: N/A
+2025-07-23 23:03:13.534 | INFO     | app.aggressive_scanner.scanner:report:94 - [Insecure Cookie (Missing HttpOnly Flag)] https://pixabay.com/ Parameter: __cf_bm Payload: Missing HttpOnly Flag
+2025-07-23 23:03:13.535 | INFO     | app.aggressive_scanner.scanner:report:94 - [Insecure Cookie (Missing/Weak SameSite Flag)] https://pixabay.com/ Parameter: __cf_bm Payload: Weak SameSite: None
+2025-07-23 23:03:13.535 | INFO     | app.main:scan:181 - ✅ CyberScythe scan completed in 8.92 seconds - Found 0 vulnerabilities
+2025-07-23 23:03:13.536 | INFO     | app.main:scan:185 - 📄 Starting PDF report generation for 0 vulnerabilities
+/app/app/main.py:63: UserWarning: Substituting font arial by core font helvetica
+  pdf.set_font('Arial', 'B', 16)
+/app/app/main.py:70: UserWarning: Substituting font arial by core font helvetica
+  pdf.set_font('Arial', 'B', 12)
+/app/app/main.py:75: UserWarning: Substituting font arial by core font helvetica
+  pdf.set_font('Arial', '', 10)
+/app/app/main.py:88: UserWarning: Substituting font arial by core font helvetica
+  pdf.set_font('Arial', 'B', 12)
+/app/app/main.py:90: UserWarning: Substituting font arial by core font helvetica
+  pdf.set_font('Arial', '', 10)
+/app/app/main.py:99: UserWarning: Substituting font arial by core font helvetica
+  pdf.set_font('Arial', 'B', 12)
+/app/app/main.py:101: UserWarning: Substituting font arial by core font helvetica
+  pdf.set_font('Arial', '', 9)
+/app/app/main.py:114: UserWarning: Substituting font arial by core font helvetica
+  pdf.set_font('Arial', 'B', 10)
+/app/app/main.py:116: UserWarning: Substituting font arial by core font helvetica
+  pdf.set_font('Arial', '', 9)
+2025-07-23 23:03:13.550 | ERROR    | app.main:scan:199 - ❌ PDF generation failed after 0.01 seconds: 'bytearray' object has no attribute 'encode'
+2025-07-23 23:03:13.550 | ERROR    | app.main:scan:200 - 📍 PDF error traceback: 'bytearray' object has no attribute 'encode'
+2025-07-23 23:03:13.551 | INFO     | app.main:scan:203 - 📋 Returning JSON fallback response
+INFO:     103.48.70.167:64907 - "POST /scan HTTP/1.1" 200 OK
+INFO:     127.0.0.1:47874 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59252 - "GET /health HTTP/1.1" 200 OK
+^C
+[ec2-user@ip-172-31-25-160 Vuln_Prism]$ INFO:     127.0.0.1:37898 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:37572 - "GET /health HTTP/1.1" 200 OK

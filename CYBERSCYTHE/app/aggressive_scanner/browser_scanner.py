@@ -120,15 +120,31 @@ async def aggressive_run(url: str, scan_result: ScanResult):
 
             # --- Perform Static Analysis First ---
             logger.info(f"Performing static analysis on {url}")
-            check_security_headers(headers, scan_result.vulnerabilities, url)
-            check_exposed_api_keys(html_content, scan_result.vulnerabilities, url)
-            check_outdated_software(headers, html_content, scan_result.vulnerabilities, url)
-            check_directory_listing(url, scan_result.vulnerabilities, url)
-            check_common_misconfigurations(url, scan_result.vulnerabilities, url)
-            check_insecure_forms(tree, url, scan_result.vulnerabilities, url)
-            check_sensitive_file_exposure(url, scan_result.vulnerabilities, url)
-            check_insecure_cookies(await context.cookies(), url, scan_result.vulnerabilities, url)
-            check_cors_misconfiguration(headers, scan_result.vulnerabilities, url)
+
+            # Create temporary list for detectors that haven't been updated yet
+            temp_vulnerabilities = []
+
+            # Updated detectors (use scan_result directly)
+            check_security_headers(headers, scan_result, url)
+            check_exposed_api_keys(html_content, scan_result, url)
+            check_insecure_cookies(await context.cookies(), url, scan_result, url)
+            check_cors_misconfiguration(headers, scan_result, url)
+
+            # Legacy detectors (still use vulnerabilities list)
+            check_outdated_software(headers, html_content, temp_vulnerabilities, url)
+            check_directory_listing(url, temp_vulnerabilities, url)
+            check_common_misconfigurations(url, temp_vulnerabilities, url)
+            check_insecure_forms(tree, url, temp_vulnerabilities, url)
+            check_sensitive_file_exposure(url, temp_vulnerabilities, url)
+
+            # Convert legacy vulnerabilities to scan_result
+            for vuln in temp_vulnerabilities:
+                scan_result.add_vulnerability(
+                    url=vuln.get('url', url),
+                    vuln_type=vuln.get('type', 'Unknown'),
+                    param=vuln.get('param', 'N/A'),
+                    payload=vuln.get('payload', 'N/A')
+                )
 
             # --- Dynamic Injection Testing on Forms ---
             logger.info(f"Starting dynamic form injection for {url}")

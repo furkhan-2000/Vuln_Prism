@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import List
 import os
 import httpx
 import uvicorn
@@ -30,7 +31,7 @@ class ChatMessage(BaseModel):
     content: str
 
 class ChatRequest(BaseModel):
-    messages: list[ChatMessage]
+    messages: List[ChatMessage]
     max_tokens: int = 1024
     temperature: float = 0.7
 

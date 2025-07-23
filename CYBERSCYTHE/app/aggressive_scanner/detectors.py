@@ -129,7 +129,7 @@ def detect_info_disclosure(response_text: str) -> bool:
         logger.error(f"Info disclosure detection error: {e}")
         return False
 
-def check_security_headers(headers, vulnerabilities, url):
+def check_security_headers(headers, scan_result, url):
     missing_headers = []
     if 'Strict-Transport-Security' not in headers:
         missing_headers.append("Strict-Transport-Security (HSTS)")
@@ -143,16 +143,14 @@ def check_security_headers(headers, vulnerabilities, url):
         missing_headers.append("X-XSS-Protection (or misconfigured)")
 
     if missing_headers:
-        vulnerabilities.append({
-            "url": url,
-            "type": "Missing Security Headers",
-            "severity": "Medium",
-            "description": f"The following security headers are missing or misconfigured: {', '.join(missing_headers)}. This can lead to various attacks like XSS, clickjacking, and protocol downgrade attacks.",
-            "param": "N/A",
-            "payload": "N/A"
-        })
+        scan_result.add_vulnerability(
+            url=url,
+            vuln_type="Missing Security Headers",
+            param="N/A",
+            payload=f"Missing: {', '.join(missing_headers)}"
+        )
 
-def check_exposed_api_keys(html_content, vulnerabilities, url):
+def check_exposed_api_keys(html_content, scan_result, url):
     patterns = [
         r'sk-[a-zA-Z0-9]{32,}',
         r'AIza[0-9A-Za-z\-_]{35}',
@@ -179,16 +177,14 @@ def check_exposed_api_keys(html_content, vulnerabilities, url):
             found_keys.append(match)
 
     if found_keys:
-        vulnerabilities.append({
-            "url": url,
-            "type": "Exposed API Key/Token",
-            "severity": "High",
-            "description": f"Potentially exposed API keys or tokens found in the HTML content. Examples: {', '.join(found_keys[:3])}. This could lead to unauthorized access to services.",
-            "param": "Page Content",
-            "payload": ", '.join(found_keys[:3])"
-        })
+        scan_result.add_vulnerability(
+            url=url,
+            vuln_type="Exposed API Key/Token",
+            param="Page Content",
+            payload=", ".join(found_keys[:3])
+        )
 
-def check_outdated_software(headers, html_content, vulnerabilities, url):
+def check_outdated_software(headers, html_content, scan_result, url):
     server_header = headers.get('Server', '').lower()
     if "apache" in server_header and not re.search(r'apache/(2\.[4-9]\.\d+|[3-9]\.\d+\.\d+)', server_header):
         vulnerabilities.append({
@@ -362,7 +358,7 @@ def check_sensitive_file_exposure(base_url, vulnerabilities, url):
         except httpx.RequestError:
             pass
 
-def check_insecure_cookies(cookies, base_url, vulnerabilities, url):
+def check_insecure_cookies(cookies, base_url, scan_result, url):
     for cookie in cookies:
         cookie_name = cookie.get('name')
         cookie_secure = cookie.get('secure')
@@ -370,46 +366,38 @@ def check_insecure_cookies(cookies, base_url, vulnerabilities, url):
         cookie_samesite = cookie.get('samesite')
 
         if base_url.startswith("https://") and not cookie_secure:
-            vulnerabilities.append({
-                "url": url,
-                "type": "Insecure Cookie (Missing Secure Flag)",
-                "severity": "Medium",
-                "description": f"Cookie '{cookie_name}' is served over HTTPS but is missing the 'Secure' flag. This cookie could be intercepted over HTTP if the user accesses the site insecurely.",
-                "param": cookie_name,
-                "payload": "Missing Secure Flag"
-            })
+            scan_result.add_vulnerability(
+                url=url,
+                vuln_type="Insecure Cookie (Missing Secure Flag)",
+                param=cookie_name,
+                payload="Missing Secure Flag"
+            )
 
         if not cookie_httponly:
-            vulnerabilities.append({
-                "url": url,
-                "type": "Insecure Cookie (Missing HttpOnly Flag)",
-                "severity": "Medium",
-                "description": f"Cookie '{cookie_name}' is missing the 'HttpOnly' flag. This makes it vulnerable to XSS attacks, as JavaScript can access the cookie.",
-                "param": cookie_name,
-                "payload": "Missing HttpOnly Flag"
-            })
+            scan_result.add_vulnerability(
+                url=url,
+                vuln_type="Insecure Cookie (Missing HttpOnly Flag)",
+                param=cookie_name,
+                payload="Missing HttpOnly Flag"
+            )
 
         if cookie_samesite not in ['Lax', 'Strict', 'lax', 'strict']:
-            vulnerabilities.append({
-                "url": url,
-                "type": "Insecure Cookie (Missing/Weak SameSite Flag)",
-                "severity": "Low",
-                "description": f"Cookie '{cookie_name}' is missing or has a weak 'SameSite' attribute ('{cookie_samesite}'). This can make it vulnerable to CSRF attacks.",
-                "param": cookie_name,
-                "payload": f"Weak SameSite: {cookie_samesite}"
-            })
+            scan_result.add_vulnerability(
+                url=url,
+                vuln_type="Insecure Cookie (Missing/Weak SameSite Flag)",
+                param=cookie_name,
+                payload=f"Weak SameSite: {cookie_samesite}"
+            )
 
-def check_cors_misconfiguration(headers, vulnerabilities, url):
+def check_cors_misconfiguration(headers, scan_result, url):
     acao = headers.get('Access-Control-Allow-Origin')
     if acao == '*':
-        vulnerabilities.append({
-            "url": url,
-            "type": "CORS Misconfiguration (Wildcard Origin)",
-            "severity": "High",
-            "description": "The 'Access-Control-Allow-Origin' header is set to '*', allowing any domain to access resources. This can lead to Cross-Origin Resource Sharing (CORS) vulnerabilities if sensitive data is exposed.",
-            "param": "Access-Control-Allow-Origin Header",
-            "payload": acao
-        })
+        scan_result.add_vulnerability(
+            url=url,
+            vuln_type="CORS Misconfiguration (Wildcard Origin)",
+            param="Access-Control-Allow-Origin Header",
+            payload=acao
+        )
     elif acao and ',' in acao:
         vulnerabilities.append({
             "url": url,

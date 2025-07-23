@@ -4,6 +4,8 @@ import uuid
 import logging
 import subprocess
 import json
+import time
+import traceback
 from zipfile import ZipFile
 from tarfile import open as TarOpen
 from pathlib import Path
@@ -86,9 +88,6 @@ async def scan_code(
             else: shutil.move(upload_path, os.path.join(code_dir, safe_filename))
 
         # 2. Run Scan
-        import time
-        import traceback
-
         scan_start_time = time.time()
         logger.info(f"🚀 Starting comprehensive SAST scan for target: {target} at {time.strftime('%Y-%m-%d %H:%M:%S')}")
 
