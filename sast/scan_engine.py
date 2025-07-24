@@ -347,13 +347,11 @@ def run_full_scan(source_dir: str, temp_id: str) -> Tuple[Dict[str, int], List[D
 
     tasks: Dict[str, Any] = {}
 
-    # Semgrep
+    # Semgrep (simplified config)
     semgrep_out = os.path.join(base_output, "semgrep.json")
     tasks["semgrep"] = (
         ["semgrep", "--json", "--metrics=off", "--timeout", "600",
-         "--output", semgrep_out, source_dir,
-         "--config", "p/all", "--config", "p/security-audit",
-         "--config", "p/owasp-top-10", "--config", "p/python-security"],
+         "--output", semgrep_out, source_dir, "--config", "auto"],
         semgrep_out, parse_semgrep
     )
 
@@ -365,10 +363,10 @@ def run_full_scan(source_dir: str, temp_id: str) -> Tuple[Dict[str, int], List[D
             bandit_out, parse_bandit
         )
 
-    # Trivy
+    # Trivy (with offline fallback)
     trivy_out = os.path.join(base_output, "trivy.json")
     tasks["trivy"] = (
-        ["trivy", "fs", "--format", "json", "--output", trivy_out, source_dir],
+        ["trivy", "fs", "--format", "json", "--output", trivy_out, "--skip-db-update", source_dir],
         trivy_out, parse_trivy
     )
 
@@ -391,15 +389,26 @@ def run_full_scan(source_dir: str, temp_id: str) -> Tuple[Dict[str, int], List[D
     else:
         logger.info("No valid requirements.txt; skipping pip-audit.")
 
-    # Dependency-Check
-    dep_dir = os.path.join(base_output, "depcheck")
-    os.makedirs(dep_dir, exist_ok=True)
-    dep_xml = os.path.join(dep_dir, "dependency-check-report.xml")
-    tasks["dependency-check"] = (
-        ["/usr/local/bin/dependency-check.sh", "-s", source_dir,
-         "-f", "XML", "-o", dep_dir, "--prettyPrint"],
-        dep_xml, parse_dependency_check
+    # Dependency-Check (only if dependency files exist)
+    dependency_files = ["requirements.txt", "package.json", "pom.xml", "build.gradle",
+                       "Gemfile", "composer.json", "go.mod", "Cargo.toml"]
+    has_dependencies = any(
+        os.path.exists(os.path.join(root, file))
+        for root, dirs, files in os.walk(source_dir)
+        for file in files if file in dependency_files
     )
+
+    if has_dependencies:
+        dep_dir = os.path.join(base_output, "depcheck")
+        os.makedirs(dep_dir, exist_ok=True)
+        dep_xml = os.path.join(dep_dir, "dependency-check-report.xml")
+        tasks["dependency-check"] = (
+            ["/usr/local/bin/dependency-check.sh", "-s", source_dir,
+             "-f", "XML", "-o", dep_dir, "--prettyPrint"],
+            dep_xml, parse_dependency_check
+        )
+    else:
+        logger.info("No dependency files found, skipping dependency-check")
 
     all_issues: List[Dict[str, Any]] = []
     with ThreadPoolExecutor(max_workers=os.cpu_count() + 2) as executor:
