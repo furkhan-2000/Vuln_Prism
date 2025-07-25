@@ -7,11 +7,6 @@ preemptionPolicy: PreemptLowerPriority
 globalDefault: false
 description: Priority class for critical Vuln‑Prism
 ---
-apiVersion: v1 
-kind: Namespace
-metadata: 
-  name: mustang 
----
 apiVersion: v1
 kind: Secret
 metadata:
@@ -50,7 +45,6 @@ roleRef:
   kind: Role
   name: vuln-role
   apiGroup: rbac.authorization.k8s.io
-
 ---
 apiVersion: apps/v1
 kind: Deployment

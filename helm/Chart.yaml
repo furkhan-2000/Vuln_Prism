@@ -1,0 +1,20 @@
+apiVersion: v2 
+name: vuln
+description:  Unified Helm chart for Vuln Prism, bundling SAST, CYBERSCYTHE, and chatbot frontend into a single, production-ready deployment.
+type: application 
+version: 1.0.0 
+appVersion: "1.0"
+
+keywords: 
+  - vuln 
+  - sast 
+  - cyber 
+  - vulnPrism 
+  - vulnSecurity  
+
+home: https://github.com/furkhan-2000/Vuln_Prism.git
+
+maintainers: 
+  - name:  furkhan 
+    email: furkhan2000@icloud.com 
+    url:   https://www.linkedin.com/in/khan-mohammed-790b18214

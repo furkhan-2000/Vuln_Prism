@@ -1,0 +1,539 @@
+# Global namespace
+namespace:
+  name: mustang
+
+# Vuln service configuration
+frontend:
+  priorityClass:
+    name: vuln-pc
+    value: 100000
+    preemptionPolicy: PreemptLowerPriority
+    globalDefault: false
+    description: Priority class for critical Vuln‑Prism
+
+  secret:
+    name: openrouter-secret
+    namespace: mustang
+    type: Opaque
+    stringData:
+      DEEPSEEK_API_KEY: "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"
+
+  serviceAccount:
+    name: vuln
+    namespace: mustang
+
+  role:
+    name: vuln-role
+    namespace: mustang
+    rules:
+      - apiGroups: ["", "apps", "rbac.authorization.k8s.io", "networking.k8s.io", "autoscaling"]
+        resources:  ["pods", "replicasets", "deployments", "secrets", "horizontalpodautoscalers", "verticalpodautoscalers"]
+        verbs: ["list", "get", "watch", "create", "delete", "update"]
+
+  roleBinding:
+    name: vuln-rlbng
+    namespace: mustang
+    subjects:
+      - kind: ServiceAccount
+        name: vuln
+        namespace: mustang
+    roleRef:
+      kind: Role
+      name: vuln-role
+      apiGroup: "rbac.authorization.k8s.io"
+
+  deployment:
+    name: vuln-dep
+    namespace: mustang
+    labels:
+      prod: "true"
+      tier: bmw
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "3000"
+    spec:
+      replicas: 2
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+      selector:
+        matchLabels:
+          tier: bmw
+      template:
+        metadata:
+          labels:
+            tier: bmw
+        spec:
+          priorityClassName: vuln-pc
+          serviceAccountName: vuln
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchLabels:
+                      tier: bmw
+                  topologyKey: "kubernetes.io/hostname"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+            - name: vuln-con
+              image: furkhan2000/shark:front-end
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+              ports:
+                - containerPort: 3000
+              envFrom:
+                - secretRef:
+                    name: openrouter-secret
+              resources:
+                requests:
+                  cpu: "250m"
+                  memory: "300Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "650Mi"
+              readinessProbe:
+                httpGet:
+                  path: /
+                  port: 3000
+                initialDelaySeconds: 8
+                periodSeconds: 10
+              livenessProbe:
+                tcpSocket:
+                  port: 3000
+                initialDelaySeconds: 8
+                periodSeconds: 10
+
+  service:
+    name: vuln-svc
+    namespace: mustang
+    spec:
+      selector:
+        tier: bmw
+      ports:
+        - port: 3000
+          targetPort: 3000
+          protocol: TCP
+
+  networkPolicy:
+    name: vuln-np
+    namespace: mustang
+    spec:
+      podSelector:
+        matchLabels:
+          tier: bmw
+      policyTypes:
+      - Ingress
+      - Egress
+      ingress:
+        - from:
+          - ipBlock:
+              cidr: 0.0.0.0/0
+            ports:
+              - protocol: TCP
+                port: 3000
+      egress:
+        - to:
+          - ipBlock:
+              cidr: 0.0.0.0/0
+            ports:
+              - protocol: TCP
+                port: 443
+              - protocol: TCP
+                port: 80
+              - protocol: TCP
+                port: 53
+
+  horizontalPodAutoscaler:
+    name: vuln-hpa
+    namespace: mustang
+    spec:
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: vuln-dep
+      minReplicas: 2
+      maxReplicas: 10
+      metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 75
+
+# SAST service configuration
+sast:
+  serviceAccount:
+    name: sast
+    namespace: mustang
+
+  role:
+    name: sast-role
+    namespace: mustang
+    rules:
+      - apiGroups: ["", "apps", "rbac.authorization.k8s.io", "networking.k8s.io", "batch", "autoscaling"]
+        resources: ["pods", "replicasets", "deployments", "networkpolicies", "horizontalpodautoscalers", "verticalpodautoscalers", "configmaps"]
+        verbs: ["get", "create", "list", "watch", "update", "delete"]
+
+  roleBinding:
+    name: sast-rb
+    namespace: mustang
+    subjects:
+      - kind: ServiceAccount
+        name: sast
+        namespace: mustang
+    roleRef:
+      kind: Role
+      name: sast-role
+      apiGroup: rbac.authorization.k8s.io
+
+  persistentVolume:
+    name: sast-pv
+    spec:
+      persistentVolumeReclaimPolicy: Retain
+      capacity:
+        storage: 700Mi
+      accessModes:
+        - ReadWriteMany
+      hostPath:
+        path: /tmp/sast
+
+  persistentVolumeClaim:
+    name: sast-pvc
+    namespace: mustang
+    spec:
+      storageClassName: ""
+      accessModes:
+        - ReadWriteMany
+      resources:
+        requests:
+          storage: 500Mi
+
+  deployment:
+    name: sast-dep
+    namespace: mustang
+    labels:
+      tier: porsche
+      prod: "true"
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/path: /metrics
+      prometheus.io/port: "5050"
+    spec:
+      replicas: 2
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+      selector:
+        matchLabels:
+          tier: porsche
+      template:
+        metadata:
+          labels:
+            tier: porsche
+        spec:
+          serviceAccountName: sast
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                 - labelSelector:
+                      matchLabels:
+                        tier: porsche
+                   topologyKey: "kubernetes.io/hostname"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+            runAsGroup: 1001
+            fsGroup: 1001
+          containers:
+            - name: sast-con
+              image: furkhan2000/shark:sast
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+              ports:
+                - containerPort: 5050
+              volumeMounts:
+                - name: temp-storage
+                  mountPath: /home/jenkins
+                - name: tmp-storage
+                  mountPath: /tmp
+              resources:
+                requests:
+                  cpu: "250m"
+                  memory: "300Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "650Mi"
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: 5050
+                initialDelaySeconds: 60
+                periodSeconds: 30
+                timeoutSeconds: 30
+                failureThreshold: 10
+              livenessProbe:
+                tcpSocket:
+                  port: 5050
+                initialDelaySeconds: 60
+                periodSeconds: 30
+                timeoutSeconds: 30
+                failureThreshold: 10
+          volumes:
+            - name: temp-storage
+              emptyDir: {}
+            - name: tmp-storage
+              emptyDir: {}
+
+  service:
+    name: sast-svc
+    namespace: mustang
+    spec:
+      selector:
+        tier: porsche
+      ports:
+        - port: 5050
+          targetPort: 5050
+          protocol: TCP
+
+  networkPolicy:
+    name: sast-np
+    namespace: mustang
+    spec:
+      podSelector:
+        matchLabels:
+          tier: porsche
+      policyTypes:
+        - Ingress
+        - Egress
+      ingress:
+        - from:
+            - ipBlock:
+                cidr: 0.0.0.0/0
+          ports:
+            - protocol: TCP
+              port: 5050
+      egress:
+        - to:
+            - ipBlock:
+                cidr: 0.0.0.0/0
+          ports:
+            - protocol: TCP
+              port: 443
+            - protocol: TCP
+              port: 80
+            - protocol: UDP
+              port: 53
+
+  horizontalPodAutoscaler:
+    name: sast-hpa
+    namespace: mustang
+    spec:
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: sast-dep
+      minReplicas: 2
+      maxReplicas: 10
+      metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 75
+
+# CYBER service configuration
+cyber:
+  serviceAccount:
+    name: cyber
+    namespace: mustang
+
+  role:
+    name: cyber-role
+    namespace: mustang
+    rules:
+      - apiGroups:  ["", "apps", "rbac.authorization.k8s.io", "networking.k8s.io", "autoscaling"]
+        resources:  ["pods", "replicasets", "deployments", "networkpolicies", "horizontalpodautoscalers", "verticalpodautoscalers", "configmaps"]
+        verbs: ["get", "create", "list", "watch", "update", "delete"]
+
+  roleBinding:
+    name: cyber-rb
+    namespace: mustang
+    subjects:
+      - kind: ServiceAccount
+        name: cyber
+        namespace: mustang
+    roleRef:
+      kind: Role
+      name: cyber-role
+      apiGroup: rbac.authorization.k8s.io
+
+  deployment:
+    name: cyber-dep
+    namespace: mustang
+    labels:
+      tier: versace
+      prod: "true"
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "5051"
+    spec:
+      replicas: 2
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+      selector:
+        matchLabels:
+          tier: versace
+      template:
+        metadata:
+          labels:
+            tier: versace
+        spec:
+          serviceAccountName: cyber
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchLabels:
+                        tier: versace
+                    topologyKey: "kubernetes.io/hostname"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+          containers:
+            - name: cyber-con
+              image: furkhan2000/shark:cyber
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                allowPrivilegeEscalation: false
+              ports:
+                - containerPort: 5051
+              resources:
+                requests:
+                  cpu: "250m"
+                  memory: "300Mi"
+                limits:
+                  cpu: "500m"
+                  memory: "650Mi"
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: 5051
+                initialDelaySeconds: 15
+                periodSeconds: 10
+                timeoutSeconds: 5
+              livenessProbe:
+                tcpSocket:
+                  port: 5051
+                initialDelaySeconds: 15
+                periodSeconds: 10
+                timeoutSeconds: 5
+
+  service:
+    name: cyber-svc
+    namespace: mustang
+    spec:
+      selector:
+        tier: versace
+      ports:
+        - port: 5051
+          protocol: TCP
+          targetPort: 5051
+
+  networkPolicy:
+    name: cyber-np
+    namespace: mustang
+    spec:
+      podSelector:
+        matchLabels:
+          tier: versace
+      policyTypes:
+        - Ingress
+        - Egress
+      ingress:
+        - from:
+            - ipBlock:
+                cidr: 0.0.0.0/0
+          ports:
+            - protocol: TCP
+              port: 5051
+      egress:
+        - to:
+            - ipBlock:
+                cidr: 0.0.0.0/0
+          ports:
+            - protocol: TCP
+              port: 443
+            - protocol: TCP
+              port: 80
+            - protocol: UDP
+              port: 53
+
+  horizontalPodAutoscaler:
+    name: cyber-hpa
+    namespace: mustang
+    spec:
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: cyber-dep
+      minReplicas: 2
+      maxReplicas: 10
+      metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            target:
+              type: Utilization
+              averageUtilization: 75
+
+# ingress 
+ingress:
+  name: vuln-ingress
+  namespace: mustang
+  ingressClassName: nginx
+  annotations:
+    useRegex: true
+    rewriteTarget: /
+  rules:
+    - http:
+        paths:
+          - path: "/vuln(/|$)(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: vuln-svc
+                port:
+                  number: 3000
+          - path: "/sast(/|$)(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: sast-svc
+                port:
+                  number: 5050
+          - path: "/cyber(/|$)(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: cyber-svc
+                port:
+                  number: 5051

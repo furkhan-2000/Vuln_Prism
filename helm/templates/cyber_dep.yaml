@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.deployment.name }}
+  namespace: {{ .Values.deployment.namespace }}
+  labels:
+    tier: {{ .Values.deployment.labels.tier }}
+    prod: {{ .Values.deployment.labels.prod }}
+  annotations:
+    prometheus.io/scrape: {{ .Values.deployment.annotations.prometheus.io.scrape | quote }}
+    prometheus.io/path: {{ .Values.deployment.annotations.prometheus.io.path }}
+    prometheus.io/port: {{ .Values.deployment.annotations.prometheus.io.port | quote }}
+spec:
+  replicas: {{ .Values.deployment.spec.replicas }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: {{ .Values.deployment.spec.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.deployment.spec.strategy.rollingUpdate.maxUnavailable }}
+  selector:
+    matchLabels:
+      tier: {{ .Values.deployment.spec.selector.matchLabels.tier }}
+  template:
+    metadata:
+      labels:
+        tier: {{ .Values.deployment.spec.template.labels.tier }}
+    spec:
+      serviceAccountName: {{ .Values.deployment.spec.template.spec.serviceAccountName }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  tier: {{ .Values.deployment.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution.labelSelector.matchLabels.tier }}
+              topologyKey: "kubernetes.io/hostname"
+      securityContext:
+        runAsNonRoot: {{ .Values.deployment.spec.template.spec.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.deployment.spec.template.spec.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.deployment.spec.template.spec.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.deployment.spec.template.spec.securityContext.fsGroup }}
+      containers:
+        - name: {{ .Values.deployment.spec.template.spec.containers.name }}
+          image: {{ .Values.deployment.spec.template.spec.containers.image }}
+          imagePullPolicy: {{ .Values.deployment.spec.template.spec.containers.imagePullPolicy }}
+          securityContext:
+            allowPrivilegeEscalation: {{ .Values.deployment.spec.template.spec.containers.securityContext.allowPrivilegeEscalation }}
+          ports:
+            - containerPort: {{ .Values.deployment.spec.template.spec.containers.ports.containerPort }}
+          resources:
+            requests:
+              cpu: {{ .Values.deployment.spec.template.spec.containers.resources.requests.cpu }}
+              memory: {{ .Values.deployment.spec.template.spec.containers.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.deployment.spec.template.spec.containers.resources.limits.cpu }}
+              memory: {{ .Values.deployment.spec.template.spec.containers.resources.limits.memory }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.deployment.spec.template.spec.containers.readinessProbe.httpGet.path }}
+              port: {{ .Values.deployment.spec.template.spec.containers.readinessProbe.httpGet.port }}
+            initialDelaySeconds: {{ .Values.deployment.spec.template.spec.containers.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.deployment.spec.template.spec.containers.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.deployment.spec.template.spec.containers.readinessProbe.timeoutSeconds }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.deployment.spec.template.spec.containers.livenessProbe.tcpSocket.port }}
+            initialDelaySeconds: {{ .Values.deployment.spec.template.spec.containers.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.deployment.spec.template.spec.containers.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.deployment.spec.template.spec.containers.livenessProbe.timeoutSeconds }}
