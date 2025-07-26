@@ -3,7 +3,9 @@ kind: Role
 metadata: 
   name: {{ .Values.cyber.role.name }}
   namespace: {{ .Values.cyber.role.namespace }}
-rules: 
-  - apiGroups: {{ .Values.cyber.role.rules.apiGroups }}
-    resources: {{ .Values.cyber.role.rules.resources }}
-    verbs: {{ .Values.cyber.role.rules.verbs }}
+rules:
+{{- range .Values.cyber.role.rules }}
+  - apiGroups: {{ .apiGroups }}
+    resources: {{ .resources }}
+    verbs: {{ .verbs }}
+{{- end }}
