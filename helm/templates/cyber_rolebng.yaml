@@ -4,9 +4,11 @@ metadata:
   name: {{ .Values.cyber.roleBinding.name }}
   namespace: {{ .Values.cyber.roleBinding.namespace }}
 subjects: 
-  - kind: {{ .Values.cyber.roleBinding.subjects.kind }}
-    name: {{ .Values.cyber.roleBinding.subjects.name }}
-    namespace: {{ .Values.cyber.roleBinding.subjects.namespace }}
+{{- range .Values.cyber.roleBinding.subjects }}
+  - kind: {{ .kind }}
+    name: {{ .name }}
+    namespace: {{ .namespace }}
+{{- end }}
 roleRef: 
   kind: {{ .Values.cyber.roleBinding.roleRef.kind }}
   name: {{ .Values.cyber.roleBinding.roleRef.name }}

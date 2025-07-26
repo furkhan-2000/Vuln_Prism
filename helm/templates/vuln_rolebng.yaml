@@ -1,13 +1,15 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
+apiVersion: rbac.authorization.k8s.io/v1 
+kind: RoleBinding 
+metadata: 
   name: {{ .Values.vuln.roleBinding.name }}
   namespace: {{ .Values.vuln.roleBinding.namespace }}
-subjects:
-  - kind: ServiceAccount
-    name: {{ .Values.vuln.roleBinding.subjects.name }}
-    namespace: {{ .Values.vuln.roleBinding.subjects.namespace }}
-roleRef:
-  kind: Role
+subjects: 
+{{- range .Values.vuln.roleBinding.subjects }}
+  - kind: {{ .kind }}
+    name: {{ .name }}
+    namespace: {{ .namespace }}
+{{- end }}
+roleRef: 
+  kind: {{ .Values.vuln.roleBinding.roleRef.kind }}
   name: {{ .Values.vuln.roleBinding.roleRef.name }}
-  apiGroup: rbac.authorization.k8s.io
+  apiGroup: {{ .Values.vuln.roleBinding.roleRef.apiGroup }}
