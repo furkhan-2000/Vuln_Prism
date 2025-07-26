@@ -5,15 +5,16 @@ metadata:
   namespace: {{ .Values.horizontalPodAutoscaler.namespace }}
 spec:
   scaleTargetRef:
-    apiVersion: {{ .Values.horizontalPodAutoscaler.scaleTargetRef.apiVersion }}
-    kind: {{ .Values.horizontalPodAutoscaler.scaleTargetRef.kind }}
-    name: {{ .Values.horizontalPodAutoscaler.scaleTargetRef.name }}
-  minReplicas: {{ .Values.horizontalPodAutoscaler.minReplicas }}
-  maxReplicas: {{ .Values.horizontalPodAutoscaler.maxReplicas }}
+    apiVersion: {{ .Values.horizontalPodAutoscaler.spec.scaleTargetRef.apiVersion }}
+    kind: {{ .Values.horizontalPodAutoscaler.spec.scaleTargetRef.kind }}
+    name: {{ .Values.horizontalPodAutoscaler.spec.scaleTargetRef.name }}
+  minReplicas: {{ .Values.horizontalPodAutoscaler.spec.minReplicas }}
+  maxReplicas: {{ .Values.horizontalPodAutoscaler.spec.maxReplicas }}
+  {{- $metric := index .Values.horizontalPodAutoscaler.spec.metrics 0 }}
   metrics:
-    - type: Resource
+    - type: Resource        
       resource:
-        name: cpu
+        name: {{ $metric.resource.name }}
         target:
           type: Utilization
-          averageUtilization: {{ .Values.horizontalPodAutoscaler.metrics.cpu.target.averageUtilization }}
+          averageUtilization: {{ $metric.resource.target.averageUtilization }}

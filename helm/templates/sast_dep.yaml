@@ -31,7 +31,7 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  tier: {{ .Values.deployment.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].labelSelector.matchLabels.tier }}
+                  tier: {{ (index .Values.deployment.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
               topologyKey: "kubernetes.io/hostname"
       securityContext:
         runAsNonRoot: {{ .Values.deployment.spec.template.spec.securityContext.runAsNonRoot }}
@@ -48,10 +48,10 @@ spec:
           ports:
             - containerPort: {{ .Values.deployment.spec.template.spec.containers.ports.containerPort }}
           volumeMounts:
-            - name: {{ .Values.deployment.spec.template.spec.containers.volumeMounts[0].name }}
-              mountPath: {{ .Values.deployment.spec.template.spec.containers.volumeMounts[0].mountPath }}
-            - name: {{ .Values.deployment.spec.template.spec.containers.volumeMounts[1].name }}
-              mountPath: {{ .Values.deployment.spec.template.spec.containers.volumeMounts[1].mountPath }}
+            - name: {{ (index .Values.deployment.spec.template.spec.containers.volumeMounts 0).name }}
+              mountPath: {{ (index .Values.deployment.spec.template.spec.containers.volumeMounts 0).mountPath }}
+            - name: {{ (index .Values.deployment.spec.template.spec.containers.volumeMounts 1).name }}
+              mountPath: {{ (index .Values.deployment.spec.template.spec.containers.volumeMounts 1).mountPath }}
           resources:
             requests:
               cpu: {{ .Values.deployment.spec.template.spec.containers.resources.requests.cpu }}
@@ -75,7 +75,7 @@ spec:
             timeoutSeconds: {{ .Values.deployment.spec.template.spec.containers.livenessProbe.timeoutSeconds }}
             failureThreshold: {{ .Values.deployment.spec.template.spec.containers.livenessProbe.failureThreshold }}
       volumes:
-        - name: {{ .Values.deployment.spec.template.spec.volumes[0].name }}
+        - name: {{ (index .Values.deployment.spec.template.spec.volumes 0).name }}
           emptyDir: {}
-        - name: {{ .Values.deployment.spec.template.spec.volumes[1].name }}
+        - name: {{ (index .Values.deployment.spec.template.spec.volumes 1).name }}
           emptyDir: {}
