@@ -7,8 +7,8 @@ metadata:
     prod: {{ .Values.vuln.deployment.labels.prod | quote }}
     tier: {{ .Values.vuln.deployment.labels.tier }}
   annotations:
-    "prometheus.io/scrape": {{ .Values.vuln.deployment.annotations."prometheus.io.scrape" | quote }}
-    "prometheus.io/port": {{ .Values.vuln.deployment.annotations."prometheus.io.port" | quote }}
+    "prometheus.io/scrape": {{ index .Values.vuln.deployment.annotations "prometheus.io.scrape" | quote }}
+    "prometheus.io/port": {{ index .Values.vuln.deployment.annotations "prometheus.io.port" | quote }}
 spec:
   replicas: {{ .Values.vuln.deployment.spec.replicas }}
   strategy:

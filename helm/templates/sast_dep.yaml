@@ -7,9 +7,9 @@ metadata:
     tier: {{ .Values.sast.deployment.labels.tier }}
     prod: {{ .Values.sast.deployment.labels.prod | quote }}
   annotations:
-    "prometheus.io/scrape": {{ .Values.sast.deployment.annotations."prometheus.io.scrape" | quote }}
-    "prometheus.io/path": {{ .Values.sast.deployment.annotations."prometheus.io.path" | quote }}
-    "prometheus.io/port": {{ .Values.sast.deployment.annotations."prometheus.io.port" | quote }}
+    "prometheus.io/scrape": {{ index .Values.sast.deployment.annotations "prometheus.io.scrape" | quote }}
+    "prometheus.io/path": {{ index .Values.sast.deployment.annotations "prometheus.io.path" | quote }}
+    "prometheus.io/port": {{ index .Values.sast.deployment.annotations "prometheus.io.port" | quote }}
 spec:
   replicas: {{ .Values.sast.deployment.spec.replicas }}
   strategy:
