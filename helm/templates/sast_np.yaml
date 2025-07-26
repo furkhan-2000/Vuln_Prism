@@ -6,25 +6,33 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      tier: {{ .Values.sast.networkPolicy.podSelector.matchLabels.tier }}
+      tier: {{ .Values.sast.networkPolicy.spec.podSelector.matchLabels.tier }}
   policyTypes:
     - Ingress
     - Egress
   ingress:
+    {{- range .Values.sast.networkPolicy.spec.ingress }}
     - from:
+        {{- range .from }}
         - ipBlock:
-            cidr: {{ .Values.sast.networkPolicy.ingress.ipBlock.cidr }}
+            cidr: {{ .ipBlock.cidr }}
+        {{- end }}
       ports:
-        {{- range .Values.sast.networkPolicy.ingress.ports }}
+        {{- range .ports }}
         - protocol: {{ .protocol | default "TCP" }}
           port: {{ .port }}
         {{- end }}
+    {{- end }}
   egress:
+    {{- range .Values.sast.networkPolicy.spec.egress }}
     - to:
+        {{- range .to }}
         - ipBlock:
-            cidr: {{ .Values.sast.networkPolicy.egress.ipBlock.cidr }}
+            cidr: {{ .ipBlock.cidr }}
+        {{- end }}
       ports:
-        {{- range .Values.sast.networkPolicy.egress.ports }}
+        {{- range .ports }}
         - protocol: {{ .protocol }}
           port: {{ .port }}
         {{- end }}
+    {{- end }}
