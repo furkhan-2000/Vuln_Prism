@@ -6,7 +6,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      tier: {{ .Values.cyber.networkPolicy.podSelector.tier }}
+      tier: {{ .Values.cyber.networkPolicy.podSelector.matchLabels.tier }}
   policyTypes:
     - Ingress
     - Egress

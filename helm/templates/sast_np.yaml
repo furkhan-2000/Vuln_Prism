@@ -6,7 +6,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      tier: {{ .Values.sast.networkPolicy.podSelector.tier }}
+      tier: {{ .Values.sast.networkPolicy.podSelector.matchLabels.tier }}
   policyTypes:
     - Ingress
     - Egress
