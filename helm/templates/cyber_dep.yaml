@@ -8,7 +8,7 @@ metadata:
     prod: {{ .Values.cyber.deployment.labels.prod }}
   annotations:
     "prometheus.io/scrape": {{ index .Values.cyber.deployment.annotations "prometheus.io/scrape" | quote }}
-    "prometheus.io/path": {{ index .Values.cyber.deployment.annotations "prometheus.io/path" }}
+    "prometheus.io/path": {{ index .Values.cyber.deployment.annotations "prometheus.io/path" | quote }}
     "prometheus.io/port": {{ index .Values.cyber.deployment.annotations "prometheus.io/port" | quote }}
 spec:
   replicas: {{ .Values.cyber.deployment.spec.replicas }}
@@ -39,30 +39,35 @@ spec:
         runAsGroup: {{ .Values.cyber.deployment.spec.template.spec.securityContext.runAsGroup }}
         fsGroup: {{ .Values.cyber.deployment.spec.template.spec.securityContext.fsGroup }}
       containers:
-        - name: {{ .Values.cyber.deployment.spec.template.spec.containers.name }}
-          image: {{ .Values.cyber.deployment.spec.template.spec.containers.image }}
-          imagePullPolicy: {{ .Values.cyber.deployment.spec.template.spec.containers.imagePullPolicy }}
+{{- range .Values.cyber.deployment.spec.template.spec.containers }}
+        - name: {{ .name }}
+          image: {{ .image }}
+          imagePullPolicy: {{ .imagePullPolicy }}
           securityContext:
-            allowPrivilegeEscalation: {{ .Values.cyber.deployment.spec.template.spec.containers.securityContext.allowPrivilegeEscalation }}
+            allowPrivilegeEscalation: {{ .securityContext.allowPrivilegeEscalation }}
+            readOnlyRootFilesystem: {{ .securityContext.readOnlyRootFilesystem }}
           ports:
-            - containerPort: {{ .Values.cyber.deployment.spec.template.spec.containers.ports.containerPort }}
+            - containerPort: {{ .ports.containerPort }}
           resources:
             requests:
-              cpu: {{ .Values.cyber.deployment.spec.template.spec.containers.resources.requests.cpu }}
-              memory: {{ .Values.cyber.deployment.spec.template.spec.containers.resources.requests.memory }}
+              cpu: {{ .resources.requests.cpu }}
+              memory: {{ .resources.requests.memory }}
             limits:
-              cpu: {{ .Values.cyber.deployment.spec.template.spec.containers.resources.limits.cpu }}
-              memory: {{ .Values.cyber.deployment.spec.template.spec.containers.resources.limits.memory }}
+              cpu: {{ .resources.limits.cpu }}
+              memory: {{ .resources.limits.memory }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.cyber.deployment.spec.template.spec.containers.readinessProbe.httpGet.path }}
-              port: {{ .Values.cyber.deployment.spec.template.spec.containers.readinessProbe.httpGet.port }}
-            initialDelaySeconds: {{ .Values.cyber.deployment.spec.template.spec.containers.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.cyber.deployment.spec.template.spec.containers.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.cyber.deployment.spec.template.spec.containers.readinessProbe.timeoutSeconds }}
+              path: {{ .readinessProbe.httpGet.path }}
+              port: {{ .readinessProbe.httpGet.port }}
+            initialDelaySeconds: {{ .readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .readinessProbe.timeoutSeconds }}
+            failureThreshold: {{ .readinessProbe.failureThreshold }}
           livenessProbe:
             tcpSocket:
-              port: {{ .Values.cyber.deployment.spec.template.spec.containers.livenessProbe.tcpSocket.port }}
-            initialDelaySeconds: {{ .Values.cyber.deployment.spec.template.spec.containers.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.cyber.deployment.spec.template.spec.containers.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.cyber.deployment.spec.template.spec.containers.livenessProbe.timeoutSeconds }}
+              port: {{ .livenessProbe.tcpSocket.port }}
+            initialDelaySeconds: {{ .livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .livenessProbe.timeoutSeconds }}
+            failureThreshold: {{ .livenessProbe.failureThreshold }}
+{{- end }}
