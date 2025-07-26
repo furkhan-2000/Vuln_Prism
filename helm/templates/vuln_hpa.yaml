@@ -1,16 +1,16 @@
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Values.horizontalPodAutoscaler.name }}
-  namespace: {{ .Values.horizontalPodAutoscaler.namespace }}
+  name: {{ .Values.vuln.horizontalPodAutoscaler.name }}
+  namespace: {{ .Values.vuln.horizontalPodAutoscaler.namespace }}
 spec:
   scaleTargetRef:
-    apiVersion: {{ .Values.horizontalPodAutoscaler.spec.scaleTargetRef.apiVersion }}
-    kind: {{ .Values.horizontalPodAutoscaler.spec.scaleTargetRef.kind }}
-    name: {{ .Values.horizontalPodAutoscaler.spec.scaleTargetRef.name }}
-  minReplicas: {{ .Values.horizontalPodAutoscaler.spec.minReplicas }}
-  maxReplicas: {{ .Values.horizontalPodAutoscaler.spec.maxReplicas }}
-  {{- $metric := index .Values.horizontalPodAutoscaler.spec.metrics 0 }}
+    apiVersion: {{ .Values.vuln.horizontalPodAutoscaler.spec.scaleTargetRef.apiVersion }}
+    kind: {{ .Values.vuln.horizontalPodAutoscaler.spec.scaleTargetRef.kind }}
+    name: {{ .Values.vuln.horizontalPodAutoscaler.spec.scaleTargetRef.name }}
+  minReplicas: {{ .Values.vuln.horizontalPodAutoscaler.spec.minReplicas }}
+  maxReplicas: {{ .Values.vuln.horizontalPodAutoscaler.spec.maxReplicas }}
+  {{- $metric := index .Values.vuln.horizontalPodAutoscaler.spec.metrics 0 }}
   metrics:
     - type: Resource        
       resource:

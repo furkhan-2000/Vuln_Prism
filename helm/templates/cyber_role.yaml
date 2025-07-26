@@ -1,10 +1,9 @@
 apiVersion: rbac.authorization.k8s.io/v1 
 kind: Role 
 metadata: 
-   name: {{ .Values.role.name }}
-   namespace: {{ .Values.role.namespace }}
+  name: {{ .Values.cyber.role.name }}
+  namespace: {{ .Values.cyber.role.namespace }}
 rules: 
-   - apiGroups: {{ .Values.role.rules.apiGroups }}
-     resources: {{ .Values.role.rules.resources }}
-     verbs: {{ .Values.role.rules.verbs }} 
-  
+  - apiGroups: {{ .Values.cyber.role.rules.apiGroups }}
+    resources: {{ .Values.cyber.role.rules.resources }}
+    verbs: {{ .Values.cyber.role.rules.verbs }}

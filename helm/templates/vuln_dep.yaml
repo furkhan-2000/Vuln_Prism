@@ -1,70 +1,70 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.deployment.name }}
-  namespace: {{ .Values.deployment.namespace }}
+  name: {{ .Values.vuln.deployment.name }}
+  namespace: {{ .Values.vuln.deployment.namespace }}
   labels:
-    prod: {{ .Values.deployment.labels.prod | quote }}
-    tier: {{ .Values.deployment.labels.tier }}
+    prod: {{ .Values.vuln.deployment.labels.prod | quote }}
+    tier: {{ .Values.vuln.deployment.labels.tier }}
   annotations:
-    prometheus.io/scrape: {{ .Values.deployment.annotations.prometheus.io.scrape | quote }}
-    prometheus.io/port: {{ .Values.deployment.annotations.prometheus.io.port | quote }}
+    prometheus.io/scrape: {{ .Values.vuln.deployment.annotations.prometheus.io.scrape | quote }}
+    prometheus.io/port: {{ .Values.vuln.deployment.annotations.prometheus.io.port | quote }}
 spec:
-  replicas: {{ .Values.deployment.spec.replicas }}
+  replicas: {{ .Values.vuln.deployment.spec.replicas }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: {{ .Values.deployment.spec.strategy.rollingUpdate.maxSurge }}
-      maxUnavailable: {{ .Values.deployment.spec.strategy.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.vuln.deployment.spec.strategy.rollingUpdate.maxSurge }}
+      maxUnavailable: {{ .Values.vuln.deployment.spec.strategy.rollingUpdate.maxUnavailable }}
   selector:
     matchLabels:
-      tier: {{ .Values.deployment.spec.selector.matchLabels.tier }}
+      tier: {{ .Values.vuln.deployment.spec.selector.matchLabels.tier }}
   template:
     metadata:
       labels:
-        tier: {{ .Values.deployment.spec.selector.matchLabels.tier }}
+        tier: {{ .Values.vuln.deployment.spec.selector.matchLabels.tier }}
     spec:
-      priorityClassName: {{ .Values.deployment.spec.template.spec.priorityClassName }}
-      serviceAccountName: {{ .Values.deployment.spec.template.spec.serviceAccountName }}
+      priorityClassName: {{ .Values.vuln.deployment.spec.template.spec.priorityClassName }}
+      serviceAccountName: {{ .Values.vuln.deployment.spec.template.spec.serviceAccountName }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  tier: {{ (index .Values.deployment.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
+                  tier: {{ (index .Values.vuln.deployment.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
               topologyKey: "kubernetes.io/hostname"
       securityContext:
-        runAsUser: {{ .Values.deployment.spec.template.spec.securityContext.runAsUser }}
-        runAsGroup: {{ .Values.deployment.spec.template.spec.securityContext.runAsGroup }}
-        fsGroup: {{ .Values.deployment.spec.template.spec.securityContext.fsGroup }}
-        runAsNonRoot: {{ .Values.deployment.spec.template.spec.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.vuln.deployment.spec.template.spec.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.vuln.deployment.spec.template.spec.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.vuln.deployment.spec.template.spec.securityContext.fsGroup }}
+        runAsNonRoot: {{ .Values.vuln.deployment.spec.template.spec.securityContext.runAsNonRoot }}
       containers:
-        - name: {{ .Values.deployment.spec.template.spec.containers.name }}
-          image: {{ .Values.deployment.spec.template.spec.containers.image }}
-          imagePullPolicy: {{ .Values.deployment.spec.template.spec.containers.imagePullPolicy }}
+        - name: {{ .Values.vuln.deployment.spec.template.spec.containers.name }}
+          image: {{ .Values.vuln.deployment.spec.template.spec.containers.image }}
+          imagePullPolicy: {{ .Values.vuln.deployment.spec.template.spec.containers.imagePullPolicy }}
           securityContext:
-            allowPrivilegeEscalation: {{ .Values.deployment.spec.template.spec.containers.securityContext.allowPrivilegeEscalation }}
-            readOnlyRootFilesystem: {{ .Values.deployment.spec.template.spec.containers.securityContext.readOnlyRootFilesystem }}
+            allowPrivilegeEscalation: {{ .Values.vuln.deployment.spec.template.spec.containers.securityContext.allowPrivilegeEscalation }}
+            readOnlyRootFilesystem: {{ .Values.vuln.deployment.spec.template.spec.containers.securityContext.readOnlyRootFilesystem }}
           ports:
-            - containerPort: {{ .Values.deployment.spec.template.spec.containers.ports.containerPort }}
+            - containerPort: {{ .Values.vuln.deployment.spec.template.spec.containers.ports.containerPort }}
           envFrom:
             - secretRef:
-                name: {{ .Values.deployment.spec.template.spec.containers.envFrom.secretRef.name }}
+                name: {{ .Values.vuln.deployment.spec.template.spec.containers.envFrom.secretRef.name }}
           resources:
             requests:
-              cpu: {{ .Values.deployment.spec.template.spec.containers.resources.requests.cpu | quote }}
-              memory: {{ .Values.deployment.spec.template.spec.containers.resources.requests.memory | quote }}
+              cpu: {{ .Values.vuln.deployment.spec.template.spec.containers.resources.requests.cpu | quote }}
+              memory: {{ .Values.vuln.deployment.spec.template.spec.containers.resources.requests.memory | quote }}
             limits:
-              cpu: {{ .Values.deployment.spec.template.spec.containers.resources.limits.cpu | quote }}
-              memory: {{ .Values.deployment.spec.template.spec.containers.resources.limits.memory | quote }}
+              cpu: {{ .Values.vuln.deployment.spec.template.spec.containers.resources.limits.cpu | quote }}
+              memory: {{ .Values.vuln.deployment.spec.template.spec.containers.resources.limits.memory | quote }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.deployment.spec.template.spec.containers.readinessProbe.httpGet.path }}
-              port: {{ .Values.deployment.spec.template.spec.containers.readinessProbe.httpGet.port }}
-            initialDelaySeconds: {{ .Values.deployment.spec.template.spec.containers.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.deployment.spec.template.spec.containers.readinessProbe.periodSeconds }}
+              path: {{ .Values.vuln.deployment.spec.template.spec.containers.readinessProbe.httpGet.path }}
+              port: {{ .Values.vuln.deployment.spec.template.spec.containers.readinessProbe.httpGet.port }}
+            initialDelaySeconds: {{ .Values.vuln.deployment.spec.template.spec.containers.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.vuln.deployment.spec.template.spec.containers.readinessProbe.periodSeconds }}
           livenessProbe:
             tcpSocket:
-              port: {{ .Values.deployment.spec.template.spec.containers.livenessProbe.tcpSocket.port }}
-            initialDelaySeconds: {{ .Values.deployment.spec.template.spec.containers.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.deployment.spec.template.spec.containers.livenessProbe.periodSeconds }}
+              port: {{ .Values.vuln.deployment.spec.template.spec.containers.livenessProbe.tcpSocket.port }}
+            initialDelaySeconds: {{ .Values.vuln.deployment.spec.template.spec.containers.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.vuln.deployment.spec.template.spec.containers.livenessProbe.periodSeconds }}

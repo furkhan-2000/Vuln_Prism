@@ -1,30 +1,30 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ .Values.networkPolicy.name }}
-  namespace: {{ .Values.networkPolicy.namespace }}
+  name: {{ .Values.cyber.networkPolicy.name }}
+  namespace: {{ .Values.cyber.networkPolicy.namespace }}
 spec:
   podSelector:
     matchLabels:
-      tier: {{ .Values.networkPolicy.podSelector.tier }}
+      tier: {{ .Values.cyber.networkPolicy.podSelector.tier }}
   policyTypes:
     - Ingress
     - Egress
   ingress:
     - from:
         - ipBlock:
-            cidr: {{ .Values.networkPolicy.ingress.ipBlock.cidr }}
+            cidr: {{ .Values.cyber.networkPolicy.ingress.ipBlock.cidr }}
       ports:
-        {{- range .Values.networkPolicy.ingress.ports }}
+        {{- range .Values.cyber.networkPolicy.ingress.ports }}
         - protocol: {{ .protocol | default "TCP" }}
           port: {{ .port }}
         {{- end }}
   egress:
     - to:
         - ipBlock:
-            cidr: {{ .Values.networkPolicy.egress.ipBlock.cidr }}
+            cidr: {{ .Values.cyber.networkPolicy.egress.ipBlock.cidr }}
       ports:
-        {{- range .Values.networkPolicy.egress.ports }}
+        {{- range .Values.cyber.networkPolicy.egress.ports }}
         - protocol: {{ .protocol }}
           port: {{ .port }}
         {{- end }}

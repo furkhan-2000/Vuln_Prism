@@ -1,13 +1,13 @@
 apiVersion: rbac.authorization.k8s.io/v1 
 kind: RoleBinding 
 metadata: 
-  name: {{ .Values.roleBinding.name }}
-  namespace: {{ .Values.roleBinding.namespace }}
+  name: {{ .Values.cyber.roleBinding.name }}
+  namespace: {{ .Values.cyber.roleBinding.namespace }}
 subjects: 
-    - kind: {{ .Values.roleBinding.subjects.kind }}
-      name: {{ .Values.roleBinding.subjects.name }}
-      namespace: {{ .Values.roleBinding.subjects.namespace }}
+  - kind: {{ .Values.cyber.roleBinding.subjects.kind }}
+    name: {{ .Values.cyber.roleBinding.subjects.name }}
+    namespace: {{ .Values.cyber.roleBinding.subjects.namespace }}
 roleRef: 
-    kind: {{ .Values.roleBinding.roleRef.kind }}
-    name: {{ .Values.roleBinding.roleRef.name }}
-    apiGroup: {{ .Values.roleBinding.roleRef.apiGroup }}
+  kind: {{ .Values.cyber.roleBinding.roleRef.kind }}
+  name: {{ .Values.cyber.roleBinding.roleRef.name }}
+  apiGroup: {{ .Values.cyber.roleBinding.roleRef.apiGroup }}

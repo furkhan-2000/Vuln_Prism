@@ -3,7 +3,7 @@ namespace:
   name: mustang
 
 # Vuln service configuration
-frontend:
+vuln:
   priorityClass:
     name: vuln-pc
     value: 100000

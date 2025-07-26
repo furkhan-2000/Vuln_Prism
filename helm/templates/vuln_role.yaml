@@ -1,9 +1,9 @@
 apiVersion: rbac.authorization.k8s.io/v1 
 kind: Role 
 metadata: 
-   name: {{ .Values.role.name }}
-   namespace: {{ .Values.role.namespace }}
+   name: {{ .Values.vuln.role.name }}
+   namespace: {{ .Values.vuln.role.namespace }}
 rules: 
-  - apiGroups: {{ .Values.role.rules.apiGroups }}
-    resources: {{ .Values.role.rules.resources }}
-    verbs: {{ .Values.role.rules.verbs}}
+  - apiGroups: {{ .Values.vuln.role.rules.apiGroups }}
+    resources: {{ .Values.vuln.role.rules.resources }}
+    verbs: {{ .Values.vuln.role.rules.verbs }}

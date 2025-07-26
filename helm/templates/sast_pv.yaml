@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Values.persistentVolume.name }}
+  name: {{ .Values.sast.persistentVolume.name }}
 spec:
-  persistentVolumeReclaimPolicy: {{ .Values.persistentVolume.spec.persistentVolumeReclaimPolicy }}
+  persistentVolumeReclaimPolicy: {{ .Values.sast.persistentVolume.spec.persistentVolumeReclaimPolicy }}
   capacity:
-    storage: {{ .Values.persistentVolume.spec.capacity.storage }}
+    storage: {{ .Values.sast.persistentVolume.spec.capacity.storage }}
   accessModes:
-    {{ .Values.persistentVolume.spec.accessModes }}
+    {{ .Values.sast.persistentVolume.spec.accessModes }}
   hostPath:
-    path: {{ .Values.persistentVolume.spec.hostPath.path }}
+    path: {{ .Values.sast.persistentVolume.spec.hostPath.path }}
