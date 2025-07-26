@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.service.name }}
-  namespace: {{ .Values.service.namespace }}
+  name: {{ .Values.frontend.service.name }}
+  namespace: {{ .Values.frontend.service.namespace }}
 spec:
   selector:
-    tier: {{ .Values.service.selector.tier }}
+    tier: {{ .Values.frontend.service.spec.selector.tier }}
+  {{- $port := index .Values.frontend.service.spec.ports 0 }}
   ports:
-    - name: {{ .Values.service.ports.name }}
-      protocol: {{ .Values.service.ports.protocol }}
-      port: {{ .Values.service.ports.port }}
-      targetPort: {{ .Values.service.ports.targetPort }}
+    - port: {{ $port.port }}
+      targetPort: {{ $port.targetPort }}
+      protocol: {{ $port.protocol | default "TCP" }}
