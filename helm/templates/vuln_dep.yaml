@@ -27,11 +27,11 @@ spec:
       priorityClassName: {{ .Values.vuln.deployment.spec.template.spec.priorityClassName }}
       serviceAccountName: {{ .Values.vuln.deployment.spec.template.spec.serviceAccountName }}
       affinity:   
-        podAntiAffinity: 
+        podAntiAffinity:       
           requiredDuringSchedulingIgnoredDuringExecution: 
             - labelSelector: 
                 matchLabels: 
-                  tier: {{ .Values.vuln.deployment.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution.labelSelector.matchLabels.tier }}
+                  tier: {{ (index .Values.vuln.deployment.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
               topologyKey: "kubernetes.io/hostname" 
       securityContext: 
         runAsNonRoot:  {{ .Values.vuln.deployment.spec.template.spec.securityContext.runAsNonRoot }}
