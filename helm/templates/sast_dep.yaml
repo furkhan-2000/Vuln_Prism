@@ -23,7 +23,7 @@ spec:
   template:
     metadata:
       labels:
-        tier: {{ .Values.sast.deployment.spec.template.labels.tier }}
+        tier: {{ .Values.sast.deployment.spec.template.metadata.labels.tier }}
     spec:
       serviceAccountName: {{ .Values.sast.deployment.spec.template.spec.serviceAccountName }}
       affinity:
