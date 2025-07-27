@@ -4,8 +4,8 @@ metadata:
   name: {{ .Values.vuln.deployment.name }}
   namespace: {{ .Values.vuln.deployment.namespace }}
   labels: 
-    prod: {{ .Values.vuln.deployment.labels.prod }}
-    tier: {{ .Values.vuln.deployment.labels.tier  }}
+    prod: {{ .Values.vuln.deployment.labels.prod | quote }}
+    tier: {{ .Values.vuln.deployment.labels.tier  | quote }}
   annotations: 
     "prometheus.io/scrape": {{ index .Values.vuln.deployment.annotations "prometheus.io/scrape" | quote }}
     "prometheus.io/port": {{ index .Values.vuln.deployment.annotations "prometheus.io/port" | quote }}

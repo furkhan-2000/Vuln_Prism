@@ -80,7 +80,7 @@ vuln:
     namespace: mustang
     labels:
       prod: "true"
-      tier: bmw
+      tier: "bmw"
     annotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "3000"
@@ -254,7 +254,7 @@ sast:
     name: sast-dep
     namespace: mustang
     labels:
-      tier: porsche
+      tier: "porsche"
       prod: "true"
     annotations:
       prometheus.io/scrape: "true"
@@ -418,7 +418,7 @@ cyber:
     name: cyber-dep
     namespace: mustang
     labels:
-      tier: versace
+      tier: "versace"
       prod: "true"
     annotations:
       prometheus.io/scrape: "true"

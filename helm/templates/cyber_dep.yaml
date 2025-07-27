@@ -4,8 +4,8 @@ metadata:
   name: {{ .Values.cyber.deployment.name }}
   namespace: {{ .Values.cyber.deployment.namespace }}
   labels:
-    tier: {{ .Values.cyber.deployment.labels.tier }}
-    prod: {{ .Values.cyber.deployment.labels.prod }}
+    tier: {{ .Values.cyber.deployment.labels.tier | quote }}
+    prod: {{ .Values.cyber.deployment.labels.prod | quote }}
   annotations:
     "prometheus.io/scrape": {{ index .Values.cyber.deployment.annotations "prometheus.io/scrape" | quote }}
     "prometheus.io/path": {{ index .Values.cyber.deployment.annotations "prometheus.io/path" | quote }}

@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.sast.deployment.name }}
   namespace: {{ .Values.sast.deployment.namespace }}
   labels:
-    tier: {{ .Values.sast.deployment.labels.tier }}
+    tier: {{ .Values.sast.deployment.labels.tier | quote }}
     prod: {{ .Values.sast.deployment.labels.prod | quote }}
   annotations:
     "prometheus.io/scrape": {{ index .Values.sast.deployment.annotations "prometheus.io/scrape" | quote }}
