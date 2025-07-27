@@ -47,7 +47,7 @@ spec:
             allowPrivilegeEscalation: {{ .securityContext.allowPrivilegeEscalation }}
             readOnlyRootFilesystem: {{ .securityContext.readOnlyRootFilesystem }}
           ports:
-            - containerPort: {{ .ports.containerPort }}
+            - containerPort: {{ (index .ports 0).containerPort }}
           resources:
             requests:
               cpu: {{ .resources.requests.cpu }}

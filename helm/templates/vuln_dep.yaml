@@ -47,10 +47,10 @@ spec:
             allowPrivilegeEscalation: {{ .securityContext.allowPrivilegeEscalation }}
             readOnlyRootFilesystem: {{ .securityContext.readOnlyRootFilesystem }}
           ports: 
-            - containerPort: {{ .ports.containerPort }}
+            - containerPort: {{ (index .ports 0).containerPort }}
           envFrom: 
             - secretRef: 
-                name: {{ .envFrom.secretRef.name }}
+                name: {{ (index .envFrom 0).secretRef.name }}
           resources: 
             requests: 
               cpu: {{ .resources.requests.cpu }}
