@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.sast.frontend.service.name }}
-  namespace: {{ .Values.sast.frontend.service.namespace }}
+  name: {{ .Values.sast.service.name }}
+  namespace: {{ .Values.sast.service.namespace }}
 spec:
   selector:
-    tier: {{ .Values.sast.frontend.service.spec.selector.tier }}
-  {{- $port := index .Values.sast.frontend.service.spec.ports 0 }}
+    tier: {{ .Values.sast.service.spec.selector.tier }}
+  {{- $port := index .Values.sast.service.spec.ports 0 }}
   ports:
     - port: {{ $port.port }}
       targetPort: {{ $port.targetPort }}
