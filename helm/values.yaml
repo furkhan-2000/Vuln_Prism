@@ -2,6 +2,39 @@
 namespace:
   name: mustang
 
+# ingress 
+ingress:
+  name: vuln-ingress
+  namespace: mustang
+  ingressClassName: nginx
+  annotations:
+    useRegex: true
+    rewriteTarget: /
+  rules:
+    - http:
+        paths:
+          - path: "/vuln(/|$)(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: vuln-svc
+                port:
+                  number: 3000
+          - path: "/sast(/|$)(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: sast-svc
+                port:
+                  number: 5050
+          - path: "/cyber(/|$)(.*)"
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: cyber-svc
+                port:
+                  number: 5051
+                  
 # Vuln service configuration
 vuln:
   priorityClass:
@@ -504,36 +537,3 @@ cyber:
             target:
               type: Utilization
               averageUtilization: 75
-
-# ingress 
-ingress:
-  name: vuln-ingress
-  namespace: mustang
-  ingressClassName: nginx
-  annotations:
-    useRegex: true
-    rewriteTarget: /
-  rules:
-    - http:
-        paths:
-          - path: "/vuln(/|$)(.*)"
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: vuln-svc
-                port:
-                  number: 3000
-          - path: "/sast(/|$)(.*)"
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: sast-svc
-                port:
-                  number: 5050
-          - path: "/cyber(/|$)(.*)"
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: cyber-svc
-                port:
-                  number: 5051
