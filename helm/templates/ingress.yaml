@@ -3,6 +3,11 @@ kind: Ingress
 metadata:
   name: {{ .Values.ingress.name }}
   namespace: {{ .Values.ingress.namespace }}
+  annotations: 
+    "helm.sh/hook": post-install
+    "helm.sh/hook-delete-policy": before-hook-creation
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: {{ .Values.ingress.ingressClassName }}
   rules:
