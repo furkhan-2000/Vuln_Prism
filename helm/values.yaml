@@ -1,8 +1,8 @@
-# Global namespace
+# values.yaml
+
 namespace:
   name: mustang
 
-# ingress 
 ingress:
   name: vuln-ingress
   namespace: mustang
@@ -34,8 +34,7 @@ ingress:
                 name: cyber-svc
                 port:
                   number: 5051
-                  
-# Vuln service configuration
+
 vuln:
   priorityClass:
     name: vuln-pc
@@ -49,7 +48,7 @@ vuln:
     namespace: mustang
     type: Opaque
     stringData:
-      DEEPSEEK_API_KEY: "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"
+      DEEPSEEK_API_KEY: "REPLACE_ME"
 
   serviceAccount:
     name: vuln
@@ -75,8 +74,8 @@ vuln:
       name: vuln-role
       apiGroup: "rbac.authorization.k8s.io"
 
-  deployment:
-    name: vuln-dep
+  rollout:
+    name: vuln-rollout
     namespace: mustang
     labels:
       prod: "true"
@@ -86,11 +85,10 @@ vuln:
       prometheus.io/port: "3000"
     spec:
       replicas: 2
-      strategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
+      canarySteps:
+      - setWeight: 50
+      - pause: { duration: 30 }
+      - setWeight: 100
       selector:
         matchLabels:
           tier: bmw
@@ -167,22 +165,22 @@ vuln:
       - Egress
       ingress:
         - from:
-          - ipBlock:
-              cidr: 0.0.0.0/0
-            ports:
-              - protocol: TCP
-                port: 3000
+            - ipBlock:
+                cidr: 0.0.0.0/0
+          ports:
+            - protocol: TCP
+              port: 3000
       egress:
         - to:
-          - ipBlock:
-              cidr: 0.0.0.0/0
-            ports:
-              - protocol: TCP
-                port: 443
-              - protocol: TCP
-                port: 80
-              - protocol: TCP
-                port: 53
+            - ipBlock:
+                cidr: 0.0.0.0/0
+          ports:
+            - protocol: TCP
+              port: 443
+            - protocol: TCP
+              port: 80
+            - protocol: TCP
+              port: 53
 
   horizontalPodAutoscaler:
     name: vuln-hpa
@@ -190,8 +188,8 @@ vuln:
     spec:
       scaleTargetRef:
         apiVersion: apps/v1
-        kind: Deployment
-        name: vuln-dep
+        kind: Rollout
+        name: vuln-rollout
       minReplicas: 2
       maxReplicas: 10
       metrics:
@@ -202,7 +200,6 @@ vuln:
               type: Utilization
               averageUtilization: 75
 
-# SAST service configuration
 sast:
   serviceAccount:
     name: sast
@@ -250,8 +247,8 @@ sast:
         requests:
           storage: 500Mi
 
-  deployment:
-    name: sast-dep
+  rollout:
+    name: sast-rollout
     namespace: mustang
     labels:
       tier: "porsche"
@@ -262,11 +259,10 @@ sast:
       prometheus.io/port: "5050"
     spec:
       replicas: 2
-      strategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
+      canarySteps:
+      - setWeight: 50
+      - pause: { duration: 30 }
+      - setWeight: 100
       selector:
         matchLabels:
           tier: porsche
@@ -279,10 +275,10 @@ sast:
           affinity:
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
-                 - labelSelector:
-                      matchLabels:
-                        tier: porsche
-                   topologyKey: "kubernetes.io/hostname"
+                - labelSelector:
+                    matchLabels:
+                      tier: porsche
+                  topologyKey: "kubernetes.io/hostname"
           securityContext:
             runAsNonRoot: true
             runAsUser: 1001
@@ -376,8 +372,8 @@ sast:
     spec:
       scaleTargetRef:
         apiVersion: apps/v1
-        kind: Deployment
-        name: sast-dep
+        kind: Rollout
+        name: sast-rollout
       minReplicas: 2
       maxReplicas: 10
       metrics:
@@ -388,7 +384,6 @@ sast:
               type: Utilization
               averageUtilization: 75
 
-# CYBER service configuration
 cyber:
   serviceAccount:
     name: cyber
@@ -414,8 +409,8 @@ cyber:
       name: cyber-role
       apiGroup: rbac.authorization.k8s.io
 
-  deployment:
-    name: cyber-dep
+  rollout:
+    name: cyber-rollout
     namespace: mustang
     labels:
       tier: "versace"
@@ -425,11 +420,10 @@ cyber:
       prometheus.io/port: "5051"
     spec:
       replicas: 2
-      strategy:
-        type: RollingUpdate
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
+      canarySteps:
+      - setWeight: 50
+      - pause: { duration: 30 }
+      - setWeight: 100
       selector:
         matchLabels:
           tier: versace
@@ -442,10 +436,10 @@ cyber:
           affinity:
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchLabels:
-                        tier: versace
-                    topologyKey: "kubernetes.io/hostname"
+                - labelSelector:
+                    matchLabels:
+                      tier: versace
+                  topologyKey: "kubernetes.io/hostname"
           securityContext:
             runAsNonRoot: true
             runAsUser: 1000
@@ -457,6 +451,7 @@ cyber:
               imagePullPolicy: IfNotPresent
               securityContext:
                 allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
               ports:
                 - containerPort: 5051
               resources:
@@ -473,12 +468,14 @@ cyber:
                 initialDelaySeconds: 15
                 periodSeconds: 10
                 timeoutSeconds: 5
+                failureThreshold: 3
               livenessProbe:
                 tcpSocket:
                   port: 5051
                 initialDelaySeconds: 15
                 periodSeconds: 10
                 timeoutSeconds: 5
+                failureThreshold: 3
 
   service:
     name: cyber-svc
@@ -488,8 +485,8 @@ cyber:
         tier: versace
       ports:
         - port: 5051
-          protocol: TCP
           targetPort: 5051
+          protocol: TCP
 
   networkPolicy:
     name: cyber-np
@@ -526,8 +523,8 @@ cyber:
     spec:
       scaleTargetRef:
         apiVersion: apps/v1
-        kind: Deployment
-        name: cyber-dep
+        kind: Rollout
+        name: cyber-rollout
       minReplicas: 2
       maxReplicas: 10
       metrics:

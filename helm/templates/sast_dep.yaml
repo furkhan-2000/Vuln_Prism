@@ -14,8 +14,8 @@ spec:
   replicas: {{ .Values.sast.rollout.spec.replicas }}
   strategy:
     canary:
-      steps:
-{{ toYaml .Values.rollout.canarySteps | indent 8 }}
+      steps:               
+{{ toYaml .Values.sast.rollout.spec.canarySteps | indent 8 }}
   selector:
     matchLabels:
       tier: {{ .Values.sast.rollout.spec.selector.matchLabels.tier }}

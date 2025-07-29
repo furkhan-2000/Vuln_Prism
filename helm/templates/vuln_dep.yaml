@@ -14,7 +14,7 @@ spec:
   strategy: 
     canary:
       steps:
-{{ toYaml .Values.rollout.canarySteps | indent 8 }}
+{{ toYaml .Values.vuln.rollout.spec.canarySteps | indent 8 }}
   selector: 
     matchLabels: 
       tier: {{ .Values.vuln.rollout.spec.selector.matchLabels.tier }}
