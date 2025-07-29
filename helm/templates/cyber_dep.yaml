@@ -10,6 +10,7 @@ metadata:
     "prometheus.io/scrape": {{ index .Values.cyber.rollout.annotations "prometheus.io/scrape" | quote }}
     "prometheus.io/path": {{ index .Values.cyber.rollout.annotations "prometheus.io/path" | quote }}
     "prometheus.io/port": {{ index .Values.cyber.rollout.annotations "prometheus.io/port" | quote }}
+
 spec:
   replicas: {{ .Values.cyber.rollout.spec.replicas }}
   strategy:
@@ -19,6 +20,7 @@ spec:
   selector:
     matchLabels:
       tier: {{ .Values.cyber.rollout.spec.selector.matchLabels.tier }}
+
   template:
     metadata:
       labels:
@@ -32,11 +34,13 @@ spec:
                 matchLabels:
                   tier: {{ (index .Values.cyber.rollout.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
               topologyKey: "kubernetes.io/hostname"
+
       securityContext:
         runAsNonRoot: {{ .Values.cyber.rollout.spec.template.spec.securityContext.runAsNonRoot }}
         runAsUser: {{ .Values.cyber.rollout.spec.template.spec.securityContext.runAsUser }}
         runAsGroup: {{ .Values.cyber.rollout.spec.template.spec.securityContext.runAsGroup }}
         fsGroup: {{ .Values.cyber.rollout.spec.template.spec.securityContext.fsGroup }}
+
       containers:
 {{- range .Values.cyber.rollout.spec.template.spec.containers }}
         - name: {{ .name }}
@@ -47,8 +51,8 @@ spec:
             readOnlyRootFilesystem: {{ .securityContext.readOnlyRootFilesystem }}
           ports:
             - containerPort: {{ (index .ports 0).containerPort }}
-          volumeMounts: 
-{{- range .volumeMounts }} 
+          volumeMounts:
+{{- range .volumeMounts }}
             - name: {{ .name }}
               mountPath: {{ .mountPath }}
 {{- end }}
@@ -74,8 +78,10 @@ spec:
             periodSeconds: {{ .livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .livenessProbe.timeoutSeconds }}
             failureThreshold: {{ .livenessProbe.failureThreshold }}
+{{- end }}
+
       volumes:
 {{- range .Values.cyber.rollout.spec.template.spec.volumes }}
-  - name: {{ .name }}
-    emptyDir: {}
+        - name: {{ .name }}
+          emptyDir: {}
 {{- end }}
