@@ -1,45 +1,44 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
-  name: {{ .Values.cyber.deployment.name }}
-  namespace: {{ .Values.cyber.deployment.namespace }}
+  name: {{ .Values.cyber.rollout.name }}
+  namespace: {{ .Values.cyber.rollout.namespace }}
   labels:
-    tier: {{ .Values.cyber.deployment.labels.tier | quote }}
-    prod: {{ .Values.cyber.deployment.labels.prod | quote }}
+    tier: {{ .Values.cyber.rollout.labels.tier | quote }}
+    prod: {{ .Values.cyber.rollout.labels.prod | quote }}
   annotations:
-    "prometheus.io/scrape": {{ index .Values.cyber.deployment.annotations "prometheus.io/scrape" | quote }}
-    "prometheus.io/path": {{ index .Values.cyber.deployment.annotations "prometheus.io/path" | quote }}
-    "prometheus.io/port": {{ index .Values.cyber.deployment.annotations "prometheus.io/port" | quote }}
+    "prometheus.io/scrape": {{ index .Values.cyber.rollout.annotations "prometheus.io/scrape" | quote }}
+    "prometheus.io/path": {{ index .Values.cyber.rollout.annotations "prometheus.io/path" | quote }}
+    "prometheus.io/port": {{ index .Values.cyber.rollout.annotations "prometheus.io/port" | quote }}
 spec:
-  replicas: {{ .Values.cyber.deployment.spec.replicas }}
+  replicas: {{ .Values.cyber.rollout.spec.replicas }}
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: {{ .Values.cyber.deployment.spec.strategy.rollingUpdate.maxSurge }}
-      maxUnavailable: {{ .Values.cyber.deployment.spec.strategy.rollingUpdate.maxUnavailable }}
+    canary:
+      steps:
+{{ toYaml .Values.cyber.rollout.canarySteps | indent 8 }}
   selector:
     matchLabels:
-      tier: {{ .Values.cyber.deployment.spec.selector.matchLabels.tier }}
+      tier: {{ .Values.cyber.rollout.spec.selector.matchLabels.tier }}
   template:
     metadata:
       labels:
-        tier: {{ .Values.cyber.deployment.spec.template.metadata.labels.tier }}
+        tier: {{ .Values.cyber.rollout.spec.template.metadata.labels.tier }}
     spec:
-      serviceAccountName: {{ .Values.cyber.deployment.spec.template.spec.serviceAccountName }}
+      serviceAccountName: {{ .Values.cyber.rollout.spec.template.spec.serviceAccountName }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  tier: {{ (index .Values.cyber.deployment.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
+                  tier: {{ (index .Values.cyber.rollout.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
               topologyKey: "kubernetes.io/hostname"
       securityContext:
-        runAsNonRoot: {{ .Values.cyber.deployment.spec.template.spec.securityContext.runAsNonRoot }}
-        runAsUser: {{ .Values.cyber.deployment.spec.template.spec.securityContext.runAsUser }}
-        runAsGroup: {{ .Values.cyber.deployment.spec.template.spec.securityContext.runAsGroup }}
-        fsGroup: {{ .Values.cyber.deployment.spec.template.spec.securityContext.fsGroup }}
+        runAsNonRoot: {{ .Values.cyber.rollout.spec.template.spec.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.cyber.rollout.spec.template.spec.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.cyber.rollout.spec.template.spec.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.cyber.rollout.spec.template.spec.securityContext.fsGroup }}
       containers:
-{{- range .Values.cyber.deployment.spec.template.spec.containers }}
+{{- range .Values.cyber.rollout.spec.template.spec.containers }}
         - name: {{ .name }}
           image: {{ .image }}
           imagePullPolicy: {{ .imagePullPolicy }}

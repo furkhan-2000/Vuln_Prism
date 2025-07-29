@@ -50,8 +50,8 @@ roleRef:
   name: cyber-role
   apiGroup: rbac.authorization.k8s.io
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: cyber-dep
   namespace: mustang
@@ -65,10 +65,11 @@ metadata:
 spec:
   replicas: 2
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: {duration: 120}
+        - setWeight: 100
   selector:
     matchLabels:
       tier: versace
@@ -98,12 +99,11 @@ spec:
             allowPrivilegeEscalation: false
           ports:
             - containerPort: 5051
-          # Future RDS Integration - Uncomment when needed
-          # envFrom:
-          #   - configMapRef:
-          #       name: cyber-config-rds
-          #   - secretRef:
-          #       name: cyber-secrets-rds
+      #    envFrom:
+      #     - configMapRef:
+      #          name: cyber-config-rds
+      #     - secretRef:
+      #          name: cyber-secrets-rds
           resources:
             requests:
               cpu: "250m"
@@ -176,8 +176,8 @@ metadata:
   namespace: mustang
 spec:
   scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
     name: cyber-dep
   minReplicas: 2
   maxReplicas: 10

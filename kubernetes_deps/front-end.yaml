@@ -46,8 +46,8 @@ roleRef:
   name: vuln-role
   apiGroup: rbac.authorization.k8s.io
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: vuln-dep
   namespace: mustang
@@ -60,10 +60,11 @@ metadata:
 spec:
   replicas: 2
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: {duration: 120}
+        - setWeight: 100
   selector:
     matchLabels:
       tier: bmw
@@ -168,8 +169,8 @@ metadata:
   namespace: mustang
 spec:
   scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
     name: vuln-dep
   minReplicas: 2
   maxReplicas: 10
@@ -179,4 +180,4 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 75 
+          averageUtilization: 75

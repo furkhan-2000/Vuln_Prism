@@ -1,45 +1,44 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
-  name: {{ .Values.sast.deployment.name }}
-  namespace: {{ .Values.sast.deployment.namespace }}
+  name: {{ .Values.sast.rollout.name }}
+  namespace: {{ .Values.sast.rollout.namespace }}
   labels:
-    tier: {{ .Values.sast.deployment.labels.tier | quote }}
-    prod: {{ .Values.sast.deployment.labels.prod | quote }}
+    tier: {{ .Values.sast.rollout.labels.tier | quote }}
+    prod: {{ .Values.sast.rollout.labels.prod | quote }}
   annotations:
-    "prometheus.io/scrape": {{ index .Values.sast.deployment.annotations "prometheus.io/scrape" | quote }}
-    "prometheus.io/path": {{ index .Values.sast.deployment.annotations "prometheus.io/path" | quote }}
-    "prometheus.io/port": {{ index .Values.sast.deployment.annotations "prometheus.io/port" | quote }}
+    "prometheus.io/scrape": {{ index .Values.sast.rollout.annotations "prometheus.io/scrape" | quote }}
+    "prometheus.io/path": {{ index .Values.sast.rollout.annotations "prometheus.io/path" | quote }}
+    "prometheus.io/port": {{ index .Values.sast.rollout.annotations "prometheus.io/port" | quote }}
 spec:
-  replicas: {{ .Values.sast.deployment.spec.replicas }}
+  replicas: {{ .Values.sast.rollout.spec.replicas }}
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: {{ .Values.sast.deployment.spec.strategy.rollingUpdate.maxSurge }}
-      maxUnavailable: {{ .Values.sast.deployment.spec.strategy.rollingUpdate.maxUnavailable }}
+    canary:
+      steps:
+{{ toYaml .Values.rollout.canarySteps | indent 8 }}
   selector:
     matchLabels:
-      tier: {{ .Values.sast.deployment.spec.selector.matchLabels.tier }}
+      tier: {{ .Values.sast.rollout.spec.selector.matchLabels.tier }}
   template:
     metadata:
       labels:
-        tier: {{ .Values.sast.deployment.spec.template.metadata.labels.tier }}
+        tier: {{ .Values.sast.rollout.spec.template.metadata.labels.tier }}
     spec:
-      serviceAccountName: {{ .Values.sast.deployment.spec.template.spec.serviceAccountName }}
+      serviceAccountName: {{ .Values.sast.rollout.spec.template.spec.serviceAccountName }}
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             - labelSelector:
                 matchLabels:
-                  tier: {{ (index .Values.sast.deployment.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
+                  tier: {{ (index .Values.sast.rollout.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
               topologyKey: "kubernetes.io/hostname"
       securityContext:
-        runAsNonRoot: {{ .Values.sast.deployment.spec.template.spec.securityContext.runAsNonRoot }}
-        runAsUser: {{ .Values.sast.deployment.spec.template.spec.securityContext.runAsUser }}
-        runAsGroup: {{ .Values.sast.deployment.spec.template.spec.securityContext.runAsGroup }}
-        fsGroup: {{ .Values.sast.deployment.spec.template.spec.securityContext.fsGroup }}
+        runAsNonRoot: {{ .Values.sast.rollout.spec.template.spec.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.sast.rollout.spec.template.spec.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.sast.rollout.spec.template.spec.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.sast.rollout.spec.template.spec.securityContext.fsGroup }}
       containers:
-{{- range .Values.sast.deployment.spec.template.spec.containers }}
+{{- range .Values.sast.rollout.spec.template.spec.containers }}
         - name: {{ .name }}
           image: {{ .image }}
           imagePullPolicy: {{ .imagePullPolicy }}
@@ -77,7 +76,7 @@ spec:
             failureThreshold: {{ .livenessProbe.failureThreshold }}
 {{- end }}
       volumes:
-{{- range .Values.sast.deployment.spec.template.spec.volumes }}
+{{- range .Values.sast.rollout.spec.template.spec.volumes }}
         - name: {{ .name }}
           emptyDir: {}
 {{- end }}

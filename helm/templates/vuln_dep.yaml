@@ -1,45 +1,44 @@
-apiVersion: apps/v1 
-kind: Deployment 
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout 
 metadata: 
-  name: {{ .Values.vuln.deployment.name }}
-  namespace: {{ .Values.vuln.deployment.namespace }}
+  name: {{ .Values.vuln.rollout.name }}
+  namespace: {{ .Values.vuln.rollout.namespace }}
   labels: 
-    prod: {{ .Values.vuln.deployment.labels.prod | quote }}
-    tier: {{ .Values.vuln.deployment.labels.tier  | quote }}
+    prod: {{ .Values.vuln.rollout.labels.prod | quote }}
+    tier: {{ .Values.vuln.rollout.labels.tier  | quote }}
   annotations: 
-    "prometheus.io/scrape": {{ index .Values.vuln.deployment.annotations "prometheus.io/scrape" | quote }}
-    "prometheus.io/port": {{ index .Values.vuln.deployment.annotations "prometheus.io/port" | quote }}
+    "prometheus.io/scrape": {{ index .Values.vuln.rollout.annotations "prometheus.io/scrape" | quote }}
+    "prometheus.io/port": {{ index .Values.vuln.rollout.annotations "prometheus.io/port" | quote }}
 spec: 
-  replicas: {{ .Values.vuln.deployment.spec.replicas }}
+  replicas: {{ .Values.vuln.rollout.spec.replicas }}
   strategy: 
-    type: RollingUpdate 
-    rollingUpdate: 
-      maxSurge: {{ .Values.vuln.deployment.spec.strategy.rollingUpdate.maxSurge }}
-      maxUnavailable: {{ .Values.vuln.deployment.spec.strategy.rollingUpdate.maxUnavailable }}
+    canary:
+      steps:
+{{ toYaml .Values.rollout.canarySteps | indent 8 }}
   selector: 
     matchLabels: 
-      tier: {{ .Values.vuln.deployment.spec.selector.matchLabels.tier }}
+      tier: {{ .Values.vuln.rollout.spec.selector.matchLabels.tier }}
   template: 
     metadata: 
       labels: 
-        tier: {{ .Values.vuln.deployment.spec.template.metadata.labels.tier }}
+        tier: {{ .Values.vuln.rollout.spec.template.metadata.labels.tier }}
     spec: 
-      priorityClassName: {{ .Values.vuln.deployment.spec.template.spec.priorityClassName }}
-      serviceAccountName: {{ .Values.vuln.deployment.spec.template.spec.serviceAccountName }}
+      priorityClassName: {{ .Values.vuln.rollout.spec.template.spec.priorityClassName }}
+      serviceAccountName: {{ .Values.vuln.rollout.spec.template.spec.serviceAccountName }}
       affinity:   
         podAntiAffinity:       
           requiredDuringSchedulingIgnoredDuringExecution: 
             - labelSelector: 
                 matchLabels: 
-                  tier: {{ (index .Values.vuln.deployment.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
+                  tier: {{ (index .Values.vuln.rollout.spec.template.spec.affinity.podAntiAffinity.requiredDuringSchedulingIgnoredDuringExecution 0).labelSelector.matchLabels.tier }}
               topologyKey: "kubernetes.io/hostname" 
       securityContext: 
-        runAsNonRoot:  {{ .Values.vuln.deployment.spec.template.spec.securityContext.runAsNonRoot }}
-        runAsUser: {{ .Values.vuln.deployment.spec.template.spec.securityContext.runAsUser }}
-        runAsGroup: {{ .Values.vuln.deployment.spec.template.spec.securityContext.runAsGroup }}
-        fsGroup: {{ .Values.vuln.deployment.spec.template.spec.securityContext.fsGroup }}
+        runAsNonRoot:  {{ .Values.vuln.rollout.spec.template.spec.securityContext.runAsNonRoot }}
+        runAsUser: {{ .Values.vuln.rollout.spec.template.spec.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.vuln.rollout.spec.template.spec.securityContext.runAsGroup }}
+        fsGroup: {{ .Values.vuln.rollout.spec.template.spec.securityContext.fsGroup }}
       containers:
-{{- range .Values.vuln.deployment.spec.template.spec.containers }}
+{{- range .Values.vuln.rollout.spec.template.spec.containers }}
         - name: {{ .name }}
           image: {{ .image }}
           imagePullPolicy: {{ .imagePullPolicy }}
