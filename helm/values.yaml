@@ -454,6 +454,11 @@ cyber:
                 readOnlyRootFilesystem: true
               ports:
                 - containerPort: 5051
+              volumeMounts: 
+                - name: logs 
+                  mountPath: /app/logs 
+                - name: playwright-cache 
+                  mountPath: /home/malware/.cache
               resources:
                 requests:
                   cpu: "250m"
@@ -476,7 +481,12 @@ cyber:
                 periodSeconds: 10
                 timeoutSeconds: 5
                 failureThreshold: 3
-
+          volumes:  
+            - name: logs 
+              emptyDir: {}
+            - name: playwright-cache 
+              emptyDir: {}
+ 
   service:
     name: cyber-svc
     namespace: mustang

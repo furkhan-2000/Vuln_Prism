@@ -97,8 +97,14 @@ spec:
           imagePullPolicy: IfNotPresent
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
           ports:
             - containerPort: 5051
+          volumeMounts: 
+            - name: logs 
+              mountPath: /app/logs 
+            - name: playwright-cache 
+              mountPath: /home/malware/.cache
       #    envFrom:
       #     - configMapRef:
       #          name: cyber-config-rds
@@ -124,6 +130,11 @@ spec:
             initialDelaySeconds: 15
             periodSeconds: 10
             timeoutSeconds: 5
+      volumes: 
+        - name: logs 
+          emptyDir: {}
+        - name: playwright-cache 
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service

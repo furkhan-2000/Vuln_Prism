@@ -47,6 +47,11 @@ spec:
             readOnlyRootFilesystem: {{ .securityContext.readOnlyRootFilesystem }}
           ports:
             - containerPort: {{ (index .ports 0).containerPort }}
+          volumeMounts: 
+{{- range .volumeMounts }} 
+            - name: {{ .name }}
+              mountPath: {{ .mountPath }}
+{{- end }}
           resources:
             requests:
               cpu: {{ .resources.requests.cpu }}
@@ -69,4 +74,8 @@ spec:
             periodSeconds: {{ .livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .livenessProbe.timeoutSeconds }}
             failureThreshold: {{ .livenessProbe.failureThreshold }}
+      volumes:
+{{- range .Values.cyber.rollout.spec.template.spec.volumes }}
+  - name: {{ .name }}
+    emptyDir: {}
 {{- end }}
