@@ -82,7 +82,8 @@ vuln:
       tier: "bmw"
     annotations:
       prometheus.io/scrape: "true"
-      prometheus.io/port: "3000"
+      prometheus.io/port: "3000" 
+      prometheus.io/path: "/metrics"
     spec:
       replicas: 2
       canarySteps:
@@ -255,7 +256,7 @@ sast:
       prod: "true"
     annotations:
       prometheus.io/scrape: "true"
-      prometheus.io/path: /metrics
+      prometheus.io/path: "/metrics"
       prometheus.io/port: "5050"
     spec:
       replicas: 2
@@ -418,6 +419,7 @@ cyber:
     annotations:
       prometheus.io/scrape: "true"
       prometheus.io/port: "5051"
+      prometheus.io/path: "/metrics"
     spec:
       replicas: 2
       canarySteps:
