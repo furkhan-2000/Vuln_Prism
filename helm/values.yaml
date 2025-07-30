@@ -188,7 +188,7 @@ vuln:
     namespace: mustang
     spec:
       scaleTargetRef:
-        apiVersion: apps/v1
+        apiVersion: argoproj.io/v1alpha1
         kind: Rollout
         name: vuln-rollout
       minReplicas: 2
@@ -372,7 +372,7 @@ sast:
     namespace: mustang
     spec:
       scaleTargetRef:
-        apiVersion: apps/v1
+        apiVersion: argoproj.io/v1alpha1
         kind: Rollout
         name: sast-rollout
       minReplicas: 2
@@ -534,7 +534,7 @@ cyber:
     namespace: mustang
     spec:
       scaleTargetRef:
-        apiVersion: apps/v1
+        apiVersion: argoproj.io/v1alpha1
         kind: Rollout
         name: cyber-rollout
       minReplicas: 2
