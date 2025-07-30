@@ -7,6 +7,7 @@ pipeline {
         GIT_REPO    = 'https://github.com/furkhan-2000/Vuln_Prism.git'
         DOCKER_IMAGE = 'furkhan2000/shark'
         DOCKER_TAG   = "${IMAGE_TAG}"
+        HELM_DIR     = 'Vuln_Prism/helm'
     }
     stages {
         stage ('Cleaning') {
@@ -24,7 +25,7 @@ pipeline {
                 }
             }
         }
-        stage ('Authenticating & Pushing') {
+        stage ('Update Helm values.yaml and Push') {
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'githubCred',
@@ -33,47 +34,58 @@ pipeline {
                 )]) {
                     sh '''
                         set -e
-                        git clone ${GIT_REPO} kubernetes_deps
-                        cd kubernetes_deps
-                        sed -i "s|image: ${DOCKER_IMAGE}:.*|image: ${DOCKER_IMAGE}:vuln-${DOCKER_TAG}|g" kubernetes_deps/front-end.yaml
-                        sed -i "s|image: ${DOCKER_IMAGE}:.*|image: ${DOCKER_IMAGE}:sast-${DOCKER_TAG}|g" kubernetes_deps/sast.yaml
-                        sed -i "s|image: ${DOCKER_IMAGE}:.*|image: ${DOCKER_IMAGE}:cyber-${DOCKER_TAG}|g" kubernetes_deps/cyber.yaml
+                        git clone ${GIT_REPO}
+                        cd ${HELM_DIR}
+                        # Update image tags in values.yaml using yq
+                        yq e '.vuln.rollout.spec.template.spec.containers[0].image = "${DOCKER_IMAGE}:front-end-${DOCKER_TAG}"' -i values.yaml
+                        yq e '.sast.rollout.spec.template.spec.containers[0].image = "${DOCKER_IMAGE}:sast-${DOCKER_TAG}"' -i values.yaml
+                        yq e '.cyber.rollout.spec.template.spec.containers[0].image = "${DOCKER_IMAGE}:cyber-${DOCKER_TAG}"' -i values.yaml
                         git config user.name "jenkins"
                         git config user.email "jenkins8080@icloud.com"
-                        git add kubernetes_deps/front-end.yaml kubernetes_deps/sast.yaml kubernetes_deps/cyber.yaml
-                        git commit -m "Updating all latest images and tags [ci skip]"
-                        git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/furkhan-2000/Vuln_Prism
+                        git add values.yaml
+                        git commit -m "Update image tags to ${DOCKER_TAG} [ci skip]"
+                        git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/furkhan-2000/Vuln_Prism.git
                     '''
+                }
+            }
+        }
+        stage ('Wait for ArgoCD Sync') {
+            steps {
+                script {
+                    echo "Waiting 60 seconds for ArgoCD to sync..."
+                    sleep(time: 60, unit: 'SECONDS')
                 }
             }
         }
         stage ('Check Rollout Status') {
             steps {
-                script {
-                    def deployments = [
-                        [name: 'vuln', dep: 'vuln-dep'],
-                        [name: 'cyber', dep: 'cyber-dep'],
-                        [name: 'sast', dep: 'sast-dep']
-                    ]
-                    for (d in deployments) {
-                        def status = sh(
-                            script: "kubectl rollout status deployment/${d.dep} --namespace=mustang --timeout=90s",
-                            returnStatus: true
-                        )
-                        if (status != 0) {
-                            echo "${d.name} deployment rollout failed. Attempting rollback..."
-                            sh "kubectl rollout undo deployment/${d.dep} --namespace=mustang"
-                            def rollbackStatus = sh(
-                                script: "kubectl rollout status deployment/${d.dep} --namespace=mustang --timeout=90s",
+                withCredentials([usernamePassword(
+                    credentialsId: 'githubCred',
+                    usernameVariable: 'GITHUB_USERNAME',
+                    passwordVariable: 'GITHUB_PASSWORD'
+                )]) {
+                    script {
+                        def rollouts = [
+                            [name: 'vuln', rollout: 'vuln-rollout'],
+                            [name: 'cyber', rollout: 'cyber-rollout'],
+                            [name: 'sast', rollout: 'sast-rollout']
+                        ]
+                        for (r in rollouts) {
+                            def status = sh(
+                                script: "kubectl argo rollouts get rollout ${r.rollout} --namespace=mustang --watch --timeout=90s",
                                 returnStatus: true
                             )
-                            if (rollbackStatus != 0) {
-                                error "${d.name} main deployment rollback failed; manual intervention required."
+                            if (status != 0) {
+                                echo "${r.name} rollout failed. Rolling back via Git revert..."
+                                sh '''
+                                    cd Vuln_Prism/helm
+                                    git revert HEAD
+                                    git push https://${GITHUB_USERNAME}:${GITHUB_PASSWORD}@github.com/furkhan-2000/Vuln_Prism.git
+                                '''
+                                error "${r.name} rollout failed and rollback triggered. Manual intervention may be required."
                             } else {
-                                echo "${d.name} deployment failed, but rollback succeeded."
+                                echo "${r.name} rollout is healthy."
                             }
-                        } else {
-                            echo "${d.name} deployment is healthy."
                         }
                     }
                 }
@@ -85,8 +97,8 @@ pipeline {
             echo "Build success"
             mail(
                 to: 'furkhan2000@icloud.com',
-                subject: "Pipeline success: vulnPrism-CI #${env.BUILD_NUMBER}",
-                body: "The vulnPrism-CI pipeline has succeeded. ${env.BUILD_URL}"
+                subject: "Pipeline success: vulnPrism-CD #${env.BUILD_NUMBER}",
+                body: "The vulnPrism-CD pipeline has succeeded. ${env.BUILD_URL}"
             )
         }
         failure {
