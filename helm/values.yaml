@@ -229,6 +229,7 @@ sast:
   persistentVolume:
     name: sast-pv
     spec:
+      storageClassName: "standard"
       persistentVolumeReclaimPolicy: Retain
       capacity:
         storage: 700Mi

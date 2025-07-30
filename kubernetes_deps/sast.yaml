@@ -54,6 +54,7 @@ kind: PersistentVolume
 metadata:
   name: sast-pv
 spec:
+  storageClassName: "standard"
   capacity:
     storage: 700Mi
   accessModes:
@@ -69,7 +70,7 @@ metadata:
   namespace: mustang
 spec:
   volumeName: sast-pv
-  storageClassName: ""
+  storageClassName: "standard"
   accessModes:
     - ReadWriteMany
   resources:
