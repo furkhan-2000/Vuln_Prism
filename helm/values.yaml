@@ -241,7 +241,7 @@ sast:
     name: sast-pvc
     namespace: mustang
     spec:
-      storageClassName: ""
+      storageClassName: "standard"
       accessModes:
         - ReadWriteMany
       resources:
