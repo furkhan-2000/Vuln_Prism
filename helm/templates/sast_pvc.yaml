@@ -7,7 +7,7 @@ spec:
   storageClassName: {{ .Values.sast.persistentVolumeClaim.spec.storageClassName }}
   volumeName: {{ .Values.sast.persistentVolumeClaim.spec.volumeName }}
   accessModes:
-    - {{ .Values.sast.persistentVolumeClaim.spec.accessModes 0 }}
+    {{ .Values.sast.persistentVolumeClaim.spec.accessModes }}
   resources:
     requests:
       storage: {{ .Values.sast.persistentVolumeClaim.spec.resources.requests.storage }}
