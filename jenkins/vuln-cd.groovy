@@ -71,8 +71,9 @@ pipeline {
                             [name: 'sast', rollout: 'sast-rollout']
                         ]
                         for (r in rollouts) {
+                            // Use shell timeout to limit the wait time
                             def status = sh(
-                                script: "kubectl argo rollouts get rollout vuln-rollout --namespace=mustang --watch --timeout-seconds 90",
+                                script: "timeout 90s kubectl argo rollouts get rollout ${r.rollout} --namespace=mustang --watch",
                                 returnStatus: true
                             )
                             if (status != 0) {
