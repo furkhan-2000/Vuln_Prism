@@ -72,7 +72,7 @@ pipeline {
                         ]
                         for (r in rollouts) {
                             def status = sh(
-                                script: "kubectl argo rollouts get rollout ${r.rollout} --namespace=mustang --watch --timeout=90s",
+                                script: "kubectl argo rollouts get rollout vuln-rollout --namespace=mustang --watch --timeout-seconds 90",
                                 returnStatus: true
                             )
                             if (status != 0) {
