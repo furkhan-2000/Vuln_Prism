@@ -3,6 +3,7 @@ kind: PersistentVolume
 metadata:
   name: {{ .Values.sast.persistentVolume.name }}
 spec:
+  storageClassName: {{ .Values.sast.persistentVolume.spec.storageClassName }}
   persistentVolumeReclaimPolicy: {{ .Values.sast.persistentVolume.spec.persistentVolumeReclaimPolicy }}
   capacity:
     storage: {{ .Values.sast.persistentVolume.spec.capacity.storage }}
