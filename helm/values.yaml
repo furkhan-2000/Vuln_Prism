@@ -299,7 +299,9 @@ sast:
                 - name: temp-storage
                   mountPath: /home/jenkins
                 - name: tmp-storage
-                  mountPath: /tmp
+                  mountPath: /tmp 
+                - name: storeroom
+                  mountPath: /pvc-store 
               resources:
                 requests:
                   cpu: "250m"
@@ -326,7 +328,10 @@ sast:
             - name: temp-storage
               emptyDir: {}
             - name: tmp-storage
-              emptyDir: {}
+              emptyDir: {} 
+            - name: storeroom
+              persistentVolumeClaim:
+                claimName: sast-pvc
 
   service:
     name: sast-svc

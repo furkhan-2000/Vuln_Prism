@@ -131,7 +131,9 @@ spec:
             - name: temp-storage
               mountPath: /home/jenkins
             - name: tmp-storage
-              mountPath: /tmp
+              mountPath: /tmp 
+            - name: storeroom
+              mountPath: /pvc-store
           # Future RDS Integration - Uncomment when needed
           # envFrom:
           #   - configMapRef:
@@ -165,6 +167,9 @@ spec:
           emptyDir: {}
         - name: tmp-storage
           emptyDir: {}
+        - name: storeroom
+          persistentVolumeClaim:
+            claimName: sast-pvc
 ---
 apiVersion: v1
 kind: Service
