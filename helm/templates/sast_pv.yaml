@@ -8,6 +8,6 @@ spec:
   capacity:
     storage: {{ .Values.sast.persistentVolume.spec.capacity.storage }}
   accessModes:
-    {{ .Values.sast.persistentVolume.spec.accessModes }}
+    - {{ .Values.sast.persistentVolume.spec.accessModes 0 }}
   hostPath:
     path: {{ .Values.sast.persistentVolume.spec.hostPath.path }}

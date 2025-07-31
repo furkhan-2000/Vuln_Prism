@@ -14,7 +14,7 @@ spec:
   replicas: {{ .Values.sast.rollout.spec.replicas }}
   strategy:
     canary:
-      steps:               
+      steps:
 {{ toYaml .Values.sast.rollout.spec.canarySteps | indent 8 }}
   selector:
     matchLabels:
@@ -81,8 +81,8 @@ spec:
 {{- if .emptyDir }}
           emptyDir: {}
 {{- end }}
-{{- if .persistentVolumeClaim }} 
-    persistentVolumeClaim:
-      claimName: {{ .persistentVolumeClaim.claimName }}
+{{- if .persistentVolumeClaim }}
+          persistentVolumeClaim:
+            claimName: {{ .persistentVolumeClaim.claimName }}
 {{- end }}
 {{- end }}
