@@ -88,7 +88,39 @@ pipeline {
                                 echo "${r.name} rollout is healthy."
                             }
                         }
+
                     }
+                }
+            }
+        }
+        stage ('packging into helm') {
+            steps {
+                script {
+                    try {
+                        sh '''
+                        cd ${HELM_DIR} 
+                        echo "Linting Helm Chart"
+                        helm lint --strict .
+                        '''
+                    } catch (error) { 
+                        error "🪳 Helm lint failed! please fix the chart issue before packging"
+                    }
+                    sh '''
+                        cd ${HELM_DIR}
+                        echo "packging helm chart" 
+                        helm package . 
+                        echo "Helm chart packaged successfully"
+                    '''
+                }
+            }
+        }
+        stage ('Releasing') {
+            steps {
+                withCredentials([string(credentialsId: '', variable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                        export GH_TOKEN=$GITHUB_TOKEN 
+                        gh release create ...
+                    '''
                 }
             }
         }
